@@ -1,6 +1,5 @@
 package com.myshop.internetshop.classes.controllers;
 import com.myshop.internetshop.classes.services.ProductDataService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.myshop.internetshop.classes.dto.ProductDataDto;
 

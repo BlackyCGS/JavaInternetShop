@@ -7,8 +7,8 @@ import java.util.List;
 
 @Service
 public class ProductDataServiceImpl implements ProductDataService {
-    public int[] prices = {500,200,100,390};
-    public String[] names = {"RTX 4090", "RTX 4080", "RTX 4070", "RTX 4060"};
+    private final int[] prices = {500,200,100,390};
+    private final String[] names = {"RTX 4090", "RTX 4080", "RTX 4070", "RTX 4060"};
     public ProductDataDto getProductData(int id) {
         if (id > prices.length - 1) {
             return new ProductDataDto(-1, "There is no product with id " + id);
