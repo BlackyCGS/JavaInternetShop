@@ -1,8 +1,11 @@
-package com.myshop.internetshop.classes.services;
+package com.myshop.internetshop.classes.services.implementations;
 
 import com.myshop.internetshop.classes.dto.ProductDataDto;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.myshop.internetshop.classes.exceptions.NotFoundException;
+import com.myshop.internetshop.classes.services.ProductDataService;
 import org.springframework.stereotype.Service;
 
 
@@ -13,7 +16,7 @@ public class ProductDataServiceImpl implements ProductDataService {
 
     public ProductDataDto getProductData(int id) {
         if (id > prices.length - 1) {
-            return new ProductDataDto(-1, "There is no product with id " + id);
+            throw new NotFoundException();
         }
         return new ProductDataDto(prices[id], names[id]);
     }
