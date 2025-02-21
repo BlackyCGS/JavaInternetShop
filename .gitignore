@@ -75,3 +75,4 @@ src/main/webapp/rsrc/dist/
 src/main/resources/application-local.properties
 webpack-assets.json
 src/main/resources/application.properties
+*.properties
