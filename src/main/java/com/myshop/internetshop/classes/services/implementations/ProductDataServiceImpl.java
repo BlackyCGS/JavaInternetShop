@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 public class ProductDataServiceImpl implements ProductDataService {
     private final int[] prices = {500, 200, 100, 390};
     private final String[] names = {"RTX 4090", "RTX 4080", "RTX 4070", "RTX 4060"};
+    private final int[] prices2 = {1500, 1200, 1100, 1390};
+    private final String[] names2 = {"RTX 3080", "RTX 3070", "RTX 3070TI", "RTX 3060"};
 
     public ProductDataDto getProductData(int id) {
         if (id > prices.length - 1) {
@@ -30,5 +32,12 @@ public class ProductDataServiceImpl implements ProductDataService {
             }
         }
         return productDatas;
+    }
+
+    public ProductDataDto getProductDataById(int id) {
+        if (id > prices.length - 1) {
+            throw new NotFoundException();
+        }
+        return new ProductDataDto(prices2[id], names2[id]);
     }
 }

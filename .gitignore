@@ -31,11 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
-*.iml
-.settings
 target
-.project
-.classpath
 dist
 
 # Numerous always-ignore extensions
@@ -69,7 +65,6 @@ nbproject
 thumbs.db
 
 # Folders to ignore
-.idea
 .hg
 .svn
 .CVS
@@ -79,3 +74,4 @@ src/main/webapp/WEB-INF/ftl/rsrc/
 src/main/webapp/rsrc/dist/
 src/main/resources/application-local.properties
 webpack-assets.json
+src/main/resources/application.properties

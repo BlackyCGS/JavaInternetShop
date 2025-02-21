@@ -9,4 +9,6 @@ public interface ProductDataService {
     ProductDataDto getProductData(int id);
 
     List<ProductDataDto> getProductDatas(int amount);
+
+    ProductDataDto getProductDataById(int id);
 }
