@@ -3,6 +3,7 @@ package com.myshop.internetshop.classes.services;
 import com.myshop.internetshop.classes.dto.GpuDto;
 import com.myshop.internetshop.classes.entities.Gpu;
 import com.myshop.internetshop.classes.entities.Products;
+import com.myshop.internetshop.classes.exceptions.NotFoundException;
 import com.myshop.internetshop.classes.repositories.GpuRepository;
 import com.myshop.internetshop.classes.repositories.ProductsRepository;
 import jakarta.transaction.Transactional;
@@ -30,6 +31,13 @@ public class GpuService {
                                    int hdmi, int tdp, int vram) {
         List<Gpu> gpus = gpuRepository.searchGpu(producer, boostClock,
                 displayPort, hdmi, tdp, vram);
+        return getGpuDtos(gpus);
+    }
+
+    private List<GpuDto> getGpuDtos(List<Gpu> gpus) {
+        if (gpus.isEmpty()) {
+            throw new NotFoundException();
+        }
         List<GpuDto> gpuDtos = new ArrayList<>();
         for (Gpu gpu : gpus) {
             GpuDto gpuDto = convertToDto(gpu);
@@ -39,17 +47,16 @@ public class GpuService {
     }
 
     public GpuDto getGpuById(int id) {
-        return convertToDto(gpuRepository.findByProductId(id));
+        if (gpuRepository.existsById(id)) {
+            return convertToDto(gpuRepository.findByProductId(id));
+        } else {
+            throw new NotFoundException();
+        }
     }
 
     public List<GpuDto> getGpuByName(String name) {
         List<Gpu> gpus = gpuRepository.findByName(name);
-        List<GpuDto> gpuDtos = new ArrayList<>();
-        for (Gpu gpu : gpus) {
-            GpuDto gpuDto = convertToDto(gpu);
-            gpuDtos.add(gpuDto);
-        }
-        return gpuDtos;
+        return getGpuDtos(gpus);
     }
 
     @Transactional

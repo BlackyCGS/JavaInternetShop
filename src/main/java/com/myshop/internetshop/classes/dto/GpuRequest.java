@@ -31,6 +31,24 @@ public class GpuRequest {
     @JsonProperty("VGA")
     private String vga;
 
+    public void setBaseInfo(String name, String producer, String boostClock,
+                            String vram) {
+        this.name = name;
+        this.producer = producer;
+        this.boostClock = boostClock;
+        this.vram = vram;
+    }
+
+    public void setAdditionalInfo(String displayPort, String dvi, String hdmi, String tdp,
+                                  String vga) {
+        this.displayPort = displayPort;
+        this.dvi = dvi;
+        this.hdmi = hdmi;
+        this.tdp = tdp;
+        this.vga = vga;
+
+    }
+
     public Integer parseInteger(String value) {
         if (value == null || value.isEmpty()) {
             return null;
