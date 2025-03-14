@@ -32,8 +32,8 @@ class GpuRequestTest {
     @Test
     void toEntityShouldConvertToGpuEntity() {
         gpuRequest = new GpuRequest();
-        gpuRequest.setBaseInfo("RTX 4090", "NVIDIA", "2235 MHz", "24 GB");
-        gpuRequest.setAdditionalInfo("3", "0", "1", "450W", "0");
+        gpuRequest.setBaseInfo("RTX 4090", "NVIDIA", "2235 MHz", "24 GB", "250$");
+        gpuRequest.setAdditionalInfo(3, 0, 1, "450W", 0);
 
         Gpu gpu = gpuRequest.toEntity();
 
@@ -47,5 +47,6 @@ class GpuRequestTest {
         assertEquals(3, gpu.getDisplayPort());
         assertEquals(0, gpu.getDvi());
         assertEquals(0, gpu.getVga());
+        assertEquals(250, gpu.getPrice());
     }
 }

@@ -1,12 +1,8 @@
 package com.myshop.internetshop.classes.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.myshop.internetshop.classes.enums.ProductTableId;
+import jakarta.persistence.*;
 
 
 @Entity
@@ -14,11 +10,7 @@ import jakarta.persistence.Table;
 public class Gpu {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int productId;
-
-    @Column(nullable = false, columnDefinition = "INT DEFAULT 1000")
-    private int tableId = 1000;
 
     @Column(nullable = false)
     private String name;
@@ -47,6 +39,15 @@ public class Gpu {
     @Column(nullable = false)
     private int vga = 0;
 
+    @Column(nullable = false)
+    private float price = 0;
+
+    //@OneToOne(mappedBy = "gpu", cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @MapsId
+    @JsonIgnore
+    @JoinColumn(name = "product_id")
+    private Product product;
 
     public Gpu() { /* Default constructor */
     }
@@ -60,17 +61,31 @@ public class Gpu {
         this.vram = vram;
     }
 
-    public void setAdditionalInfo(int displayPort, int dvi, int hdmi, int tdp, int vga) {
+    public void setAdditionalInfo(int displayPort, int dvi, int hdmi, int tdp, int vga,
+            float price) {
         this.displayPort = displayPort;
         this.dvi = dvi;
         this.hdmi = hdmi;
         this.tdp = tdp;
         this.vga = vga;
+        this.price = price;
 
+    }
+
+    public Product parseToProduct() {
+        Product returnProduct = new Product();
+        returnProduct.setName(this.name);
+        returnProduct.setCategoryId(ProductTableId.GPU.getTableId());
+        returnProduct.setPrice(this.price);
+        return returnProduct;
     }
 
     public int getProductId() {
         return productId;
+    }
+
+    public void setProductId(int id) {
+        this.productId = id;
     }
 
     public String getName() {
@@ -143,5 +158,21 @@ public class Gpu {
 
     public void setVga(int vga) {
         this.vga = vga;
+    }
+
+    public float getPrice() {
+        return price;
+    }
+
+    public void setPrice(float price) {
+        this.price = price;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public Product getProduct() {
+        return product;
     }
 }

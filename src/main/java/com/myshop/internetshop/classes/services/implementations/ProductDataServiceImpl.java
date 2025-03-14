@@ -17,7 +17,7 @@ public class ProductDataServiceImpl implements ProductDataService {
 
     public ProductDataDto getProductData(int id) {
         if (id > prices.length - 1) {
-            throw new NotFoundException();
+            throw new NotFoundException("Not found");
         }
         return new ProductDataDto(prices[id], names[id]);
     }
@@ -35,7 +35,7 @@ public class ProductDataServiceImpl implements ProductDataService {
 
     public ProductDataDto getProductDataById(int id) {
         if (id > prices.length - 1) {
-            throw new NotFoundException();
+            throw new NotFoundException("Not found");
         }
         return new ProductDataDto(prices2[id], names2[id]);
     }

@@ -1,30 +1,27 @@
 package com.myshop.internetshop.classes.services;
 
 import com.myshop.internetshop.classes.dto.GpuDto;
+import com.myshop.internetshop.classes.dto.GpuRequest;
 import com.myshop.internetshop.classes.entities.Gpu;
-import com.myshop.internetshop.classes.entities.Products;
+import com.myshop.internetshop.classes.entities.Product;
+import com.myshop.internetshop.classes.enums.ProductTableId;
 import com.myshop.internetshop.classes.exceptions.NotFoundException;
 import com.myshop.internetshop.classes.repositories.GpuRepository;
 import com.myshop.internetshop.classes.repositories.ProductsRepository;
 import jakarta.transaction.Transactional;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 
 @Service
 public class GpuService {
 
     private final GpuRepository gpuRepository;
-    private final ProductsRepository productsRepository;
 
     @Autowired
     public GpuService(GpuRepository gpuRepository, ProductsRepository productsRepository) {
         this.gpuRepository = gpuRepository;
-        this.productsRepository = productsRepository;
     }
 
     public List<GpuDto> getAllGpus(String producer, int boostClock, int displayPort,
@@ -36,7 +33,7 @@ public class GpuService {
 
     private List<GpuDto> getGpuDtos(List<Gpu> gpus) {
         if (gpus.isEmpty()) {
-            throw new NotFoundException();
+            throw new NotFoundException("There are no gpus found");
         }
         List<GpuDto> gpuDtos = new ArrayList<>();
         for (Gpu gpu : gpus) {
@@ -50,7 +47,7 @@ public class GpuService {
         if (gpuRepository.existsById(id)) {
             return convertToDto(gpuRepository.findByProductId(id));
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("There is no gpu with id " + id);
         }
     }
 
@@ -60,24 +57,31 @@ public class GpuService {
     }
 
     @Transactional
-    public Gpu saveGpu(Gpu gpu) {
-        Random rand = new SecureRandom();
-        int price = rand.nextInt(2000);
-        gpuRepository.save(gpu);
-        Products products = new Products(1000, (int) gpuRepository.count(),
-                gpu.getName(), price);
-        productsRepository.save(products);
-        return gpu;
+    public Gpu saveGpu(GpuRequest gpuRequest) {
+        Gpu gpu;
+        gpu = gpuRequest.toEntity();
+        Product product = new Product();
+        product.setName(gpu.getName());
+        product.setPrice(gpu.getPrice());
+        product.setCategoryId(ProductTableId.GPU.getTableId());
+        gpu.setProduct(product);
+        return gpuRepository.save(gpu);
     }
 
+    public GpuRequest saveGpuRequest(GpuRequest gpuRequest) {
+        Gpu gpu = gpuRequest.toEntity();
+        gpuRepository.save(gpu);
+        return gpuRequest;
+    }
+
+    @Transactional
     public void deleteGpu(int id) {
-        productsRepository.deleteById((long) (10000000 + id));
-        gpuRepository.deleteById(id);
+        gpuRepository.deleteByProductId(id);
     }
 
     public GpuDto convertToDto(Gpu gpu) {
         return new GpuDto(gpu.getProductId(), gpu.getName(), gpu.getProducer(),
                 gpu.getBoostClock(), gpu.getDisplayPort(), gpu.getDvi(), gpu.getHdmi(),
-                gpu.getTdp(), gpu.getVga(), gpu.getVram());
+                gpu.getTdp(), gpu.getVga(), gpu.getVram(), gpu.getPrice());
     }
 }

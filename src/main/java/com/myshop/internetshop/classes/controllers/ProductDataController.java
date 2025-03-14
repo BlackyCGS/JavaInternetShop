@@ -30,11 +30,6 @@ public class ProductDataController {
         return productDataService.getProductDatas(amount);
     }
 
-    @GetMapping("/")
-    public String error() {
-        return "Error 404 Not Found";
-    }
-
     @GetMapping("/{id}")
     public ProductDataDto getProductDataById(@PathVariable int id) {
         return productDataService.getProductDataById(id);

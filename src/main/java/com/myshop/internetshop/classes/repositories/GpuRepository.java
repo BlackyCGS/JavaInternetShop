@@ -28,4 +28,6 @@ public interface GpuRepository extends JpaRepository<Gpu, Integer> {
             @Param("tdp") Integer tdp,
             @Param("vram") Integer vram
     );
+
+    void deleteByProductId(int id);
 }

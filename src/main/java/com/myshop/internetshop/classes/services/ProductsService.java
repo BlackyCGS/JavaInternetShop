@@ -1,7 +1,8 @@
 package com.myshop.internetshop.classes.services;
 
-import com.myshop.internetshop.classes.dto.ProductsDto;
-import com.myshop.internetshop.classes.entities.Products;
+import com.myshop.internetshop.classes.dto.ProductDto;
+import com.myshop.internetshop.classes.entities.Product;
+import com.myshop.internetshop.classes.exceptions.NotFoundException;
 import com.myshop.internetshop.classes.repositories.ProductsRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,18 +19,33 @@ public class ProductsService {
         this.productsRepository = productsRepository;
     }
 
-    public List<ProductsDto> getAllProducts() {
-        List<Products> products = productsRepository.findAll();
-        List<ProductsDto> productsDtos = new ArrayList<>();
-        for (Products product : products) {
-            ProductsDto productsDto = convertToDto(product);
-            productsDtos.add(productsDto);
+    public List<ProductDto> getAllProducts() {
+        List<Product> products = productsRepository.findAll();
+        if(products.isEmpty()) {
+            throw new NotFoundException("There are no products");
         }
-        return productsDtos;
+        List<ProductDto> productDtos = new ArrayList<>();
+        for (Product product : products) {
+            ProductDto productDto = convertToDto(product);
+            productDtos.add(productDto);
+        }
+        return productDtos;
     }
 
-    private ProductsDto convertToDto(Products products) {
-        return new ProductsDto(products.getProductId(), products.getName(), products.getPrice());
+    private ProductDto convertToDto(Product product) {
+        return new ProductDto(product);
+    }
+
+    public Product getProductById(Integer productId) {
+        return productsRepository.findById(productId);
+    }
+
+    public void deleteProductById(long productId) {
+        if(productsRepository.existsById(productId)) {
+            productsRepository.deleteById(productId);
+        } else {
+            throw new NotFoundException("There are already no product");
+        }
     }
 
 }

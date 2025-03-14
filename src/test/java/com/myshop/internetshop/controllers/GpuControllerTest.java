@@ -37,11 +37,11 @@ class GpuControllerTest {
         gpu.setName("RTX 4090");
         gpu.setProducer("NVIDIA");
 
-        gpuDto = new GpuDto(1, "RTX 4090", "NVIDIA", 2235, 3, 0, 1, 450, 0, 24);
+        gpuDto = new GpuDto(1, "RTX 4090", "NVIDIA", 2235, 3, 0, 1, 450, 0, 24, 250);
 
         gpuRequest = new GpuRequest();
-        gpuRequest.setBaseInfo("RTX 4090", "NVIDIA", "2235 MHz", "24 GB");
-        gpuRequest.setAdditionalInfo("3", "0", "1", "450W", "0");
+        gpuRequest.setBaseInfo("RTX 4090", "NVIDIA", "2235 MHz", "24 GB", "250$");
+        gpuRequest.setAdditionalInfo(3, 0, 1, "450W", 0);
     }
 
     @Test

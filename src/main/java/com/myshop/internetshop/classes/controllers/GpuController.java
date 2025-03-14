@@ -28,7 +28,7 @@ public class GpuController {
         this.gpuService = gpuService;
     }
 
-    @GetMapping("/all")
+    @GetMapping
     public List<GpuDto> getAllGpus(@RequestParam(required = false) String producer,
                             @RequestParam(required = false, defaultValue = "0") Integer boostClock,
                             @RequestParam(required = false, defaultValue = "0") Integer displayPort,
@@ -50,15 +50,13 @@ public class GpuController {
 
     @PostMapping
     public Gpu createGpu(@RequestBody GpuRequest gpu) {
-        Gpu gpuTmp = gpu.toEntity();
-        return gpuService.saveGpu(gpuTmp);
+        return gpuService.saveGpu(gpu);
     }
 
     @PostMapping("/list")
     public ResponseEntity<String> createGpus(@RequestBody List<GpuRequest> gpus) {
         for (GpuRequest gpu : gpus) {
-            Gpu gpuTmp = gpu.toEntity();
-            gpuService.saveGpu(gpuTmp);
+            gpuService.saveGpu(gpu);
         }
         return ResponseEntity.ok("Gpus created");
     }

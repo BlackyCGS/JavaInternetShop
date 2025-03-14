@@ -8,7 +8,7 @@ Java spring boot web application
 
 - Ability to add items to the cart
 - Ability to add items to favorite 
-- Different specs for each type of products
+- Different specs for each type of product
 - API
 
 
