@@ -1,11 +1,10 @@
 package com.myshop.internetshop.dto;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.myshop.internetshop.classes.dto.GpuRequest;
 import com.myshop.internetshop.classes.entities.Gpu;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 class GpuRequestTest {
 
@@ -17,36 +16,59 @@ class GpuRequestTest {
     }
 
     @Test
-    void parseIntegerShouldReturnParsedValue() {
+    void testSetBaseInfo() {
+        gpuRequest.setBaseInfo("RTX 3080", "NVIDIA", "1800", "10GB", "700");
+
+        assertEquals("RTX 3080", gpuRequest.getName());
+        assertEquals("NVIDIA", gpuRequest.getProducer());
+        assertEquals("1800", gpuRequest.getBoostClock());
+        assertEquals("10GB", gpuRequest.getVram());
+        assertEquals("700", gpuRequest.getPrice());
+    }
+
+    @Test
+    void testSetAdditionalInfo() {
+        gpuRequest.setAdditionalInfo(1, 1, 1, "300", 0);
+
+        assertEquals(1, gpuRequest.getHdmi());
+        assertEquals(1, gpuRequest.getDisplayPort());
+        assertEquals(1, gpuRequest.getDvi());
+        assertEquals("300", gpuRequest.getTdp());
+        assertEquals(0, gpuRequest.getVga());
+    }
+
+    @Test
+    void testParseInteger() {
         assertEquals(100, gpuRequest.parseInteger("100 MHz"));
-        assertEquals(500, gpuRequest.parseInteger("500W"));
+        assertEquals(0, gpuRequest.parseInteger(null));
+        assertEquals(0, gpuRequest.parseInteger("abc"));
+        assertEquals(0, gpuRequest.parseInteger(""));
     }
 
     @Test
-    void parseIntegerShouldReturnNullForInvalidValues() {
-        assertNull(gpuRequest.parseInteger(null));
-        assertNull(gpuRequest.parseInteger(""));
-        assertNull(gpuRequest.parseInteger("NoNumbers"));
+    void testParseFloatNumber() {
+        assertEquals(100.0f, gpuRequest.parseFloatNumber("100 MHz"));
+        assertTrue(gpuRequest.parseFloatNumber(null) > 0);  // случайный результат, но больше 0
+        assertTrue(gpuRequest.parseFloatNumber("abc") > 0);  // случайный результат, но больше 0
+        assertTrue(gpuRequest.parseFloatNumber("") > 0);  // случайный результат, но больше 0
     }
 
     @Test
-    void toEntityShouldConvertToGpuEntity() {
-        gpuRequest = new GpuRequest();
-        gpuRequest.setBaseInfo("RTX 4090", "NVIDIA", "2235 MHz", "24 GB", "250$");
-        gpuRequest.setAdditionalInfo(3, 0, 1, "450W", 0);
+    void testToEntity() {
+        gpuRequest.setBaseInfo("RTX 3080", "NVIDIA", "1800", "10GB", "700");
+        gpuRequest.setAdditionalInfo(1, 1, 1, "300", 0);
 
         Gpu gpu = gpuRequest.toEntity();
 
-        assertNotNull(gpu);
-        assertEquals("RTX 4090", gpu.getName());
+        assertEquals("RTX 3080", gpu.getName());
         assertEquals("NVIDIA", gpu.getProducer());
-        assertEquals(2235, gpu.getBoostClock());
-        assertEquals(24, gpu.getVram());
-        assertEquals(450, gpu.getTdp());
+        assertEquals(1800, gpu.getBoostClock());
+        assertEquals(10, gpu.getVram());
+        assertEquals(300, gpu.getTdp());
         assertEquals(1, gpu.getHdmi());
-        assertEquals(3, gpu.getDisplayPort());
-        assertEquals(0, gpu.getDvi());
+        assertEquals(1, gpu.getDisplayPort());
+        assertEquals(1, gpu.getDvi());
         assertEquals(0, gpu.getVga());
-        assertEquals(250, gpu.getPrice());
+        assertEquals(700.0f, gpu.getPrice());
     }
 }

@@ -2,39 +2,40 @@ package com.myshop.internetshop.classes.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.myshop.internetshop.classes.entities.Gpu;
+
 import java.security.SecureRandom;
 import java.util.Random;
 
 public class GpuRequest {
     @JsonProperty("name")
-    private String name;
+    String name;
 
     @JsonProperty("producer")
-    private String producer;
+    String producer;
 
     @JsonProperty("boostClock")
-    private String boostClock;
+    String boostClock;
 
     @JsonProperty("vram")
-    private String vram;
+    String vram;
 
     @JsonProperty("tdp")
-    private String tdp;
+    String tdp;
 
     @JsonProperty("hdmi")
-    private int hdmi;
+    int hdmi;
 
     @JsonProperty("displayPort")
-    private int displayPort;
+    int displayPort;
 
     @JsonProperty("dvi")
-    private int dvi;
+    int dvi;
 
     @JsonProperty("vga")
-    private int vga;
+    int vga;
 
     @JsonProperty("price")
-    private String price;
+    String price;
 
     public void setBaseInfo(String name, String producer, String boostClock,
                             String vram, String price) {
@@ -96,5 +97,45 @@ public class GpuRequest {
         gpu.setVga(this.vga);
         gpu.setPrice(parseFloatNumber(this.price));
         return gpu;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public String getProducer() {
+        return this.producer;
+    }
+
+    public String getBoostClock() {
+        return this.boostClock;
+    }
+
+    public String getVram() {
+        return this.vram;
+    }
+
+    public String getTdp() {
+        return this.tdp;
+    }
+
+    public int getHdmi() {
+        return this.hdmi;
+    }
+
+    public int getDisplayPort() {
+        return this.displayPort;
+    }
+
+    public int getDvi() {
+        return this.dvi;
+    }
+
+    public int getVga() {
+        return this.vga;
+    }
+
+    public String getPrice() {
+        return this.price;
     }
 }
