@@ -20,6 +20,7 @@ public class UserRequest {
     public UserRequest() {
         /*Default Constructor*/
     }
+
     public User parseToUser() {
         User user = new User();
         user.setName(this.name);

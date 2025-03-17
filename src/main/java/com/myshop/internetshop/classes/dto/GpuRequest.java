@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.myshop.internetshop.classes.entities.Gpu;
 import java.security.SecureRandom;
 import java.util.Random;
+import lombok.Getter;
 
+@Getter
 public class GpuRequest {
     @JsonProperty("name")
     String name;
@@ -74,7 +76,7 @@ public class GpuRequest {
             return rand.nextFloat(2000);
         }
 
-        String numericValue = value.replaceAll("\\D", "");
+        String numericValue = value.replaceAll("[^0-9.]", "");
         if (numericValue.isEmpty()) {
             Random rand = new SecureRandom();
             return rand.nextFloat(2000);
@@ -98,43 +100,4 @@ public class GpuRequest {
         return gpu;
     }
 
-    public String getName() {
-        return this.name;
-    }
-
-    public String getProducer() {
-        return this.producer;
-    }
-
-    public String getBoostClock() {
-        return this.boostClock;
-    }
-
-    public String getVram() {
-        return this.vram;
-    }
-
-    public String getTdp() {
-        return this.tdp;
-    }
-
-    public int getHdmi() {
-        return this.hdmi;
-    }
-
-    public int getDisplayPort() {
-        return this.displayPort;
-    }
-
-    public int getDvi() {
-        return this.dvi;
-    }
-
-    public int getVga() {
-        return this.vga;
-    }
-
-    public String getPrice() {
-        return this.price;
-    }
 }

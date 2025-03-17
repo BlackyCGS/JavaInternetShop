@@ -22,6 +22,7 @@ public class GpuDto {
     public GpuDto() {
         /*Default Constructor*/
     }
+
     public GpuDto(Gpu gpu) {
         this.productId = gpu.getProductId();
         this.name = gpu.getName();
@@ -35,6 +36,7 @@ public class GpuDto {
         this.vram = gpu.getVram();
         this.price = gpu.getPrice();
     }
+
     public void setBaseInfo(int productId, String name, String producer) {
         this.productId = productId;
         this.name = name;
@@ -42,7 +44,7 @@ public class GpuDto {
     }
 
     public void setAdditionalInfo(int boostClock, int displayPort,
-        int tdp,int vram, float price) {
+        int tdp, int vram, float price) {
         this.boostClock = boostClock;
         this.displayPort = displayPort;
         this.tdp = tdp;
