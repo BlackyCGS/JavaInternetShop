@@ -6,11 +6,10 @@ import com.myshop.internetshop.classes.entities.Order;
 import com.myshop.internetshop.classes.entities.Product;
 import com.myshop.internetshop.classes.exceptions.NotFoundException;
 import com.myshop.internetshop.classes.repositories.OrderRepository;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
 
 @Service
 public class OrderService {
@@ -19,6 +18,7 @@ public class OrderService {
     private final ProductsService productsService;
     private final UserService userService;
     private static final String NOT_FOUND_MESSAGE = "Order not found";
+
     OrderService(OrderRepository orderRepository, ProductsService productsService,
                  UserService userService) {
         this.orderRepository = orderRepository;
@@ -27,11 +27,13 @@ public class OrderService {
     }
 
     public OrderDto addProductsToOrder(int orderId, List<Integer> productsId) {
-        if(orderRepository.existsById(orderId)) {
+        if (orderRepository.existsById(orderId)) {
             Order order = orderRepository.findByOrderId(orderId);
             List<Product> products = order.getProducts();
             for (Integer productId : productsId) {
-                products.add(productsService.getProductById(productId));
+                if (productsService.existsById(productId)) {
+                    products.add(productsService.getProductById(productId));
+                }
             }
             order.setProducts(products);
             order = orderRepository.save(order);
@@ -46,7 +48,7 @@ public class OrderService {
     }
 
     public OrderDto changeStatus(int id, int status) {
-        if(orderRepository.existsById(id)) {
+        if (orderRepository.existsById(id)) {
             Order order = orderRepository.findByOrderId(id);
             order.setOrderStatus(status);
             orderRepository.save(order);
@@ -57,7 +59,7 @@ public class OrderService {
     }
 
     public UserDto createOrder(int userId) {
-        if(userService.existsById(userId)) {
+        if (userService.existsById(userId)) {
             Order order = new Order();
             order.setOrderStatus(0);
             order.setUser(userService.findByUserId(userId));
@@ -69,7 +71,7 @@ public class OrderService {
     }
 
     public OrderDto getOrderById(int orderId) {
-        if(orderRepository.existsById(orderId)) {
+        if (orderRepository.existsById(orderId)) {
             Order order = orderRepository.findByOrderId(orderId);
             return new OrderDto(order);
         } else {

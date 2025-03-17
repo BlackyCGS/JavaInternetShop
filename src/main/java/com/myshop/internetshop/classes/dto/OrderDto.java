@@ -2,9 +2,12 @@ package com.myshop.internetshop.classes.dto;
 
 import com.myshop.internetshop.classes.entities.Order;
 import com.myshop.internetshop.classes.entities.Product;
-
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 public class OrderDto {
 
     private int orderId;
@@ -27,38 +30,6 @@ public class OrderDto {
         this.orderId = orderId;
         this.orderStatus = orderStatus;
         this.userId = userId;
-        this.products = products;
-    }
-
-    public int getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(int orderId) {
-        this.orderId = orderId;
-    }
-
-    public int getOrderStatus() {
-        return orderStatus;
-    }
-
-    public void setOrderStatus(int orderStatus) {
-        this.orderStatus = orderStatus;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public List<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
         this.products = products;
     }
 

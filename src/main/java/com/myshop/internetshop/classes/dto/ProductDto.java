@@ -17,6 +17,7 @@ public class ProductDto {
         this.price = product.getPrice();
         this.gpu = product.getGpu();
     }
+
     public String getName() {
         return name;
     }

@@ -80,8 +80,6 @@ public class GpuService {
     }
 
     public GpuDto convertToDto(Gpu gpu) {
-        return new GpuDto(gpu.getProductId(), gpu.getName(), gpu.getProducer(),
-                gpu.getBoostClock(), gpu.getDisplayPort(), gpu.getDvi(), gpu.getHdmi(),
-                gpu.getTdp(), gpu.getVga(), gpu.getVram(), gpu.getPrice());
+        return new GpuDto(gpu);
     }
 }

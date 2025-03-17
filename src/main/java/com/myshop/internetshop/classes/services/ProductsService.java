@@ -21,7 +21,7 @@ public class ProductsService {
 
     public List<ProductDto> getAllProducts() {
         List<Product> products = productsRepository.findAll();
-        if(products.isEmpty()) {
+        if (products.isEmpty()) {
             throw new NotFoundException("There are no products");
         }
         List<ProductDto> productDtos = new ArrayList<>();
@@ -41,11 +41,15 @@ public class ProductsService {
     }
 
     public void deleteProductById(long productId) {
-        if(productsRepository.existsById(productId)) {
+        if (productsRepository.existsById(productId)) {
             productsRepository.deleteById(productId);
         } else {
             throw new NotFoundException("There are already no product");
         }
+    }
+
+    public boolean existsById(long productId) {
+        return productsRepository.existsById(productId);
     }
 
 }

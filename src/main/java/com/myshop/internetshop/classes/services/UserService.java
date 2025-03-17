@@ -22,10 +22,10 @@ public class UserService {
 
     @Transactional
     public User createUser(UserRequest userRequest) {
-        if(userRepository.existsByEmail(userRequest.getEmail())) {
+        if (userRepository.existsByEmail(userRequest.getEmail())) {
             throw new ConflictException("User with that email already exists");
         }
-        if(userRepository.existsByName(userRequest.getName())) {
+        if (userRepository.existsByName(userRequest.getName())) {
             throw new ConflictException("User with that name already exists");
         }
         User user = new User();
@@ -37,10 +37,9 @@ public class UserService {
 
     @Transactional
     public void deleteUser(int id) {
-        if(userRepository.existsById(id)) {
+        if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
-        }
-        else {
+        } else {
             throw new NotFoundException("User you want to delete does not exist");
         }
     }
@@ -54,35 +53,33 @@ public class UserService {
     }
 
     public UserDto updateUser(int id, UserRequest userRequest) {
-        if(userRepository.existsById(id)) {
+        if (userRepository.existsById(id)) {
             User user = userRepository.findByUserId(id);
-            if(userRequest.getName() != null) {
+            if (userRequest.getName() != null) {
                 user.setName(userRequest.getName());
             }
-            if(userRequest.getEmail() != null) {
+            if (userRequest.getEmail() != null) {
                 user.setEmail(userRequest.getEmail());
             }
-            if(userRequest.getPassword() != null) {
+            if (userRequest.getPassword() != null) {
                 user.setPassword(userRequest.getPassword());
             }
             userRepository.save(user);
             return new UserDto(userRepository.save(user));
-        }
-        else {
+        } else {
             throw new NotFoundException("User you want to update does not exist");
         }
     }
 
     public UserDto updateOrder(int userId, OrderDto orderDto) {
-        if(userRepository.existsById(userId)) {
+        if (userRepository.existsById(userId)) {
             Order order = orderDto.toOrder();
             order.setUser(userRepository.findByUserId(userId));
             User user = userRepository.getByUserId(userId);
             user.addNewOrder(order);
             userRepository.save(user);
             return new UserDto(user);
-        }
-        else {
+        } else {
             throw new NotFoundException("User does not exist");
         }
     }
@@ -92,7 +89,7 @@ public class UserService {
     }
 
     public User findByUserId(int id) {
-        if(userRepository.existsById(id)) {
+        if (userRepository.existsById(id)) {
             return userRepository.findByUserId(id);
         } else {
             throw new NotFoundException("User does not exists");

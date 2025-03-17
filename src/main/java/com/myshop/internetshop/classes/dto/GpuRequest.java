@@ -2,7 +2,6 @@ package com.myshop.internetshop.classes.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.myshop.internetshop.classes.entities.Gpu;
-
 import java.security.SecureRandom;
 import java.util.Random;
 

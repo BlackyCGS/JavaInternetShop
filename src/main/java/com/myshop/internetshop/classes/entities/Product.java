@@ -1,9 +1,28 @@
 package com.myshop.internetshop.classes.entities;
 
-import jakarta.persistence.*;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.ConstraintMode;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.Table;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
+
+@Setter
+@Getter
 @Entity
 @Table(name = "products")
 public class Product {
@@ -18,12 +37,16 @@ public class Product {
 
     private float price;
 
+    @Getter
+    @Setter
     @OneToOne(mappedBy = "product", cascade = CascadeType.PERSIST, orphanRemoval = true)
     @PrimaryKeyJoinColumn
     private Gpu gpu;
 
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
     @ManyToMany(fetch = FetchType.LAZY, cascade =
-            {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType
+        {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType
             .REFRESH},
             targetEntity = Order.class)
     @JoinTable(name = "orders_products",
@@ -31,6 +54,7 @@ public class Product {
             joinColumns = @JoinColumn(name = "product_id"),
             foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT),
             inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
+    @JsonIgnore
     private List<Order> orders;
 
     public Product(int categoryId, int id, String name, int price) {
@@ -41,42 +65,4 @@ public class Product {
     }
 
     public Product() {}
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int productId) {
-        this.id = productId;
-    }
-
-    public int getCategoryId() {return categoryId; }
-
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public float getPrice() {
-        return price;
-    }
-
-    public void setPrice(float price) {
-        this.price = price;
-    }
-
-    public void setGpu(Gpu gpu) {
-        this.gpu = gpu;
-    }
-
-    public Gpu getGpu() {
-        return gpu;
-    }
 }
