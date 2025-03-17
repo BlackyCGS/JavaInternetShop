@@ -1,9 +1,7 @@
 package com.myshop.internetshop.classes.services;
 
-import com.myshop.internetshop.classes.dto.OrderDto;
 import com.myshop.internetshop.classes.dto.UserDto;
 import com.myshop.internetshop.classes.dto.UserRequest;
-import com.myshop.internetshop.classes.entities.Order;
 import com.myshop.internetshop.classes.entities.User;
 import com.myshop.internetshop.classes.exceptions.ConflictException;
 import com.myshop.internetshop.classes.exceptions.NotFoundException;
@@ -68,19 +66,6 @@ public class UserService {
             return new UserDto(userRepository.save(user));
         } else {
             throw new NotFoundException("User you want to update does not exist");
-        }
-    }
-
-    public UserDto updateOrder(int userId, OrderDto orderDto) {
-        if (userRepository.existsById(userId)) {
-            Order order = orderDto.toOrder();
-            order.setUser(userRepository.findByUserId(userId));
-            User user = userRepository.getByUserId(userId);
-            user.addNewOrder(order);
-            userRepository.save(user);
-            return new UserDto(user);
-        } else {
-            throw new NotFoundException("User does not exist");
         }
     }
 
