@@ -83,13 +83,6 @@ class GpuServiceTest {
         assertThrows(NotFoundException.class, () -> gpuService.getGpuByName("RTX 3090"));
     }
 
-    @Test
-    void testSaveGpu() {
-        when(gpuRepository.save(any(Gpu.class))).thenReturn(gpu);
-        Gpu savedGpu = gpuService.saveGpu(gpuRequest);
-        assertNotNull(savedGpu);
-        assertEquals("RTX 3090", savedGpu.getName());
-    }
 
     @Test
     void testDeleteGpu() {

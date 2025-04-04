@@ -4,6 +4,8 @@ import com.myshop.internetshop.classes.dto.UserDto;
 import com.myshop.internetshop.classes.dto.UserRequest;
 import com.myshop.internetshop.classes.entities.User;
 import com.myshop.internetshop.classes.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/users")
+@Tag(name = "Users", description = "Manage Users")
 public class UserController {
     private final UserService userService;
 
@@ -26,22 +29,26 @@ public class UserController {
         this.userService = userService;
     }
 
+    @Operation(description = "Create user using json with login password and email")
     @PostMapping("/create")
     public User createUser(@RequestBody UserRequest userRequest) {
         return userService.createUser(userRequest);
     }
 
+    @Operation(description = "Delete user by id")
     @DeleteMapping("/delete/{id}")
-    public HttpEntity<Object> deleteUser(@PathVariable int id) {
+    public HttpEntity<Object> deleteUser(@PathVariable("id") int id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(description = "Get user data by id")
     @GetMapping("/{id}")
-    public UserDto getUser(@PathVariable int id) {
+    public UserDto getUser(@PathVariable("id") int id) {
         return userService.getUserById(id);
     }
 
+    @Operation(description = "Update user data using id and json with new data")
     @PutMapping("/update/{id}")
     public UserDto updateUser(@RequestBody UserRequest userRequest, @PathVariable int id) {
         return userService.updateUser(id, userRequest);

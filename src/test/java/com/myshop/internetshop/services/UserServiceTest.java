@@ -34,12 +34,12 @@ class UserServiceTest {
     @BeforeEach
     void setUp() {
         user = new User();
-        user.setUserId(1);
+        user.setId(1);
         user.setName("JohnDoe");
         user.setEmail("johndoe@example.com");
         user.setPassword("password123");
         order = new Order();
-        order.setOrderId(1);
+        order.setId(1);
         order.setUser(user);
         user.addNewOrder(order);
         userRequest = new UserRequest();
@@ -94,7 +94,7 @@ class UserServiceTest {
     @Test
     void getUserById_shouldReturnUserDto_whenUserExists() {
         when(userRepository.existsById(1)).thenReturn(true);
-        when(userRepository.findByUserId(1)).thenReturn(user);
+        when(userRepository.findById(1)).thenReturn(user);
 
         UserDto result = userService.getUserById(1);
 
@@ -112,7 +112,7 @@ class UserServiceTest {
     @Test
     void updateUser_shouldUpdateUser_whenUserExists() {
         when(userRepository.existsById(1)).thenReturn(true);
-        when(userRepository.findByUserId(1)).thenReturn(user);
+        when(userRepository.findById(1)).thenReturn(user);
         when(userRepository.save(any())).thenReturn(user);
 
         UserDto result = userService.updateUser(1, userRequest);
@@ -145,7 +145,7 @@ class UserServiceTest {
     @Test
     void findByUserId_shouldReturnUser_whenUserExists() {
         when(userRepository.existsById(1)).thenReturn(true);
-        when(userRepository.findByUserId(1)).thenReturn(user);
+        when(userRepository.findById(1)).thenReturn(user);
 
         User result = userService.findByUserId(1);
 

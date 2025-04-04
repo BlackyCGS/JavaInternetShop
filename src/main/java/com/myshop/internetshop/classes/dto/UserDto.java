@@ -16,7 +16,7 @@ public class UserDto {
     private final List<OrderDto> orders = new ArrayList<>();
 
     public UserDto(User user) {
-        this.id = user.getUserId();
+        this.id = user.getId();
         this.name = user.getName();
         this.email = user.getEmail();
         List<Order> userOrders = user.getOrders();

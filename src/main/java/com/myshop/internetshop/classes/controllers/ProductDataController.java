@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+
+//TODO delete me
 @RestController
 @RequestMapping("/api")
 public class ProductDataController {
@@ -20,7 +22,7 @@ public class ProductDataController {
     }
 
     @GetMapping("/data/{id}")
-    public ProductDataDto getProductData(@PathVariable int id) {
+    public ProductDataDto getProductData(@PathVariable("id") int id) {
         return productDataService.getProductData(id);
     }
 
@@ -31,7 +33,7 @@ public class ProductDataController {
     }
 
     @GetMapping("/{id}")
-    public ProductDataDto getProductDataById(@PathVariable int id) {
+    public ProductDataDto getProductDataById(@PathVariable("id") int id) {
         return productDataService.getProductDataById(id);
     }
 }

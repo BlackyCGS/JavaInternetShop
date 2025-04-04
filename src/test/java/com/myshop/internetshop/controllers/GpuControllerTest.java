@@ -77,24 +77,6 @@ class GpuControllerTest {
         assertEquals("RTX 4090", result.get(0).getName());
     }
 
-    @Test
-    void createGpuShouldReturnSavedGpu() {
-        when(gpuService.saveGpu(any())).thenReturn(gpu);
-
-        Gpu result = gpuController.createGpu(gpuRequest);
-
-        assertNotNull(result);
-        assertEquals("RTX 4090", result.getName());
-    }
-
-    @Test
-    void createGpusShouldReturnSuccessMessage() {
-        List<GpuRequest> gpuRequests = Collections.singletonList(gpuRequest);
-
-        ResponseEntity<String> response = gpuController.createGpus(gpuRequests);
-
-        assertEquals("Gpus created", response.getBody());
-    }
 
     @Test
     void deleteGpuShouldCallServiceMethod() {

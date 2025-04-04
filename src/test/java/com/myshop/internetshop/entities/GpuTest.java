@@ -2,7 +2,6 @@ package com.myshop.internetshop.entities;
 
 import com.myshop.internetshop.classes.entities.Gpu;
 import com.myshop.internetshop.classes.entities.Product;
-import com.myshop.internetshop.classes.enums.ProductTableId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -49,7 +48,6 @@ class GpuTest {
 
         assertNotNull(product);
         assertEquals("RTX 3080", product.getName());
-        assertEquals(ProductTableId.GPU.getTableId(), product.getCategoryId());
         assertEquals(1500.99f, product.getPrice());
     }
 

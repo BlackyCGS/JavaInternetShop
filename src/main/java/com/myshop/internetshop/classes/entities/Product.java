@@ -31,20 +31,20 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private int categoryId;
-
     private String name;
 
     private float price;
 
     @Getter
     @Setter
-    @OneToOne(mappedBy = "product", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @SuppressWarnings("javaarchitecture:S7027")
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @PrimaryKeyJoinColumn
     private Gpu gpu;
 
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
+    @SuppressWarnings("javaarchitecture:S7027")
     @ManyToMany(fetch = FetchType.LAZY, cascade =
         {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType
             .REFRESH},
@@ -57,9 +57,8 @@ public class Product {
     @JsonIgnore
     private List<Order> orders;
 
-    public Product(int categoryId, int id, String name, int price) {
+    public Product(int id, String name, int price) {
         this.id = id;
-        this.categoryId = categoryId;
         this.name = name;
         this.price = price;
     }

@@ -1,7 +1,6 @@
 package com.myshop.internetshop.classes.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.myshop.internetshop.classes.enums.ProductTableId;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -54,6 +53,7 @@ public class Gpu {
     private float price = 0;
 
     //@OneToOne(mappedBy = "gpu", cascade = CascadeType.ALL)
+    @SuppressWarnings("javaarchitecture:S7027")
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @MapsId
     @JsonIgnore
@@ -86,7 +86,6 @@ public class Gpu {
     public Product parseToProduct() {
         Product returnProduct = new Product();
         returnProduct.setName(this.name);
-        returnProduct.setCategoryId(ProductTableId.GPU.getTableId());
         returnProduct.setPrice(this.price);
         return returnProduct;
     }

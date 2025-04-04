@@ -44,7 +44,7 @@ public class UserService {
 
     public UserDto getUserById(int id) {
         if (userRepository.existsById(id)) {
-            return new UserDto(userRepository.findByUserId(id));
+            return new UserDto(userRepository.findById(id));
         } else {
             throw new NotFoundException("User does not exist");
         }
@@ -52,7 +52,7 @@ public class UserService {
 
     public UserDto updateUser(int id, UserRequest userRequest) {
         if (userRepository.existsById(id)) {
-            User user = userRepository.findByUserId(id);
+            User user = userRepository.findById(id);
             if (userRequest.getName() != null) {
                 user.setName(userRequest.getName());
             }
@@ -75,7 +75,7 @@ public class UserService {
 
     public User findByUserId(int id) {
         if (userRepository.existsById(id)) {
-            return userRepository.findByUserId(id);
+            return userRepository.findById(id);
         } else {
             throw new NotFoundException("User does not exists");
         }

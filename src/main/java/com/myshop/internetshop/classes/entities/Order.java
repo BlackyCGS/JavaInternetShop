@@ -28,15 +28,17 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private int orderId;
+    private int id;
 
     @JsonIgnore
+    @SuppressWarnings("javaarchitecture:S7027")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Setter
     @Getter
+    @SuppressWarnings("javaarchitecture:S7027")
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE,
         CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "orders_products",

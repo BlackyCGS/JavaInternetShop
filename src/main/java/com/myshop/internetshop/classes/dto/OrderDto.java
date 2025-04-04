@@ -20,9 +20,9 @@ public class OrderDto {
     }
 
     public OrderDto(Order order) {
-        this.orderId = order.getOrderId();
+        this.orderId = order.getId();
         this.orderStatus = order.getOrderStatus();
-        this.userId = order.getUser().getUserId();
+        this.userId = order.getUser().getId();
         this.products = order.getProducts();
     }
 }

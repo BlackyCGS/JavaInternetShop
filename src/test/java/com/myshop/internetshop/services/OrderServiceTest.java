@@ -48,11 +48,11 @@ class OrderServiceTest {
     @BeforeEach
     void setUp() {
         order = new Order();
-        order.setOrderId(orderId);
+        order.setId(orderId);
         order.setOrderStatus(0);
         order.setProducts(new ArrayList<>());
         user = new User();
-        user.setUserId(1);
+        user.setId(1);
         user.setName("JohnDoe");
         user.setEmail("johndoe@example.com");
         user.setPassword("password123");
@@ -66,7 +66,7 @@ class OrderServiceTest {
         product.setId(productId);
 
         when(orderRepository.existsById(orderId)).thenReturn(true);
-        when(orderRepository.findByOrderId(orderId)).thenReturn(order);
+        when(orderRepository.findById(orderId)).thenReturn(order);
         when(productsService.existsById(productId)).thenReturn(true);
         when(productsService.getProductById(productId)).thenReturn(product);
         when(orderRepository.save(any(Order.class))).thenReturn(order);
@@ -103,7 +103,7 @@ class OrderServiceTest {
         int newStatus = 1;
 
         when(orderRepository.existsById(orderId)).thenReturn(true);
-        when(orderRepository.findByOrderId(orderId)).thenReturn(order);
+        when(orderRepository.findById(orderId)).thenReturn(order);
         when(orderRepository.save(any(Order.class))).thenReturn(order);
 
         OrderDto result = orderService.changeStatus(orderId, newStatus);
@@ -126,7 +126,7 @@ class OrderServiceTest {
     @Test
     void testCreateOrder_Success() {
         User mockUser = new User();
-        mockUser.setUserId(userId);
+        mockUser.setId(userId);
 
         when(userService.existsById(userId)).thenReturn(true);
         when(userService.findByUserId(userId)).thenReturn(mockUser);
@@ -152,12 +152,12 @@ class OrderServiceTest {
     @Test
     void testGetOrderById_Success() {
         when(orderRepository.existsById(orderId)).thenReturn(true);
-        when(orderRepository.findByOrderId(orderId)).thenReturn(order);
+        when(orderRepository.findById(orderId)).thenReturn(order);
 
         OrderDto result = orderService.getOrderById(orderId);
 
         assertNotNull(result);
-        verify(orderRepository).findByOrderId(orderId);
+        verify(orderRepository).findById(orderId);
     }
 
     @Test
