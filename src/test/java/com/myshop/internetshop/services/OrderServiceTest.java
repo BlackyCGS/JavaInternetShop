@@ -3,6 +3,7 @@ package com.myshop.internetshop.services;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.myshop.internetshop.classes.cache.Cache;
 import com.myshop.internetshop.classes.dto.OrderDto;
 import com.myshop.internetshop.classes.dto.UserDto;
 import com.myshop.internetshop.classes.entities.Order;
@@ -19,7 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,146 +27,218 @@ import java.util.List;
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
 
-    @Mock
-    private OrderRepository orderRepository;
+        @Mock
+        private OrderRepository orderRepository;
 
-    @Mock
-    private ProductsService productsService;
+        @Mock
+        private ProductsService productsService;
 
-    @Mock
-    private UserService userService;
+        @Mock
+        private UserService userService;
 
-    @InjectMocks
-    private OrderService orderService;
+        @Mock
+        private Cache<Order> orderCache;
 
-    private Order order;
-    private User user;
-    private final int orderId = 1;
-    private final int userId = 1;
-    private final int productId = 200;
+        @InjectMocks
+        private OrderService orderService;
 
-    @BeforeEach
-    void setUp() {
-        order = new Order();
-        order.setId(orderId);
-        order.setOrderStatus(0);
-        order.setProducts(new ArrayList<>());
-        user = new User();
-        user.setId(1);
-        user.setName("JohnDoe");
-        user.setEmail("johndoe@example.com");
-        user.setPassword("password123");
-        order.setUser(user);
-    }
+        private Order testOrder;
+        private User testUser;
+        private Product testProduct;
+
+        @BeforeEach
+        void setUp() {
+            testUser = new User();
+            testUser.setId(1);
+
+            testProduct = new Product();
+            testProduct.setId(1);
+
+            testOrder = new Order();
+            testOrder.setId(1);
+            testOrder.setUser(testUser);
+            testOrder.setOrderStatus(0);
+            testOrder.setProducts(new ArrayList<>());
+        }
 
     @Test
-    void testAddProductsToOrder_Success() {
-        List<Integer> productIds = List.of(productId);
-        Product product = new Product();
-        product.setId(productId);
+    void addProductsToOrder_OrderExists_AddsProducts() {
+        // Arrange
+        List<Integer> productIds = List.of(1, 2);
+        when(orderRepository.existsById(1)).thenReturn(true);
+        when(orderRepository.findById(1)).thenReturn(testOrder);
 
-        when(orderRepository.existsById(orderId)).thenReturn(true);
-        when(orderRepository.findById(orderId)).thenReturn(order);
-        when(productsService.existsById(productId)).thenReturn(true);
-        when(productsService.getProductById(productId)).thenReturn(product);
-        when(orderRepository.save(any(Order.class))).thenReturn(order);
 
-        OrderDto result = orderService.addProductsToOrder(orderId, productIds);
+        Product product1 = new Product();
+        product1.setId(1);
+        Product product2 = new Product();
+        product2.setId(2);
 
+        when(productsService.existsById(1)).thenReturn(true);
+        when(productsService.existsById(2)).thenReturn(true);
+        when(productsService.getProductById(1)).thenReturn(product1);
+        when(productsService.getProductById(2)).thenReturn(product2);
+
+        when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
+        when(orderCache.contains("order-1")).thenReturn(true);
+
+        // Act
+        OrderDto result = orderService.addProductsToOrder(1, productIds);
+
+        // Assert
         assertNotNull(result);
-        assertEquals(1, order.getProducts().size());
-        verify(orderRepository).save(order);
+        verify(orderRepository).save(testOrder);
+        verify(orderCache).contains("order-1");
+        verify(orderCache).remove("order-1");
+        verify(orderCache).put("order-1", testOrder);
+
+        // Дополнительная проверка, что продукты были добавлены
+        assertEquals(2, testOrder.getProducts().size());
     }
 
     @Test
-    void testAddProductsToOrder_OrderNotFound() {
-        List<Integer> ids = List.of(productId);
-        when(orderRepository.existsById(orderId)).thenReturn(false);
-        NotFoundException exception = assertThrows(NotFoundException.class,
-                () -> orderService.addProductsToOrder(orderId, ids));
+    void addProductsToOrder_OrderNotExists_ThrowsException() {
+        // Arrange
+        List<Integer> testList = List.of(1);
+        when(orderRepository.existsById(1)).thenReturn(false);
 
-        assertEquals("Order not found", exception.getMessage());
-        verify(orderRepository, times(1)).existsById(orderId);
+        // Act
+        NotFoundException exception = assertThrows(NotFoundException.class, () ->
+                orderService.addProductsToOrder(1, testList));
+
+        // Assert
+        assertEquals("There is no order with id 1", exception.getMessage());
     }
 
-    @Test
-    void testDeleteOrder_Success() {
-        doNothing().when(orderRepository).deleteById(orderId);
+        @Test
+        void deleteOrder_DeletesFromCacheAndRepository() {
+            // Arrange
+            when(orderCache.contains("order-1")).thenReturn(true);
 
-        orderService.deleteOrder(orderId);
+            // Act
+            orderService.deleteOrder(1);
 
-        verify(orderRepository).deleteById(orderId);
-    }
+            // Assert
+            verify(orderCache).remove("order-1");
+            verify(orderRepository).deleteById(1);
+        }
 
-    @Test
-    void testChangeStatus_Success() {
-        int newStatus = 1;
+        @Test
+        void changeStatus_OrderExists_UpdatesStatus() {
+            // Arrange
+            when(orderRepository.existsById(1)).thenReturn(true);
+            when(orderRepository.findById(1)).thenReturn(testOrder);
+            when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
+            when(orderCache.contains("order-1")).thenReturn(true); // Добавляем мок для contains
 
-        when(orderRepository.existsById(orderId)).thenReturn(true);
-        when(orderRepository.findById(orderId)).thenReturn(order);
-        when(orderRepository.save(any(Order.class))).thenReturn(order);
+            // Act
+            OrderDto result = orderService.changeStatus(1, 1);
 
-        OrderDto result = orderService.changeStatus(orderId, newStatus);
+            // Assert
+            assertNotNull(result);
+            assertEquals(1, result.getOrderStatus());
+            verify(orderCache).contains("order-1");
+            verify(orderCache).remove("order-1");
+            verify(orderCache).put("order-1", testOrder);
+        }
 
-        assertNotNull(result);
-        assertEquals(newStatus, order.getOrderStatus());
-        verify(orderRepository).save(order);
-    }
+        @Test
+        void changeStatus_OrderNotExists_ThrowsException() {
+            // Arrange
+            when(orderRepository.existsById(1)).thenReturn(false);
 
-    @Test
-    void testChangeStatus_OrderNotFound() {
-        when(orderRepository.existsById(orderId)).thenReturn(false);
+            // Act & Assert
+            assertThrows(NotFoundException.class, () ->
+                    orderService.changeStatus(1, 1));
+        }
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> orderService.changeStatus(orderId, 1));
+        @Test
+        void createOrder_UserExists_CreatesOrder() {
+            // Arrange
+            when(userService.existsById(1)).thenReturn(true);
+            when(userService.findByUserId(1)).thenReturn(testUser);
+            when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
 
-        assertEquals("404 NOT_FOUND \"Order not found\"", exception.getMessage());
-    }
+            // Act
+            UserDto result = orderService.createOrder(1);
 
-    @Test
-    void testCreateOrder_Success() {
-        User mockUser = new User();
-        mockUser.setId(userId);
+            // Assert
+            assertNotNull(result);
+            verify(orderRepository).save(any(Order.class));
+            verify(orderCache).put("order-1", testOrder);
+        }
 
-        when(userService.existsById(userId)).thenReturn(true);
-        when(userService.findByUserId(userId)).thenReturn(mockUser);
-        when(orderRepository.save(any(Order.class))).thenReturn(order);
+        @Test
+        void createOrder_UserNotExists_ThrowsException() {
+            // Arrange
+            when(userService.existsById(1)).thenReturn(false);
 
-        UserDto result = orderService.createOrder(userId);
+            // Act & Assert
+            assertThrows(NotFoundException.class, () ->
+                    orderService.createOrder(1));
+        }
 
-        assertNotNull(result);
-        verify(orderRepository).save(any(Order.class));
-    }
+        @Test
+        void getOrderById_OrderInCache_ReturnsCachedOrder() {
+            // Arrange
+            when(orderCache.contains("order-1")).thenReturn(true);
+            when(orderCache.get("order-1")).thenReturn(testOrder);
 
+            // Act
+            OrderDto result = orderService.getOrderById(1);
 
-    @Test
-    void testCreateOrder_UserNotFound() {
-        when(userService.existsById(userId)).thenReturn(false);
+            // Assert
+            assertNotNull(result);
+            verify(orderRepository, never()).findById(1);
+        }
 
-        NotFoundException exception = assertThrows(NotFoundException.class,
-                () -> orderService.createOrder(userId));
+        @Test
+        void getOrderById_OrderNotInCacheButInDb_ReturnsOrder() {
+            // Arrange
+            when(orderCache.contains("order-1")).thenReturn(false);
+            when(orderRepository.existsById(1)).thenReturn(true);
+            when(orderRepository.findById(1)).thenReturn(testOrder);
 
-        assertEquals("User does not exist", exception.getMessage());
-    }
+            // Act
+            OrderDto result = orderService.getOrderById(1);
 
-    @Test
-    void testGetOrderById_Success() {
-        when(orderRepository.existsById(orderId)).thenReturn(true);
-        when(orderRepository.findById(orderId)).thenReturn(order);
+            // Assert
+            assertNotNull(result);
+            verify(orderCache).put("order-1", testOrder);
+        }
 
-        OrderDto result = orderService.getOrderById(orderId);
+        @Test
+        void getOrderById_OrderNotExists_ThrowsException() {
+            // Arrange
+            when(orderCache.contains("order-1")).thenReturn(false);
+            when(orderRepository.existsById(1)).thenReturn(false);
 
-        assertNotNull(result);
-        verify(orderRepository).findById(orderId);
-    }
+            // Act & Assert
+            assertThrows(NotFoundException.class, () ->
+                    orderService.getOrderById(1));
+        }
 
-    @Test
-    void testGetOrderById_NotFound() {
-        when(orderRepository.existsById(orderId)).thenReturn(false);
+        @Test
+        void getByStatusAndUserId_OrdersExist_ReturnsOrderDtos() {
+            // Arrange
+            List<Order> orders = List.of(testOrder);
+            when(orderRepository.findByOrderStatus(1, 0)).thenReturn(orders);
 
-        NotFoundException exception = assertThrows(NotFoundException.class,
-                () -> orderService.getOrderById(orderId));
+            // Act
+            List<OrderDto> result = orderService.getByStatusAndUserId(0, 1);
 
-        assertEquals("Order not found", exception.getMessage());
-    }
+            // Assert
+            assertFalse(result.isEmpty());
+            verify(orderCache).put("order-1", testOrder);
+        }
+
+        @Test
+        void getByStatusAndUserId_NoOrders_ThrowsException() {
+            // Arrange
+            when(orderRepository.findByOrderStatus(1, 0)).thenReturn(new ArrayList<>());
+
+            // Act & Assert
+            assertThrows(NotFoundException.class, () ->
+                    orderService.getByStatusAndUserId(0, 1));
+        }
 }

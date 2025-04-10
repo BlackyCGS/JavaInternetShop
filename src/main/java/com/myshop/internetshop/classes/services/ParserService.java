@@ -43,7 +43,7 @@ public class ParserService {
         return productDtos;
     }
 
-    private ProductDto convertToDto(Product product) {
+    public ProductDto convertToDto(Product product) {
         return new ProductDto(product);
     }
 }

@@ -8,25 +8,29 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
+@NoArgsConstructor(force = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
 
-    private final int id;
+    private int id;
 
     @NotBlank(message = "User name can not be blank")
-    private final String name;
+    private String name;
 
     @NotBlank(message = "Email cannot be blank")
     @Email
-    private final String email;
+    private String email;
 
     @NotBlank
-    private final List<OrderDto> orders = new ArrayList<>();
+    private List<OrderDto> orders = new ArrayList<>();
 
     @NotBlank
-    private final String password;
+    private String password;
 
     public UserDto(User user) {
         this.id = user.getId();

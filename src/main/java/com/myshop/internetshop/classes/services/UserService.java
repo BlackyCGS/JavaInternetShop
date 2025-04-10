@@ -68,7 +68,6 @@ public class UserService {
             if (userDto.getPassword() != null) {
                 user.setPassword(userDto.getPassword());
             }
-            userRepository.save(user);
             logger.info("updateUser return");
             return new UserDto(userRepository.save(user));
         } else {

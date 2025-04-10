@@ -1,24 +1,29 @@
 package com.myshop.internetshop.services;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
+import com.myshop.internetshop.classes.cache.Cache;
 import com.myshop.internetshop.classes.dto.ProductDto;
+import com.myshop.internetshop.classes.entities.Gpu;
+import com.myshop.internetshop.classes.entities.Motherboard;
 import com.myshop.internetshop.classes.entities.Product;
+import com.myshop.internetshop.classes.exceptions.NotFoundException;
+import com.myshop.internetshop.classes.exceptions.ValidationException;
 import com.myshop.internetshop.classes.repositories.ProductsRepository;
 import com.myshop.internetshop.classes.services.ProductsService;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.util.Collections;
+
+import java.util.ArrayList;
 import java.util.List;
 
-import com.myshop.internetshop.classes.exceptions.NotFoundException;
-
-import java.util.Arrays;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProductsServiceTest {
@@ -26,58 +31,257 @@ class ProductsServiceTest {
     @Mock
     private ProductsRepository productsRepository;
 
+    @Mock
+    private Cache<Product> productCache;
+
     @InjectMocks
     private ProductsService productsService;
 
-    private Product product;
+    private Product testProduct;
+    private ProductDto testProductDto;
+    private Gpu testGpu;
+    private Motherboard testMotherboard;
 
     @BeforeEach
     void setUp() {
-        product = new Product();
-        product.setId(1);
-        product.setName("Test Product");
-        product.setPrice(100);
+        testProduct = new Product();
+        testProduct.setId(1);
+        testProduct.setName("Test Product");
+        testProduct.setPrice((float)100.0);
+
+        testGpu = new Gpu();
+        testGpu.setProductId(1);
+        testGpu.setProducer("NVIDIA");
+        testMotherboard = new Motherboard();
+        testMotherboard.setProductId(1);
+        testMotherboard.setSocket("AM4");
+
+        testProductDto = new ProductDto();
+        testProductDto.setName("Test Product");
+        testProductDto.setPrice((float)100.0);
+
     }
 
     @Test
-    void testGetAllProducts_Success() {
-        when(productsRepository.findAll()).thenReturn(Arrays.asList(product));
-        List<ProductDto> products = productsService.getAllProducts();
-        assertFalse(products.isEmpty());
-        assertEquals(1, products.size());
-        assertEquals("Test Product", products.get(0).getName());
+    void getAllProducts_Success() {
+        // Arrange
+        List<Product> products = List.of(testProduct);
+        when(productsRepository.findAll()).thenReturn(products);
+
+        // Act
+        List<ProductDto> result = productsService.getAllProducts();
+
+        // Assert
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+        assertEquals("Test Product", result.get(0).getName());
     }
 
     @Test
-    void testGetAllProducts_ThrowsNotFoundException() {
-        when(productsRepository.findAll()).thenReturn(Collections.emptyList());
+    void getAllProducts_Empty_ThrowsNotFoundException() {
+        // Arrange
+        when(productsRepository.findAll()).thenReturn(new ArrayList<>());
+
+        // Act & Assert
         assertThrows(NotFoundException.class, () -> productsService.getAllProducts());
     }
 
     @Test
-    void testGetProductById_Success() {
-        when(productsRepository.findById(1)).thenReturn(product);
-        Product foundProduct = productsService.getProductById(1);
-        assertNotNull(foundProduct);
-        assertEquals("Test Product", foundProduct.getName());
+    void getProductById_FromCache() {
+        // Arrange
+        String cacheKey = "products-1";
+        when(productCache.contains(cacheKey)).thenReturn(true);
+        when(productCache.get(cacheKey)).thenReturn(testProduct);
+
+        // Act
+        Product result = productsService.getProductById(1L);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("Test Product", result.getName());
+        verify(productsRepository, never()).findById(anyLong());
     }
 
     @Test
-    void testDeleteProductById_Success() {
+    void getProductById_FromRepository() {
+        // Arrange
+        String cacheKey = "products-1";
+        when(productCache.contains(cacheKey)).thenReturn(false);
         when(productsRepository.existsById(1L)).thenReturn(true);
-        doNothing().when(productsRepository).deleteById(1L);
-        assertDoesNotThrow(() -> productsService.deleteProductById(1L));
+        when(productsRepository.findById(1L)).thenReturn(testProduct);
+
+        // Act
+        Product result = productsService.getProductById(1L);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("Test Product", result.getName());
+        verify(productCache).put(cacheKey, testProduct);
     }
 
     @Test
-    void testDeleteProductById_ThrowsNotFoundException() {
+    void getProductById_NotFound_ThrowsNotFoundException() {
+        // Arrange
+        String cacheKey = "products-1";
+        when(productCache.contains(cacheKey)).thenReturn(false);
         when(productsRepository.existsById(1L)).thenReturn(false);
-        assertThrows(NotFoundException.class, () -> productsService.deleteProductById(1L));
+
+        // Act & Assert
+        assertThrows(NotFoundException.class, () -> productsService.getProductById(1L));
     }
 
     @Test
-    void testExistsById() {
+    void getGpuByParams_Success() {
+        // Arrange
+        List<Product> products = List.of(testProduct);
+        when(productsRepository.findGpuByParams(anyString(), anyInt(), anyInt(), anyInt(), anyInt(), anyInt()))
+                .thenReturn(products);
+
+        // Act
+        List<ProductDto> result = productsService.getGpuByParams("NVIDIA", 1500, 3, 2, 200, 8);
+
+        // Assert
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void getGpuByParams_NotFound_ThrowsNotFoundException() {
+        // Arrange
+        when(productsRepository.findGpuByParams(anyString(), anyInt(), anyInt(), anyInt(), anyInt(), anyInt()))
+                .thenReturn(new ArrayList<>());
+
+        // Act & Assert
+        assertThrows(NotFoundException.class, () ->
+                productsService.getGpuByParams("NVIDIA", 1500, 3, 2, 200, 8));
+    }
+
+    @Test
+    void deleteProductById_Success() {
+        // Arrange
+        String cacheKey = "products-1";
         when(productsRepository.existsById(1L)).thenReturn(true);
-        assertTrue(productsService.existsById(1L));
+        when(productCache.contains(cacheKey)).thenReturn(true);
+
+        // Act
+        productsService.deleteProductById(1L);
+
+        // Assert
+        verify(productCache).remove(cacheKey);
+        verify(productsRepository).deleteById(1L);
+    }
+
+    @Test
+    void deleteProductById_NotFound_ThrowsNotFoundException() {
+        // Arrange
+        when(productsRepository.existsById(1L)).thenReturn(false);
+
+        // Act & Assert
+        assertThrows(NotFoundException.class, () -> productsService.deleteProductById(1L));
+        verify(productCache, never()).remove(anyString());
+        verify(productsRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    @Transactional
+    void saveProduct_WithGpu_Success() {
+        // Arrange
+        testProductDto.setGpu(testGpu);
+        when(productsRepository.save(any(Product.class))).thenReturn(testProduct);
+
+        // Act
+        ProductDto result = productsService.saveProduct(testProductDto);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("Test Product", result.getName());
+        verify(productsRepository).save(any(Product.class));
+    }
+
+    @Test
+    @Transactional
+    void saveProduct_WithMotherboard_Success() {
+        // Arrange
+        testProductDto.setMotherboard(testMotherboard);
+        when(productsRepository.save(any(Product.class))).thenReturn(testProduct);
+
+        // Act
+        ProductDto result = productsService.saveProduct(testProductDto);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("Test Product", result.getName());
+        verify(productsRepository).save(any(Product.class));
+    }
+
+    @Test
+    void saveProduct_InvalidCategoryCount_ThrowsValidationException() {
+        // Arrange
+        testProductDto.setGpu(testGpu);
+        testProductDto.setMotherboard(testMotherboard);
+
+        // Act & Assert
+        assertThrows(ValidationException.class, () -> productsService.saveProduct(testProductDto));
+        verify(productsRepository, never()).save(any(Product.class));
+    }
+
+    @Test
+    void saveProducts_Success() {
+        // Arrange
+        testProductDto.setGpu(testGpu);
+        testProduct.setGpu(testGpu);
+        List<ProductDto> productDtos = List.of(testProductDto);
+        List<Product> products = List.of(testProduct);
+        when(productsRepository.saveAll(anyList())).thenReturn(products);
+
+        // Act
+        List<ProductDto> result = productsService.saveProducts(productDtos);
+
+        // Assert
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+        verify(productsRepository).saveAll(anyList());
+    }
+
+    @Test
+    void existsById_ReturnsTrue() {
+        // Arrange
+        when(productsRepository.existsById(1L)).thenReturn(true);
+
+        // Act
+        boolean result = productsService.existsById(1L);
+
+        // Assert
+        assertTrue(result);
+    }
+
+    @Test
+    void existsById_ReturnsFalse() {
+        // Arrange
+        when(productsRepository.existsById(1L)).thenReturn(false);
+
+        // Act
+        boolean result = productsService.existsById(1L);
+
+        // Assert
+        assertFalse(result);
+    }
+
+    @Test
+    void clearCache_Success() {
+        // Act
+        productsService.clearCache();
+
+        // Assert
+        verify(productCache).clear();
+    }
+
+    @Test
+    void deleteAll_Success() {
+        // Act
+        productsService.deleteAll();
+
+        // Assert
+        verify(productsRepository).deleteAll();
     }
 }

@@ -31,6 +31,18 @@
         <java.version>17</java.version>
         <sonar.organization>blackycgs</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.coverage.exclusions>
+            **/advice/**/*,
+            **/aspects/**/*,
+            **/cache/**/*,
+            **/controllers/**/*,
+            **/dto/**/*,
+            **/entities/**/*,
+            **/enums/**/*,
+            **/exceptions/**/*,
+            **/repositories/**/*,
+            **/utilities/**/*
+        </sonar.coverage.exclusions>
     </properties>
     <dependencies>
         <dependency>

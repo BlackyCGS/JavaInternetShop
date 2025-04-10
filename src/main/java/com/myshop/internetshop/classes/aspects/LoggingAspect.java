@@ -1,4 +1,4 @@
-package com.myshop.internetshop.classes.aspect;
+package com.myshop.internetshop.classes.aspects;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Objects;
