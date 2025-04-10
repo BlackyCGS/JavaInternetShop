@@ -4,7 +4,6 @@ import com.myshop.internetshop.classes.services.LogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Logs", description = "Controller for getting logs")
 public class LogController {
 
-    LogService logService;
+    final LogService logService;
 
     @Autowired
     public LogController(LogService logService) {
@@ -29,6 +28,13 @@ public class LogController {
     @GetMapping("/{date}")
     public ResponseEntity<InputStreamResource> getLogsByDate(@Parameter(description =
             "date in yyyy-MM-dd format") @PathVariable String date) {
-        return logService.getLogsByDate(date);
+        return logService.getLogsByDate("", date);
+    }
+
+    @Operation(summary = "Get warn logs from certain date")
+    @GetMapping("/{date}/warn")
+    public ResponseEntity<InputStreamResource> getWarnLogsByDate(@Parameter(description =
+            "date in yyyy-MM-dd format") @PathVariable String date) {
+        return logService.getLogsByDate("Warn", date);
     }
 }

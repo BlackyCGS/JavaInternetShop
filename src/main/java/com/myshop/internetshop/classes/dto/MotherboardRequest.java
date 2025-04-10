@@ -1,10 +1,8 @@
 package com.myshop.internetshop.classes.dto;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.myshop.internetshop.classes.entities.Motherboard;
-import static com.myshop.internetshop.classes.utilities.NumberParser.parseFloatNumber;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -55,7 +53,6 @@ public class MotherboardRequest {
     public Motherboard toEntity() {
         Motherboard motherboard = new Motherboard();
         motherboard.setName(this.name);
-        motherboard.setPrice(parseFloatNumber(this.price));
         motherboard.setProducer(this.producer);
         motherboard.setSocket(this.socket);
         motherboard.setChipset(this.chipset);

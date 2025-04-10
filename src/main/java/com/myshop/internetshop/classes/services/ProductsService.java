@@ -1,7 +1,6 @@
 package com.myshop.internetshop.classes.services;
 
 import com.myshop.internetshop.classes.cache.Cache;
-import com.myshop.internetshop.classes.dto.GpuRequest;
 import com.myshop.internetshop.classes.dto.ProductDto;
 import com.myshop.internetshop.classes.entities.Gpu;
 import com.myshop.internetshop.classes.entities.Motherboard;
@@ -25,11 +24,11 @@ public class ProductsService {
     private final ProductsRepository productsRepository;
     private final Cache<Product> productCache;
     private static final String PRODUCTS_CACHE_NAME = "products-";
+
     @Autowired
     public ProductsService(ProductsRepository productsRepository,
                            Cache<Product> productCache,
                            @Lazy GpuService gpuService) {
-        this.gpuService = gpuService;
         this.productsRepository = productsRepository;
         this.productCache = productCache;
     }
@@ -58,7 +57,7 @@ public class ProductsService {
             logger.info("getProductById return from cache");
             return productCache.get(cacheKey);
         }
-        if(productsRepository.existsById(productId)) {
+        if (productsRepository.existsById(productId)) {
             Product product = productsRepository.findById(productId);
             productCache.put(cacheKey, product);
             logger.info("getProductById return");
@@ -98,31 +97,17 @@ public class ProductsService {
     }
 
     @Transactional
-    public ProductDto saveGpu(GpuRequest gpuRequest) {
-        Gpu gpu;
-        gpu = gpuRequest.toEntity();
-        Product product = new Product();
-        product.setName(gpu.getName());
-        product.setPrice(gpu.getPrice());
-        product.setGpu(gpu);
-        gpu.setProduct(product);
-        productsRepository.save(product);
-        logger.info("saveGpu return");
-        return new ProductDto(product);
-    }
-
-    @Transactional
-    public ProductDto saveProduct(ProductDto productDto){
+    public ProductDto saveProduct(ProductDto productDto) {
         validateProductDto(productDto);
         Product product = new Product();
         product.setName(productDto.getName());
         product.setPrice(productDto.getPrice());
-        if(productDto.getGpu() != null) {
+        if (productDto.getGpu() != null) {
             product.setGpu(productDto.getGpu());
             Gpu gpu = productDto.getGpu();
             gpu.setProduct(product);
         }
-        if(productDto.getMotherboard() != null) {
+        if (productDto.getMotherboard() != null) {
             product.setMotherBoard(productDto.getMotherboard());
             Motherboard motherboard = productDto.getMotherboard();
             motherboard.setProduct(product);
@@ -141,7 +126,7 @@ public class ProductsService {
         List<Product> finalProducts = products;
         List<Gpu> gpus = productDtos.stream().map(ProductDto::getGpu).toList();
         gpus.forEach(gpu -> {
-            if (gpu!=null) {
+            if (gpu != null) {
                 gpu.setProduct(finalProducts.get(gpus.indexOf(gpu)));
             }
             }
@@ -151,6 +136,7 @@ public class ProductsService {
         return products.stream().map(this::convertToDto).toList();
 
     }
+
     public boolean existsById(long productId) {
         logger.info("existsById return");
         return productsRepository.existsById(productId);
@@ -170,9 +156,12 @@ public class ProductsService {
         if (productDto.getMotherboard() != null) {
             categoryCount++;
         }
-        if(categoryCount != 1) throw new ValidationException("ProductDto with name: "
-                + productDto.getName() + "is not valid");
+        if (categoryCount != 1) {
+            throw new ValidationException("ProductDto with name: "
+                    + productDto.getName() + "is not valid because it has " + categoryCount + " categories");
+        }
     }
+
     public void deleteAll() {
         productsRepository.deleteAll();
     }

@@ -118,7 +118,7 @@ public class OrderService {
         List<Order> orders = orderRepository.findByOrderStatus(userId, status);
         List<OrderDto> orderDtos = new ArrayList<>();
         if (orders.isEmpty()) {
-           throw new NotFoundException("There is no such orders");
+            throw new NotFoundException("There is no such orders");
         }
         for (Order order : orders) {
             orderDtos.add(new OrderDto(order));

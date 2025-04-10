@@ -6,7 +6,8 @@ import java.util.Random;
 public class NumberParser {
 
     NumberParser() {
-        throw new UnsupportedOperationException("There in no way you can call the constructor of NumberParser");
+        throw new UnsupportedOperationException(
+        "There in no way you can call the constructor of NumberParser");
     }
 
     public static Integer parseInteger(String value) {

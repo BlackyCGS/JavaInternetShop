@@ -48,7 +48,7 @@ public class UserService {
 
     public UserDto getUserById(Integer id) {
         if (userRepository.existsById(id)) {
-            User user = userRepository.safeFindByID(id);
+            User user = userRepository.safeFindById(id);
             logger.info("getUserById return");
             return new UserDto(user);
         } else {

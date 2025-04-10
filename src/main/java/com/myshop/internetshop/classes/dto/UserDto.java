@@ -3,11 +3,10 @@ package com.myshop.internetshop.classes.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.myshop.internetshop.classes.entities.Order;
 import com.myshop.internetshop.classes.entities.User;
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 
 @Getter

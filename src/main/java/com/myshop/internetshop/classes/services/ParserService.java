@@ -6,12 +6,11 @@ import com.myshop.internetshop.classes.dto.ProductDto;
 import com.myshop.internetshop.classes.entities.Gpu;
 import com.myshop.internetshop.classes.entities.Motherboard;
 import com.myshop.internetshop.classes.entities.Product;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class ParserService {
@@ -24,7 +23,6 @@ public class ParserService {
             Product product = new Product();
             Gpu gpu = gpuRequest.toEntity();
             product.setName(gpu.getName());
-            product.setPrice(gpu.getPrice());
             product.setGpu(gpu);
             productDtos.add(convertToDto(product));
         }
@@ -34,11 +32,10 @@ public class ParserService {
 
     public List<ProductDto> massMotherboardParser(List<MotherboardRequest> motherboards) {
         List<ProductDto> productDtos = new ArrayList<>();
-        for(MotherboardRequest motherboardRequest : motherboards){
+        for (MotherboardRequest motherboardRequest : motherboards) {
             Product product = new Product();
             Motherboard motherboard = motherboardRequest.toEntity();
             product.setName(motherboard.getName());
-            product.setPrice(motherboard.getPrice());
             product.setMotherBoard(motherboard);
             productDtos.add(convertToDto(product));
         }

@@ -1,12 +1,11 @@
 package com.myshop.internetshop.classes.dto;
 
+import static com.myshop.internetshop.classes.utilities.NumberParser.parseInteger;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.myshop.internetshop.classes.entities.Gpu;
 import lombok.Getter;
-
-import static com.myshop.internetshop.classes.utilities.NumberParser.parseFloatNumber;
-import static com.myshop.internetshop.classes.utilities.NumberParser.parseInteger;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
@@ -73,7 +72,6 @@ public class GpuRequest {
         gpu.setDisplayPort(this.displayPort);
         gpu.setDvi(this.dvi);
         gpu.setVga(this.vga);
-        gpu.setPrice(parseFloatNumber(this.price));
         return gpu;
     }
 

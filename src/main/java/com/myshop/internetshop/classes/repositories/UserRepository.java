@@ -11,9 +11,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     User findById(int id);
 
-    @Query("select new User(u.id, u.email, u.name) from User u where " +
-            "u.id = :id")
-    User safeFindByID(@Param("id") Integer id);
+    @Query("select new User(u.id, u.email, u.name) from User u where "
+            + "u.id = :id")
+    User safeFindById(@Param("id") Integer id);
 
 
     boolean existsByEmail(String email);

@@ -1,6 +1,7 @@
 package com.myshop.internetshop.classes.aspect;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Objects;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -10,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import java.util.Objects;
 
 @Aspect
 @Component

@@ -16,7 +16,7 @@ public class Cache<V> {
     private final Map<String, CacheEntry<V>> cacheEntryMap = new HashMap<>();
     private static final long CACHE_EXPIRE_TIME = 30 * 60 * (long) 1000;
     private static final long CACHE_SIZE = 20;
-    ScheduledExecutorService scheduler;
+    final ScheduledExecutorService scheduler;
 
     public Cache() {
         this.scheduler = Executors.newScheduledThreadPool(1);

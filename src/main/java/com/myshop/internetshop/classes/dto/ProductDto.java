@@ -5,6 +5,7 @@ import com.myshop.internetshop.classes.entities.Gpu;
 import com.myshop.internetshop.classes.entities.Motherboard;
 import com.myshop.internetshop.classes.entities.Product;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,9 +16,9 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProductDto {
     private Integer productId;
-    @NotBlank(message = "Product name can not be black")
+    @NotBlank(message = "Product name can not be blank")
     private String name;
-    @NotBlank(message = "Product price cannot be blank")
+    @NotNull(message = "Product price cannot be blank")
     private float price;
 
     private Gpu gpu;
@@ -32,20 +33,14 @@ public class ProductDto {
         this.motherboard = product.getMotherBoard();
     }
 
-    public void setGpuId(Integer gpuId) {
-        this.gpu.setProductId(gpuId);
-    }
-
     public Product toEntity() {
         Product product = new Product();
         product.setName(this.name);
         product.setPrice(this.price);
         product.setGpu(this.gpu);
+        this.gpu.setProductId(null);
         return product;
 
-    }
-    public int getProductId() {
-        return productId;
     }
 
 }

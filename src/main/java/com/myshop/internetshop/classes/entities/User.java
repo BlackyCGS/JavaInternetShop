@@ -54,7 +54,7 @@ public class User {
         orders = new ArrayList<>();
     }
 
-    public User(Integer id, String email , String name) {
+    public User(Integer id, String email, String name) {
         this.id = id;
         this.email = email;
         this.name = name;

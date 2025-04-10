@@ -1,12 +1,5 @@
 package com.myshop.internetshop.classes.services;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
 import java.nio.file.Files;
@@ -15,31 +8,43 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import com.myshop.internetshop.classes.exceptions.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
 @Service
 public class LogService {
 
-    Logger logger = LoggerFactory.getLogger(LogService.class);
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    final Logger logger = LoggerFactory.getLogger(LogService.class);
+    final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public ResponseEntity<InputStreamResource> getLogsByDate(String date) {
+    public ResponseEntity<InputStreamResource> getLogsByDate(String additional,
+                                                             String date) {
         try {
             LocalDate localDate = LocalDate.parse(date, formatter);
-            String fileName = "logs/internetShop-" + formatter.format(localDate) + ".log";
+            String fileName =
+                    "logs/internetShop" + additional + "-" + formatter.format(localDate) +
+                    ".log";
             Path path = Paths.get(fileName);
 
-            if(!Files.exists(path)) {
-                return ResponseEntity.notFound().build();
+            if (!Files.exists(path)) {
+                throw new NotFoundException("There is no file with name" + fileName);
             }
 
             InputStreamResource resource =
                     new InputStreamResource(new FileInputStream(fileName));
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + path.getFileName())
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=" + path.getFileName())
                     .contentType(MediaType.TEXT_PLAIN)
                     .body(resource);
         } catch (Exception e) {
-            logger.warn("Error while getting logs from file: {}", e.getMessage());
-            return ResponseEntity.notFound().build();
+            throw new NotFoundException("Error while getting logs from file: " + e.getMessage());
         }
     }
 }

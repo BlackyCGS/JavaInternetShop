@@ -1,7 +1,13 @@
 package com.myshop.internetshop.classes.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,9 +21,6 @@ public class Motherboard {
 
     @Column(nullable = false)
     private String name;
-
-    @Column(nullable = false)
-    private float price;
 
     @Column(nullable = false)
     private String producer;

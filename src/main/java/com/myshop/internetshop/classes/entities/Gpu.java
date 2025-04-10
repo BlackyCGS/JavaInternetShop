@@ -19,7 +19,7 @@ import lombok.Setter;
 public class Gpu {
 
     @Id
-    private int productId;
+    private Integer productId;
 
     @Column(nullable = false)
     private String name;
@@ -48,9 +48,6 @@ public class Gpu {
     @Column(nullable = false)
     private int vga = 0;
 
-    @Column(nullable = false)
-    private float price = 0;
-
     //@OneToOne(mappedBy = "gpu", cascade = CascadeType.ALL)
     @SuppressWarnings("javaarchitecture:S7027")
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -71,21 +68,18 @@ public class Gpu {
         this.vram = vram;
     }
 
-    public void setAdditionalInfo(int displayPort, int dvi, int hdmi, int tdp, int vga,
-            float price) {
+    public void setAdditionalInfo(int displayPort, int dvi, int hdmi, int tdp, int vga) {
         this.displayPort = displayPort;
         this.dvi = dvi;
         this.hdmi = hdmi;
         this.tdp = tdp;
         this.vga = vga;
-        this.price = price;
 
     }
 
     public Product parseToProduct() {
         Product returnProduct = new Product();
         returnProduct.setName(this.name);
-        returnProduct.setPrice(this.price);
         return returnProduct;
     }
 }
