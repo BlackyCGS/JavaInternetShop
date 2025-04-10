@@ -1,7 +1,6 @@
 package com.myshop.internetshop.classes.controllers;
 
 import com.myshop.internetshop.classes.dto.UserDto;
-import com.myshop.internetshop.classes.dto.UserRequest;
 import com.myshop.internetshop.classes.entities.User;
 import com.myshop.internetshop.classes.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,29 +28,29 @@ public class UserController {
         this.userService = userService;
     }
 
-    @Operation(description = "Create user using json with login password and email")
+    @Operation(summary = "Create user using json with login password and email")
     @PostMapping("/create")
-    public User createUser(@RequestBody UserRequest userRequest) {
-        return userService.createUser(userRequest);
+    public User createUser(@RequestBody UserDto userDto) {
+        return userService.createUser(userDto);
     }
 
-    @Operation(description = "Delete user by id")
+    @Operation(summary = "Delete user by id")
     @DeleteMapping("/delete/{id}")
     public HttpEntity<Object> deleteUser(@PathVariable("id") int id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(description = "Get user data by id")
+    @Operation(summary = "Get user data by id")
     @GetMapping("/{id}")
-    public UserDto getUser(@PathVariable("id") int id) {
+    public UserDto getUser(@PathVariable("id") Integer id) {
         return userService.getUserById(id);
     }
 
-    @Operation(description = "Update user data using id and json with new data")
+    @Operation(summary = "Update user data using id and json with new data")
     @PutMapping("/update/{id}")
-    public UserDto updateUser(@RequestBody UserRequest userRequest, @PathVariable int id) {
-        return userService.updateUser(id, userRequest);
+    public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable int id) {
+        return userService.updateUser(id, userDto);
     }
 
 }

@@ -9,17 +9,18 @@ import com.myshop.internetshop.classes.exceptions.NotFoundException;
 import com.myshop.internetshop.classes.repositories.OrderRepository;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class OrderService {
 
+    private final Logger logger = LoggerFactory.getLogger(OrderService.class);
     private final OrderRepository orderRepository;
     private final ProductsService productsService;
     private final UserService userService;
-    private static final String NOT_FOUND_MESSAGE = "Order not found";
+    private static final String NOT_FOUND_MESSAGE = "There is no order with id ";
     private final Cache<Order> orderCache;
     private static final String ORDER_CACHE_KEY = "order-";
 
@@ -47,9 +48,10 @@ public class OrderService {
                 orderCache.remove(cacheKey);
             }
             orderCache.put(cacheKey, order);
+            logger.info("addProductsToOrder return. Added products to order");
             return new OrderDto(order);
         } else {
-            throw new NotFoundException(NOT_FOUND_MESSAGE);
+            throw new NotFoundException(NOT_FOUND_MESSAGE + orderId);
         }
     }
 
@@ -58,6 +60,7 @@ public class OrderService {
         if (orderCache.contains(cacheKey)) {
             orderCache.remove(cacheKey);
         }
+        logger.info("Order with id {} deleted", orderId);
         orderRepository.deleteById(orderId);
     }
 
@@ -71,9 +74,10 @@ public class OrderService {
                 orderCache.remove(cacheKey);
             }
             orderCache.put(cacheKey, order);
+            logger.info("changeStatus return");
             return new OrderDto(order);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, NOT_FOUND_MESSAGE);
+            throw new NotFoundException(NOT_FOUND_MESSAGE + id);
         }
     }
 
@@ -88,6 +92,7 @@ public class OrderService {
                 orderCache.remove(cacheKey);
             }
             orderCache.put(cacheKey, order);
+            logger.info("createOrder return");
             return new UserDto(userService.findByUserId(userId));
         } else {
             throw new NotFoundException("User does not exist");
@@ -102,9 +107,10 @@ public class OrderService {
         if (orderRepository.existsById(orderId)) {
             Order order = orderRepository.findById(orderId);
             orderCache.put(cacheKey, order);
+            logger.info("getOrderById return");
             return new OrderDto(order);
         } else {
-            throw new NotFoundException(NOT_FOUND_MESSAGE);
+            throw new NotFoundException(NOT_FOUND_MESSAGE + orderId);
         }
     }
 
@@ -112,12 +118,13 @@ public class OrderService {
         List<Order> orders = orderRepository.findByOrderStatus(userId, status);
         List<OrderDto> orderDtos = new ArrayList<>();
         if (orders.isEmpty()) {
-           throw new NotFoundException(NOT_FOUND_MESSAGE);
+           throw new NotFoundException("There is no such orders");
         }
         for (Order order : orders) {
             orderDtos.add(new OrderDto(order));
             orderCache.put(ORDER_CACHE_KEY + order.getId(), order);
         }
+        logger.info("getByStatusAndUserId return");
         return orderDtos;
     }
 }

@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/products")
 @Tag(name = "Products", description = "Manage products data")
 public class ProductsController {
-
     private final ProductsService productsService;
 
     @Autowired
@@ -32,13 +31,13 @@ public class ProductsController {
         this.productsService = productsService;
     }
 
-    @Operation(description = "Get all products")
+    @Operation(summary = "Get all products")
     @GetMapping("")
     public List<ProductDto> getAllProducts() {
         return productsService.getAllProducts();
     }
 
-    @Operation(description = "Get gpus using parameters. If parameter is null, it " +
+    @Operation(summary = "Get gpus using parameters. If parameter is null, it " +
             "doesnt involved in search")
     @GetMapping("/category/gpu")
     public List<ProductDto> getGpus(@RequestParam(required = false) String producer,
@@ -55,20 +54,20 @@ public class ProductsController {
         return productsService.getGpuByParams(producer, boostClock, displayPort, hdmi, tdp, vram);
     }
 
-    @Operation(description = "Delete product by id")
+    @Operation(summary = "Delete product by id")
     @DeleteMapping("/delete/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProduct(@PathVariable("id") long id) {
         productsService.deleteProductById(id);
     }
 
-    @Operation(description = "Add gpu to database")
+    @Operation(summary = "Add gpu to database")
     @PostMapping("/gpu")
     public ProductDto createGpu(@RequestBody GpuRequest gpu) {
         return productsService.saveGpu(gpu);
     }
 
-    @Operation(description = "Add multiple gpus at once")
+    @Operation(summary = "Add multiple gpus at once")
     @PostMapping("/gpu/list")
     public ResponseEntity<String> createGpus(@RequestBody List<GpuRequest> gpus) {
         for (GpuRequest gpu : gpus) {
@@ -77,15 +76,34 @@ public class ProductsController {
         return ResponseEntity.ok("Gpus created");
     }
 
-    @Operation(description = "Clear products cache")
+    @Operation(summary = "Clear products cache")
     @GetMapping("/clearCache")
     void clearCache() {
         productsService.clearCache();
     }
 
-    @Operation(description = "Get product data by id")
+    @Operation(summary = "Get product data by id")
     @GetMapping("/{id}")
     public ProductDto getProductById(@PathVariable("id") int id) {
         return new ProductDto(productsService.getProductById(id));
+    }
+
+    @Operation(summary = "Add product")
+    @PostMapping()
+    public ProductDto addProduct(@RequestBody ProductDto product) {
+        return productsService.saveProduct(product);
+    }
+
+    @Operation(summary = "Add multiple products")
+    @PostMapping("/list")
+    public List<ProductDto> addProducts(@RequestBody List<ProductDto> products) {
+        return productsService.saveProducts(products);
+    }
+
+    @Operation(summary = "delete all")
+    @DeleteMapping
+    ResponseEntity<String> deleteAllProducts() {
+        productsService.deleteAll();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -29,7 +29,7 @@ public class Cache<V> {
             removeOldest();
         }
         cacheEntryMap.put(key, new CacheEntry<>(value));
-        logger.info("[CACHE] Put key: {} inside cache", key);
+        logger.info("Put key: {} inside cache", key);
     }
 
     public boolean contains(final String key) {
@@ -40,7 +40,7 @@ public class Cache<V> {
         CacheEntry<V> entry = cacheEntryMap.get(key);
         if (entry != null) {
             entry.refresh();
-            logger.info("[CACHE] Get key: {} inside cache", key);
+            logger.info("Get key: {} inside cache", key);
             return entry.getValue();
         }
         return null;
@@ -50,14 +50,14 @@ public class Cache<V> {
         long now = System.currentTimeMillis();
         cacheEntryMap.entrySet().removeIf(
                 entry -> now - entry.getValue().getTimestamp() > CACHE_EXPIRE_TIME);
-        logger.info("[CACHE]: Cache auto clean up complete");
+        logger.info("Cache auto clean up complete");
     }
 
     private void removeOldest() {
         cacheEntryMap.entrySet().stream().min(Comparator.comparingLong(
             entry -> entry.getValue().getTimestamp())).ifPresent(entry -> {
                 cacheEntryMap.remove(entry.getKey());
-                logger.info("[CACHE]: Removed oldest entry. Entry key: {}",
+                logger.info("Removed oldest entry. Entry key: {}",
                        entry.getKey());
             });
 
@@ -69,7 +69,7 @@ public class Cache<V> {
 
     public void clear() {
         cacheEntryMap.clear();
-        logger.info("[CACHE]: Cache cleared");
+        logger.info("Cache cleared");
     }
 
 

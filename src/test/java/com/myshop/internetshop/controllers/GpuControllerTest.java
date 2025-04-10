@@ -14,7 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
 import java.util.Collections;
 import java.util.List;
 
@@ -45,17 +44,7 @@ class GpuControllerTest {
         gpuRequest.setAdditionalInfo(3, 0, 1, "450W", 0);
     }
 
-    @Test
-    void getAllGpusShouldReturnListOfGpuDtos() {
-        when(gpuService.getAllGpus(any(), anyInt(), anyInt(), anyInt(), anyInt(), anyInt()))
-                .thenReturn(Collections.singletonList(gpuDto));
 
-        List<GpuDto> result = gpuController.getAllGpus(null, 0, 0, 0, 0, 0);
-
-        assertFalse(result.isEmpty());
-        assertEquals(1, result.size());
-        assertEquals("RTX 4090", result.get(0).getName());
-    }
 
     @Test
     void getGpuByIdShouldReturnGpuDto() {

@@ -1,11 +1,14 @@
 package com.myshop.internetshop.classes.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.myshop.internetshop.classes.entities.Gpu;
-import java.security.SecureRandom;
-import java.util.Random;
 import lombok.Getter;
 
+import static com.myshop.internetshop.classes.utilities.NumberParser.parseFloatNumber;
+import static com.myshop.internetshop.classes.utilities.NumberParser.parseInteger;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 public class GpuRequest {
     @JsonProperty("name")
@@ -57,33 +60,7 @@ public class GpuRequest {
 
     }
 
-    public Integer parseInteger(String value) {
-        if (value == null || value.isEmpty()) {
-            return 0;
-        }
 
-        String numericValue = value.replaceAll("\\D", "");
-        if (numericValue.isEmpty()) {
-            return 0;
-        }
-
-        return Integer.parseInt(numericValue);
-    }
-
-    public Float parseFloatNumber(String value) {
-        if (value == null || value.isEmpty()) {
-            Random rand = new SecureRandom();
-            return rand.nextFloat(2000);
-        }
-
-        String numericValue = value.replaceAll("[^0-9.]", "");
-        if (numericValue.isEmpty()) {
-            Random rand = new SecureRandom();
-            return rand.nextFloat(2000);
-        }
-
-        return Float.parseFloat(numericValue);
-    }
 
     public Gpu toEntity() {
         Gpu gpu = new Gpu();

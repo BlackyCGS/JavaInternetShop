@@ -42,6 +42,13 @@ public class Product {
     @PrimaryKeyJoinColumn
     private Gpu gpu;
 
+    @Getter
+    @Setter
+    @SuppressWarnings("javaarchitecture:S7027")
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @PrimaryKeyJoinColumn
+    private Motherboard motherBoard;
+
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     @SuppressWarnings("javaarchitecture:S7027")

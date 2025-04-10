@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.myshop.internetshop.classes.dto.UserDto;
-import com.myshop.internetshop.classes.dto.UserRequest;
 import com.myshop.internetshop.classes.entities.Order;
 import com.myshop.internetshop.classes.entities.User;
 import com.myshop.internetshop.classes.exceptions.ConflictException;
@@ -29,7 +28,7 @@ class UserServiceTest {
 
     private User user;
     private Order order;
-    private UserRequest userRequest;
+    private UserDto userRequest;
 
     @BeforeEach
     void setUp() {
@@ -42,10 +41,7 @@ class UserServiceTest {
         order.setId(1);
         order.setUser(user);
         user.addNewOrder(order);
-        userRequest = new UserRequest();
-        userRequest.setName("JohnDoe");
-        userRequest.setEmail("johndoe@example.com");
-        userRequest.setPassword("password123");
+        userRequest = new UserDto(user);
     }
 
     @Test

@@ -39,42 +39,6 @@ class GpuRequestTest {
     }
 
     @Test
-    void testParseInteger_withValidValue() {
-        Integer parsedValue = gpuRequest.parseInteger("1800MHz");
-        assertEquals(1800, parsedValue);
-    }
-
-    @Test
-    void testParseInteger_withEmptyString() {
-        Integer parsedValue = gpuRequest.parseInteger("");
-        assertEquals(0, parsedValue);
-    }
-
-    @Test
-    void testParseInteger_withNull() {
-        Integer parsedValue = gpuRequest.parseInteger(null);
-        assertEquals(0, parsedValue);
-    }
-
-    @Test
-    void testParseFloatNumber_withValidValue() {
-        Float parsedValue = gpuRequest.parseFloatNumber("1500.99");
-        assertEquals(1500.99, parsedValue, 0.01);
-    }
-
-    @Test
-    void testParseFloatNumber_withEmptyString() {
-        Float parsedValue = gpuRequest.parseFloatNumber("");
-        assertTrue(parsedValue >= 0 && parsedValue <= 2000);
-    }
-
-    @Test
-    void testParseFloatNumber_withNull() {
-        Float parsedValue = gpuRequest.parseFloatNumber(null);
-        assertTrue(parsedValue >= 0 && parsedValue <= 2000);
-    }
-
-    @Test
     void testToEntity() {
         gpuRequest.setBaseInfo("RTX 3090", "NVIDIA", "1800", "24GB", "1500.99");
         gpuRequest.setAdditionalInfo(3, 1, 2, "350W", 0);

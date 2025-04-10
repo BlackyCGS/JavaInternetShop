@@ -23,7 +23,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(nullable = false, unique = true)
     private String name;
@@ -51,6 +51,14 @@ public class User {
         this.email = email;
         this.password = password;
         this.permission = permission;
+        orders = new ArrayList<>();
+    }
+
+    public User(Integer id, String email , String name) {
+        this.id = id;
+        this.email = email;
+        this.name = name;
+        orders = new ArrayList<>();
     }
 
     public void addNewOrder(Order order) {
