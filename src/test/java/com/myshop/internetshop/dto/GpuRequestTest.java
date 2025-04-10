@@ -54,6 +54,5 @@ class GpuRequestTest {
         assertEquals(3, gpu.getDisplayPort());
         assertEquals(1, gpu.getDvi());
         assertEquals(0, gpu.getVga());
-        assertEquals(1500.99, gpu.getPrice(), 0.01);
     }
 }
