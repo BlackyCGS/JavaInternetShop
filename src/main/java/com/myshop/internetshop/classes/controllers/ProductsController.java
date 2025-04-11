@@ -5,9 +5,11 @@ import com.myshop.internetshop.classes.services.ProductsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Validated
 @RequestMapping("/api/products")
 @Tag(name = "Products", description = "Manage products data")
 public class ProductsController {
@@ -73,13 +76,13 @@ public class ProductsController {
 
     @Operation(summary = "Add product")
     @PostMapping()
-    public ProductDto addProduct(@RequestBody ProductDto product) {
+    public ProductDto addProduct(@Valid @RequestBody ProductDto product) {
         return productsService.saveProduct(product);
     }
 
     @Operation(summary = "Add multiple products")
     @PostMapping("/list")
-    public List<ProductDto> addProducts(@RequestBody List<ProductDto> products) {
+    public List<ProductDto> addProducts(@Valid @RequestBody List<ProductDto> products) {
         return productsService.saveProducts(products);
     }
 

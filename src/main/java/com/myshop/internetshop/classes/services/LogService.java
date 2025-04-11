@@ -7,10 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
 import com.myshop.internetshop.classes.exceptions.NotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -20,7 +17,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class LogService {
 
-    final Logger logger = LoggerFactory.getLogger(LogService.class);
     final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public ResponseEntity<InputStreamResource> getLogsByDate(String additional,

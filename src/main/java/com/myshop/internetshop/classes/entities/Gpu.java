@@ -16,6 +16,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "gpu")
+@SuppressWarnings("java:S7027")
 public class Gpu {
 
     @Id
@@ -49,7 +50,7 @@ public class Gpu {
     private int vga = 0;
 
     //@OneToOne(mappedBy = "gpu", cascade = CascadeType.ALL)
-    @SuppressWarnings("javaarchitecture:S7027")
+    @SuppressWarnings("java:S7027")
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @MapsId
     @JsonIgnore

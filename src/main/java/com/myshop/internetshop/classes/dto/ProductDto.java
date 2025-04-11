@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.myshop.internetshop.classes.entities.Gpu;
 import com.myshop.internetshop.classes.entities.Motherboard;
 import com.myshop.internetshop.classes.entities.Product;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +18,7 @@ public class ProductDto {
     private Integer productId;
     @NotBlank(message = "Product name can not be blank")
     private String name;
-    @NotNull(message = "Product price cannot be blank")
+    @Min(value = 0, message = "Price must be more than 0")
     private float price;
 
     private Gpu gpu;

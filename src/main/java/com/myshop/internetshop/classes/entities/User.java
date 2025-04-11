@@ -19,6 +19,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "users")
+@SuppressWarnings("javaarchitecture:S7027")
 public class User {
 
     @Id
@@ -37,7 +38,7 @@ public class User {
     @Column(nullable = false)
     private int permission = UserPermission.USER_PERMISSION_REGULAR.getPermissionType();
 
-    @SuppressWarnings("javaarchitecture:S7027")
+    @SuppressWarnings("java:S7027")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true,
             fetch = FetchType.LAZY)
     private List<Order> orders;

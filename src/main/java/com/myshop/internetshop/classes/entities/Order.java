@@ -23,6 +23,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "orders")
+@SuppressWarnings("javaarchitecture:S7027")
 public class Order {
 
     @Id
@@ -31,14 +32,14 @@ public class Order {
     private int id;
 
     @JsonIgnore
-    @SuppressWarnings("javaarchitecture:S7027")
+    @SuppressWarnings("java:S7027")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Setter
     @Getter
-    @SuppressWarnings("javaarchitecture:S7027")
+    @SuppressWarnings("java:S7027")
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE,
         CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "orders_products",

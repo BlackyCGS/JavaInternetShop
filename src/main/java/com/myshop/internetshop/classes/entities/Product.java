@@ -25,6 +25,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "products")
+@SuppressWarnings("java:S7027")
 public class Product {
 
     @Id
@@ -37,21 +38,21 @@ public class Product {
 
     @Getter
     @Setter
-    @SuppressWarnings("javaarchitecture:S7027")
+    @SuppressWarnings("java:S7027")
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @PrimaryKeyJoinColumn
     private Gpu gpu;
 
     @Getter
     @Setter
-    @SuppressWarnings("javaarchitecture:S7027")
+    @SuppressWarnings("java:S7027")
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @PrimaryKeyJoinColumn
     private Motherboard motherBoard;
 
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
-    @SuppressWarnings("javaarchitecture:S7027")
+    @SuppressWarnings("java:S7027")
     @ManyToMany(fetch = FetchType.LAZY, cascade =
         {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType
             .REFRESH},

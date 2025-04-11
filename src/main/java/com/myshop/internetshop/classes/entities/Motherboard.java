@@ -14,6 +14,7 @@ import lombok.Setter;
 @Entity
 @Setter
 @Getter
+@SuppressWarnings("java:S7027")
 public class Motherboard {
 
     @Id
@@ -55,6 +56,7 @@ public class Motherboard {
     @Column(nullable = false)
     private int hdmi;
 
+    @SuppressWarnings("java:S7027")
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @MapsId
     @JsonIgnore
