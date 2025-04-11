@@ -23,7 +23,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "orders")
-@SuppressWarnings("javaarchitecture:S7027")
+@SuppressWarnings("java:S7027")
 public class Order {
 
     @Id
