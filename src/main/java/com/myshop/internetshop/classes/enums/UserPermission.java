@@ -2,21 +2,21 @@ package com.myshop.internetshop.classes.enums;
 
 public enum UserPermission {
     /* Can do basically everything */
-    USER_PERMISSION_ADMIN(1),
+    ADMIN("ADMIN"),
     /*Can add, delete and change products, change order statuses */
-    USER_PERMISSION_MERCHANT(2),
+    MERCHANT("MERCHANT"),
     /*Can change order status*/
-    USER_PERMISSION_DELIVERY(3),
+    DELIVERY("DELIVERY"),
     /*Just user*/
-    USER_PERMISSION_REGULAR(4);
+    USER("USER");
 
-    private final int permission;
+    private final String permission;
 
-    UserPermission(int userPermission) {
+    UserPermission(String userPermission) {
         this.permission = userPermission;
     }
 
-    public int getPermissionType() {
+    public String getPermissionType() {
         return permission;
     }
 }

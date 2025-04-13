@@ -55,19 +55,6 @@ public class ProductsController {
         return productsService.getGpuByParams(producer, boostClock, displayPort, hdmi, tdp, vram);
     }
 
-    @Operation(summary = "Delete product by id")
-    @DeleteMapping("/delete/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteProduct(@PathVariable("id") long id) {
-        productsService.deleteProductById(id);
-    }
-
-    @Operation(summary = "Clear products cache")
-    @GetMapping("/clearCache")
-    void clearCache() {
-        productsService.clearCache();
-    }
-
     @Operation(summary = "Get product data by id")
     @GetMapping("/{id}")
     public ProductDto getProductById(@PathVariable("id") int id) {
@@ -86,10 +73,23 @@ public class ProductsController {
         return productsService.saveProducts(products);
     }
 
+    @Operation(summary = "Clear products cache")
+    @PostMapping("/clearCache")
+    void clearCache() {
+        productsService.clearCache();
+    }
+
     @Operation(summary = "delete all")
     @DeleteMapping
     ResponseEntity<String> deleteAllProducts() {
         productsService.deleteAll();
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @Operation(summary = "Delete product by id")
+    @DeleteMapping("/delete/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteProduct(@PathVariable("id") long id) {
+        productsService.deleteProductById(id);
     }
 }

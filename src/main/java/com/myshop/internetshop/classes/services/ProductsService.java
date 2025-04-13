@@ -41,7 +41,6 @@ public class ProductsService {
             ProductDto productDto = convertToDto(product);
             productDtos.add(productDto);
         }
-        logger.info("getAllProducts return");
         return productDtos;
     }
 
@@ -58,7 +57,6 @@ public class ProductsService {
         if (productsRepository.existsById(productId)) {
             Product product = productsRepository.findById(productId);
             productCache.put(cacheKey, product);
-            logger.info("getProductById return");
             return product;
         }
         throw new NotFoundException("There is no product with id " + productId);
@@ -76,7 +74,6 @@ public class ProductsService {
         for (Product product : products) {
             productDtos.add(convertToDto(product));
         }
-        logger.info("getGpuByParams return");
         return productDtos;
     }
 
@@ -111,7 +108,6 @@ public class ProductsService {
             motherboard.setProduct(product);
         }
         productsRepository.save(product);
-        logger.info("saveProduct return");
         return new ProductDto(product);
     }
 
@@ -130,13 +126,11 @@ public class ProductsService {
             }
         );
         products = productsRepository.saveAll(products);
-        logger.info("saveProducts return");
         return products.stream().map(this::convertToDto).toList();
 
     }
 
     public boolean existsById(long productId) {
-        logger.info("existsById return");
         return productsRepository.existsById(productId);
     }
 

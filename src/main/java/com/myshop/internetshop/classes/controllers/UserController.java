@@ -31,10 +31,22 @@ public class UserController {
         this.userService = userService;
     }
 
+    @Operation(summary = "Get user data by id")
+    @GetMapping("/{id}")
+    public UserDto getUser(@PathVariable("id") Integer id) {
+        return userService.getUserById(id);
+    }
+
     @Operation(summary = "Create user using json with login password and email")
     @PostMapping("/create")
     public User createUser(@Valid @RequestBody UserDto userDto) {
         return userService.createUser(userDto);
+    }
+
+    @Operation(summary = "Update user data using id and json with new data")
+    @PutMapping("/update/{id}")
+    public UserDto updateUser(@Valid @RequestBody UserDto userDto, @PathVariable int id) {
+        return userService.updateUser(id, userDto);
     }
 
     @Operation(summary = "Delete user by id")
@@ -44,16 +56,9 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Get user data by id")
-    @GetMapping("/{id}")
-    public UserDto getUser(@PathVariable("id") Integer id) {
-        return userService.getUserById(id);
-    }
+    @PutMapping("/role/{id}/{roleType}")
+    public UserDto updateUserRole(@PathVariable int id, @PathVariable String roleType) {
+        return userService.updateUserRole(id, roleType);
 
-    @Operation(summary = "Update user data using id and json with new data")
-    @PutMapping("/update/{id}")
-    public UserDto updateUser(@Valid @RequestBody UserDto userDto, @PathVariable int id) {
-        return userService.updateUser(id, userDto);
     }
-
 }

@@ -31,11 +31,23 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @Operation(summary = "Add product to order with entered id")
-    @PutMapping("/{id}/addProducts")
-    OrderDto addProductsToOrder(@PathVariable("id") int id,
-                                        @RequestBody List<Integer> productsId) {
-        return orderService.addProductsToOrder(id, productsId);
+    @Operation(summary = "Get order information using order id")
+    @GetMapping("/{id}")
+    public OrderDto getOrderById(@PathVariable int id) {
+        return orderService.getOrderById(id);
+    }
+
+    @Operation(summary = "Get order by status or/and user id")
+    @GetMapping("/")
+    public List<OrderDto> getByStatusAndUserId(@RequestParam(required = false) Integer status,
+                                               @RequestParam(required = false) Integer userId) {
+        return orderService.getByStatusAndUserId(status, userId);
+    }
+
+    @Operation(summary = "Create order")
+    @PostMapping("/create")
+    public UserDto createOrder(@RequestParam() int id) {
+        return orderService.createOrder(id);
     }
 
     @Operation(summary = "Delete order")
@@ -51,22 +63,10 @@ public class OrderController {
         return orderService.changeStatus(id, status);
     }
 
-    @Operation(summary = "Create order")
-    @PostMapping("/create")
-    public UserDto createOrder(@RequestParam() int id) {
-        return orderService.createOrder(id);
-    }
-
-    @Operation(summary = "Get order information using order id")
-    @GetMapping("/{id}")
-    public OrderDto getOrderById(@PathVariable int id) {
-        return orderService.getOrderById(id);
-    }
-
-    @Operation(summary = "Get order by status or/and user id")
-    @GetMapping("/")
-    public List<OrderDto> getByStatusAndUserId(@RequestParam(required = false) Integer status,
-                                               @RequestParam(required = false) Integer userId) {
-        return orderService.getByStatusAndUserId(status, userId);
+    @Operation(summary = "Add product to order with entered id")
+    @PutMapping("/{id}/addProducts")
+    OrderDto addProductsToOrder(@PathVariable("id") int id,
+                                @RequestBody List<Integer> productsId) {
+        return orderService.addProductsToOrder(id, productsId);
     }
 }

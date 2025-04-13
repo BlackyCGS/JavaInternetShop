@@ -48,7 +48,6 @@ public class OrderService {
                 orderCache.remove(cacheKey);
             }
             orderCache.put(cacheKey, order);
-            logger.info("addProductsToOrder return. Added products to order");
             return new OrderDto(order);
         } else {
             throw new NotFoundException(NOT_FOUND_MESSAGE + orderId);
@@ -74,7 +73,6 @@ public class OrderService {
                 orderCache.remove(cacheKey);
             }
             orderCache.put(cacheKey, order);
-            logger.info("changeStatus return");
             return new OrderDto(order);
         } else {
             throw new NotFoundException(NOT_FOUND_MESSAGE + id);
@@ -92,7 +90,6 @@ public class OrderService {
                 orderCache.remove(cacheKey);
             }
             orderCache.put(cacheKey, order);
-            logger.info("createOrder return");
             return new UserDto(userService.findByUserId(userId));
         } else {
             throw new NotFoundException("User does not exist");
@@ -107,7 +104,6 @@ public class OrderService {
         if (orderRepository.existsById(orderId)) {
             Order order = orderRepository.findById(orderId);
             orderCache.put(cacheKey, order);
-            logger.info("getOrderById return");
             return new OrderDto(order);
         } else {
             throw new NotFoundException(NOT_FOUND_MESSAGE + orderId);
@@ -124,7 +120,6 @@ public class OrderService {
             orderDtos.add(new OrderDto(order));
             orderCache.put(ORDER_CACHE_KEY + order.getId(), order);
         }
-        logger.info("getByStatusAndUserId return");
         return orderDtos;
     }
 }

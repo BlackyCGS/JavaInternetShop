@@ -1,6 +1,5 @@
 package com.myshop.internetshop.classes.services;
 
-
 import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,7 +24,7 @@ public class LogService {
             LocalDate localDate = LocalDate.parse(date, formatter);
             String fileName =
                     "logs/internetShop" + additional + "-" + formatter.format(localDate) +
-                    ".log";
+                            ".log";
             Path path = Paths.get(fileName);
 
             if (!Files.exists(path)) {
@@ -40,7 +39,7 @@ public class LogService {
                     .contentType(MediaType.TEXT_PLAIN)
                     .body(resource);
         } catch (Exception e) {
-            throw new NotFoundException("Error while getting logs from file: " + e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 }

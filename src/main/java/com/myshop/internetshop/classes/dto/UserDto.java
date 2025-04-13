@@ -26,8 +26,7 @@ public class UserDto {
     @Email
     private String email;
 
-    @NotBlank
-    private List<OrderDto> orders = new ArrayList<>();
+        private List<OrderDto> orders = new ArrayList<>();
 
     @NotBlank
     private String password;

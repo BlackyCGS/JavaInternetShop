@@ -1,6 +1,7 @@
 package com.myshop.internetshop.classes.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -20,7 +21,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Setter
 @Getter
 @Entity

@@ -2,8 +2,10 @@ package com.myshop.internetshop.classes.services;
 
 import com.myshop.internetshop.classes.dto.UserDto;
 import com.myshop.internetshop.classes.entities.User;
+import com.myshop.internetshop.classes.enums.UserPermission;
 import com.myshop.internetshop.classes.exceptions.ConflictException;
 import com.myshop.internetshop.classes.exceptions.NotFoundException;
+import com.myshop.internetshop.classes.exceptions.ValidationException;
 import com.myshop.internetshop.classes.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -32,7 +34,6 @@ public class UserService {
         user.setName(userRequest.getName());
         user.setEmail(userRequest.getEmail());
         user.setPassword(userRequest.getPassword());
-        logger.info("createUser return");
         return userRepository.save(user);
     }
 
@@ -49,7 +50,6 @@ public class UserService {
     public UserDto getUserById(Integer id) {
         if (userRepository.existsById(id)) {
             User user = userRepository.safeFindById(id);
-            logger.info("getUserById return");
             return new UserDto(user);
         } else {
             throw new NotFoundException("User does not exist");
@@ -68,7 +68,6 @@ public class UserService {
             if (userDto.getPassword() != null) {
                 user.setPassword(userDto.getPassword());
             }
-            logger.info("updateUser return");
             return new UserDto(userRepository.save(user));
         } else {
             throw new NotFoundException("User you want to update does not exist");
@@ -81,10 +80,44 @@ public class UserService {
 
     public User findByUserId(int id) {
         if (userRepository.existsById(id)) {
-            logger.info("findUserById return");
             return userRepository.findById(id);
         } else {
             throw new NotFoundException("User does not exists");
+        }
+    }
+
+    public UserDto updateUserRole(int id, String role) {
+        User user;
+        if (userRepository.existsById(id)) {
+            user = userRepository.findById(id);
+        } else {
+            throw new NotFoundException("User does not exist");
+        }
+        switch (role){
+            case "admin":
+                user.setPermission(UserPermission.ADMIN.getPermissionType());
+                break;
+            case "user":
+                user.setPermission(UserPermission.USER.getPermissionType());
+                break;
+            case "merchant":
+                user.setPermission(UserPermission.MERCHANT.getPermissionType());
+                break;
+            case "delivery":
+                user.setPermission(UserPermission.DELIVERY.getPermissionType());
+                break;
+                default:
+                    throw new ValidationException("Invalid role");
+        }
+        return new UserDto(userRepository.save(user));
+    }
+
+    public Integer getIdByUsername(String name) {
+        if (userRepository.existsByName(name)) {
+            User user = userRepository.findByName(name);
+            return user.getId();
+        } else {
+            throw new NotFoundException("User does not exist");
         }
     }
 }

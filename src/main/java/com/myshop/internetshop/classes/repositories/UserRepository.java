@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
@@ -15,8 +16,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             + "u.id = :id")
     User safeFindById(@Param("id") Integer id);
 
+    User findByName(String name);
 
     boolean existsByEmail(String email);
 
     boolean existsByName(String username);
+
+    Optional<User> findByEmail(String email);
 }
