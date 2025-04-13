@@ -109,7 +109,7 @@ public class JwtService {
 
     public boolean validateRefreshToken(String token) {
         if (refreshTokenRepository.existsByToken(token)) {
-            RefreshToken refreshToken = refreshTokenRepository.findByRefreshToken(token);
+            RefreshToken refreshToken = refreshTokenRepository.findByToken(token);
            return !refreshToken.isExpired();
         } else {
             throw new InvalidTokenException("Invalid Token");
