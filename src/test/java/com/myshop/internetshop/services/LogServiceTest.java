@@ -2,6 +2,7 @@ package com.myshop.internetshop.services;
 
 import com.myshop.internetshop.classes.exceptions.NotFoundException;
 import com.myshop.internetshop.classes.services.LogService;
+import com.myshop.internetshop.classes.utilities.LogProcessor;
 import org.junit.jupiter.api.*;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
@@ -15,14 +16,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class LogServiceTest {
 
+    private final LogProcessor logProcessor;
     private LogService logService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private final String testDate = LocalDate.now().format(formatter);
     private final String testAdditional = "-test";
 
+    LogServiceTest(LogProcessor logProcessor) {
+        this.logProcessor = logProcessor;
+    }
+
     @BeforeEach
     void setUp() throws IOException {
-        logService = new LogService();
+        logService = new LogService(logProcessor);
 
         // Создаем временный лог-файл
         String fileName = "logs/internetShop" + testAdditional + "-" + testDate + ".log";

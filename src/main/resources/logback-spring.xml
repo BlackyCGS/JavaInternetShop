@@ -1,11 +1,12 @@
 <configuration>
+    <conversionRule conversionWord="highlightex" converterClass="com.myshop.internetshop.classes.utilities.HighlightingCompositeConverterEx" />
     <property name="LOG_PATH" value="logs"/>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_PATH}/internetShop-%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>7</maxHistory>
+            <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
             <pattern>
@@ -18,7 +19,7 @@
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_PATH}/internetShopWarn-%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>7</maxHistory>
+            <maxHistory>30</maxHistory>
         </rollingPolicy>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>WARN</level>
@@ -33,7 +34,7 @@
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
-                %cyan(%d{HH:mm:ss.SSS}) %cyan([%thread]) %green(%-5level) %logger{36} - %msg%n
+                %cyan(%d{HH:mm:ss.SSS}) %cyan([%thread]) %highlightex(%-5level) %logger{36} - %msg%n
             </pattern>
         </encoder>
     </appender>

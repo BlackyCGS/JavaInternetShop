@@ -1,3 +1,4 @@
+
 package com.myshop.internetshop.classes.controllers;
 
 import com.myshop.internetshop.classes.dto.UserDto;
@@ -9,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,8 +35,15 @@ public class UserController {
 
     @Operation(summary = "Get user data by id")
     @GetMapping("/{id}")
-    public UserDto getUser(@PathVariable("id") Integer id) {
+    public UserDto getUserById(@PathVariable("id") Integer id) {
         return userService.getUserById(id);
+    }
+
+    @Operation(summary = "Get user data by name")
+    @GetMapping("/{name}")
+    @PreAuthorize("hasRole('ADMIN') || #name == authentication.name")
+    public UserDto getUserByName(@PathVariable("name") String name) {
+        return userService.getUserByName(name);
     }
 
     @Operation(summary = "Create user using json with login password and email")
@@ -57,6 +66,7 @@ public class UserController {
     }
 
     @PutMapping("/role/{id}/{roleType}")
+    @PreAuthorize("hasRole('ADMIN')")
     public UserDto updateUserRole(@PathVariable int id, @PathVariable String roleType) {
         return userService.updateUserRole(id, roleType);
 

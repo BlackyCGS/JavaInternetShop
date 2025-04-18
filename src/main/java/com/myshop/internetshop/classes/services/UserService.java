@@ -4,6 +4,7 @@ import com.myshop.internetshop.classes.dto.UserDto;
 import com.myshop.internetshop.classes.entities.User;
 import com.myshop.internetshop.classes.enums.UserPermission;
 import com.myshop.internetshop.classes.exceptions.ConflictException;
+import com.myshop.internetshop.classes.exceptions.InternalServerErrorException;
 import com.myshop.internetshop.classes.exceptions.NotFoundException;
 import com.myshop.internetshop.classes.exceptions.ValidationException;
 import com.myshop.internetshop.classes.repositories.UserRepository;
@@ -119,5 +120,13 @@ public class UserService {
         } else {
             throw new NotFoundException("User does not exist");
         }
+    }
+
+    public UserDto getUserByName(String name) {
+        if (userRepository.existsByName(name)) {
+            User user = userRepository.findByName(name);
+            return new UserDto(user);
+        }
+        throw new InternalServerErrorException("Unexpected Error");
     }
 }

@@ -8,6 +8,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
@@ -121,10 +122,12 @@ public class JwtService {
         return isTokenValid(refreshToken, userDetails) && this.validateRefreshToken(refreshToken);
     }
 
+    @Transactional
     public List<String> updateTokenPair(String refreshToken) {
         String username = this.extractUsername(refreshToken);
         if (this.isRefreshTokenValid(refreshToken)) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            refreshTokenRepository.deleteByToken(refreshToken);
             return generateTokenPair(userDetails);
         } else {
             throw new InvalidTokenException("Invalid Token");
@@ -162,7 +165,8 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    @Transactional
     public void revokeUser(int id) {
-        refreshTokenRepository.deleteByUserId(id);
+        refreshTokenRepository.deleteAllByUserId(id);
     }
 }
