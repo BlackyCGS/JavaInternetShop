@@ -2,6 +2,9 @@ package com.myshop.internetshop.classes.repositories;
 
 import com.myshop.internetshop.classes.entities.Order;
 import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,4 +22,12 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
         nativeQuery = true)
     List<Order> findByOrderStatus(@Param("id") Integer id,
                                   @Param("status") Integer status);
+
+    Optional<Order> findByUserIdAndOrderStatus(Integer userId, String orderStatus);
+
+    List<Order> findByOrderStatusNot(String orderStatus, Pageable pageable);
+
+    List<Order> findByUserIdAndOrderStatusNot(Integer userId, String orderStatus);
+
+    Integer countByOrderStatusNot(String orderStatus);
 }

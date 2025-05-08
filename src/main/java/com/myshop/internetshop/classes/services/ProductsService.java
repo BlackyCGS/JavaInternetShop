@@ -11,9 +11,11 @@ import com.myshop.internetshop.classes.repositories.ProductsRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
@@ -31,8 +33,8 @@ public class ProductsService {
         this.productCache = productCache;
     }
 
-    public List<ProductDto> getAllProducts() {
-        List<Product> products = productsRepository.findAll();
+    public List<ProductDto> getAllProducts(Pageable pageable) {
+        List<Product> products = productsRepository.findAll(pageable).toList();
         if (products.isEmpty()) {
             throw new NotFoundException("There are no products");
         }
@@ -63,11 +65,11 @@ public class ProductsService {
     }
 
     public List<ProductDto> getGpuByParams(String producer, int boostClock, int displayPort,
-                                           int hdmi, int tdp, int vram) {
+                                           int hdmi, int tdp, int vram, Pageable pageable) {
         List<ProductDto> productDtos = new ArrayList<>();
         List<Product> products = productsRepository.findGpuByParams(
                 producer, boostClock,
-                displayPort, hdmi, tdp, vram);
+                displayPort, hdmi, tdp, vram, pageable);
         if (products.isEmpty()) {
             throw new NotFoundException("There is no gpu with these parameters");
         }
@@ -125,6 +127,13 @@ public class ProductsService {
             }
             }
         );
+        List<Motherboard> motherboards =
+                productDtos.stream().map(ProductDto::getMotherboard).toList();
+        motherboards.forEach(motherboard -> {
+            if (motherboard != null) {
+                motherboard.setProduct(finalProducts.get(motherboards.indexOf(motherboard)));
+            }
+        });
         products = productsRepository.saveAll(products);
         return products.stream().map(this::convertToDto).toList();
 
@@ -154,7 +163,43 @@ public class ProductsService {
         }
     }
 
+    public List<ProductDto> getMotherboards(Pageable pageable) {
+        List<Product> products = productsRepository.getMotherboards(pageable);
+        List<ProductDto> productDtos = new ArrayList<>();
+        for (Product product : products) {
+            productDtos.add(convertToDto(product));
+        }
+        return productDtos;
+    }
+
+    public Integer getProductsCount(String category, String name) {
+
+        return switch (category) {
+            case "All" -> Math.toIntExact(productsRepository.countAllByNameContainingIgnoreCase(name));
+            case "Motherboard" -> productsRepository.countByMotherBoardIsNotNullAndNameContainingIgnoreCase(name);
+            case "Gpu" -> productsRepository.countByGpuIsNotNullAndNameContainingIgnoreCase(name);
+            default -> throw new ValidationException("Incorrect param");
+        };
+    }
+
     public void deleteAll() {
         productsRepository.deleteAll();
+    }
+
+    @Transactional
+    public ProductDto updateProduct(ProductDto productDto) {
+        validateProductDto(productDto);
+        Product product = productDto.toEntity();
+        if (productsRepository.existsById((long) product.getId())) {
+            productsRepository.save(product);
+            return convertToDto(product);
+        }
+        else {
+            throw new NotFoundException("Product with id " + product.getId() + " not found");
+        }
+    }
+
+    public List<ProductDto> searchByName(String name, Pageable pageable) {
+        return productsRepository.findByNameContainingIgnoreCase(name, pageable).stream().map(this::convertToDto).toList();
     }
 }

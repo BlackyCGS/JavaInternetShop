@@ -11,7 +11,7 @@ import lombok.Setter;
 public class OrderDto {
 
     private int orderId;
-    private int orderStatus;
+    private String orderStatus;
     private int userId;
     private List<Product> products;
 

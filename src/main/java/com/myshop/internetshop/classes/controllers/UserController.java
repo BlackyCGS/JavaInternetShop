@@ -1,25 +1,27 @@
 
 package com.myshop.internetshop.classes.controllers;
 
+import com.myshop.internetshop.classes.dto.SafeUserDto;
 import com.myshop.internetshop.classes.dto.UserDto;
 import com.myshop.internetshop.classes.entities.User;
+import com.myshop.internetshop.classes.exceptions.ForbiddenException;
+import com.myshop.internetshop.classes.services.JwtService;
 import com.myshop.internetshop.classes.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Validated
@@ -27,10 +29,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Users", description = "Manage Users")
 public class UserController {
     private final UserService userService;
+    private final JwtService jwtService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, JwtService jwtService) {
         this.userService = userService;
+        this.jwtService = jwtService;
     }
 
     @Operation(summary = "Get user data by id")
@@ -42,8 +46,27 @@ public class UserController {
     @Operation(summary = "Get user data by name")
     @GetMapping("/{name}")
     @PreAuthorize("hasRole('ADMIN') || #name == authentication.name")
-    public UserDto getUserByName(@PathVariable("name") String name) {
+    public SafeUserDto getUserByName(@PathVariable("name") String name) {
         return userService.getUserByName(name);
+    }
+
+    @Operation(summary = "Get user data by name")
+    @GetMapping("/profile")
+    public SafeUserDto getUserByName(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        String token = null;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("jwt".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                }
+            }
+        }
+        if(token != null) {
+            String name = jwtService.extractUsername(token);
+            return userService.getUserByName(name);
+        }
+        throw new ForbiddenException("Forbidden");
     }
 
     @Operation(summary = "Create user using json with login password and email")
@@ -60,6 +83,7 @@ public class UserController {
 
     @Operation(summary = "Delete user by id")
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public HttpEntity<Object> deleteUser(@PathVariable("id") int id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
@@ -67,8 +91,25 @@ public class UserController {
 
     @PutMapping("/role/{id}/{roleType}")
     @PreAuthorize("hasRole('ADMIN')")
-    public UserDto updateUserRole(@PathVariable int id, @PathVariable String roleType) {
+    public SafeUserDto updateUserRole(@PathVariable int id,
+                                      @PathVariable String roleType) {
         return userService.updateUserRole(id, roleType);
 
+    }
+
+    @GetMapping("/list")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<SafeUserDto> getAllUsers(
+            @RequestParam(required = false, defaultValue = "0") int pageNumber,
+            @RequestParam(required = false, defaultValue = "20") int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return userService.getAllUsers(pageable);
+    }
+
+    @Operation(summary = "Get total number of users")
+    @GetMapping("/amount")
+    public ResponseEntity<Integer> getTotalUsers() {
+        return ResponseEntity.ok(userService.getUsersCount());
     }
 }

@@ -16,6 +16,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +71,8 @@ class ProductsServiceTest {
         when(productsRepository.findAll()).thenReturn(products);
 
         // Act
-        List<ProductDto> result = productsService.getAllProducts();
+        Pageable pageable = PageRequest.of(0, 10);
+        List<ProductDto> result = productsService.getAllProducts(pageable);
 
         // Assert
         assertFalse(result.isEmpty());
@@ -83,7 +86,8 @@ class ProductsServiceTest {
         when(productsRepository.findAll()).thenReturn(new ArrayList<>());
 
         // Act & Assert
-        assertThrows(NotFoundException.class, () -> productsService.getAllProducts());
+        Pageable pageable = PageRequest.of(0, 10);
+        assertThrows(NotFoundException.class, () -> productsService.getAllProducts(pageable));
     }
 
     @Test
@@ -134,11 +138,14 @@ class ProductsServiceTest {
     void getGpuByParams_Success() {
         // Arrange
         List<Product> products = List.of(testProduct);
-        when(productsRepository.findGpuByParams(anyString(), anyInt(), anyInt(), anyInt(), anyInt(), anyInt()))
+        Pageable pageable = PageRequest.of(0, 10);
+        when(productsRepository.findGpuByParams(anyString(), anyInt(), anyInt(),
+                anyInt(), anyInt(), anyInt(), pageable))
                 .thenReturn(products);
 
         // Act
-        List<ProductDto> result = productsService.getGpuByParams("NVIDIA", 1500, 3, 2, 200, 8);
+        List<ProductDto> result = productsService.getGpuByParams("NVIDIA", 1500, 3, 2,
+                200, 8, pageable);
 
         // Assert
         assertFalse(result.isEmpty());
@@ -148,12 +155,14 @@ class ProductsServiceTest {
     @Test
     void getGpuByParams_NotFound_ThrowsNotFoundException() {
         // Arrange
-        when(productsRepository.findGpuByParams(anyString(), anyInt(), anyInt(), anyInt(), anyInt(), anyInt()))
+        Pageable pageable = PageRequest.of(0, 10);
+        when(productsRepository.findGpuByParams(anyString(), anyInt(), anyInt(),
+                anyInt(), anyInt(), anyInt(), pageable))
                 .thenReturn(new ArrayList<>());
 
         // Act & Assert
         assertThrows(NotFoundException.class, () ->
-                productsService.getGpuByParams("NVIDIA", 1500, 3, 2, 200, 8));
+                productsService.getGpuByParams("NVIDIA", 1500, 3, 2, 200, 8, pageable));
     }
 
     @Test

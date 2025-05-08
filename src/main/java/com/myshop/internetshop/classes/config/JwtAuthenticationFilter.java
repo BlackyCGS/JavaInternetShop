@@ -58,15 +58,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 jwtAccess.setHttpOnly(true);
                 jwtAccess.setSecure(true);
                 jwtAccess.setPath("/");
-                jwtAccess.setMaxAge((int) jwtExpiration);
+                jwtAccess.setMaxAge((int) jwtExpiration/1000);
                 jwtAccess.setDomain("localhost");
 
                 jwtr = jwtTokens.get(1);
                 Cookie jwtRefresh = new Cookie("jwtr", jwtr);
                 jwtRefresh.setHttpOnly(true);
-                jwtRefresh.setSecure(true);
-                jwtRefresh.setPath("/");
-                jwtRefresh.setMaxAge((int) refreshExpiration);
+                jwtRefresh.setSecure(true);                jwtRefresh.setPath("/");
+                jwtRefresh.setMaxAge((int) refreshExpiration/1000);
                 jwtRefresh.setDomain("localhost");
 
                 response.addCookie(jwtAccess);

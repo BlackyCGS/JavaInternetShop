@@ -99,7 +99,8 @@ public class LogService {
                 throw new NotFoundException("Log file request does not exist");
             }
             if(task.getStatus() != LogStatusEnum.SUCCESS) {
-                throw new NotFoundException("Log file is not ready yet. Check its");
+                throw new NotFoundException("Log file is not ready yet. Check its " +
+                        "status please");
             }
         try {
             Path path = Paths.get(task.getLogPath());

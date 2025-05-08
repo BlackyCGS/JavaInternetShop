@@ -31,13 +31,15 @@ public class UserDto {
     @NotBlank
     private String password;
 
+    private String  role;
+
     public UserDto(User user) {
         this.id = user.getId();
         this.name = user.getName();
         this.email = user.getEmail();
         this.password = user.getPassword();
+        this.role = user.getPermission();
         List<Order> userOrders = user.getOrders();
-
         for (Order userOrder : userOrders) {
             this.orders.add(new OrderDto(userOrder));
         }

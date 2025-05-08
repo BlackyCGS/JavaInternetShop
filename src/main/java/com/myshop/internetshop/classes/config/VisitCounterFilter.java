@@ -26,7 +26,15 @@ public class VisitCounterFilter extends OncePerRequestFilter {
                                      @NonNull HttpServletResponse response,
                                      @NonNull FilterChain filterChain)
             throws IOException, ServletException {
-        visitCounterService.incrementUrlVisits(request.getRequestURI());
-        filterChain.doFilter(request, response);
+        if (request.getRequestURI().startsWith("/api/")) {
+            if (request.getRequestURI().startsWith("/api/visits/")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+            visitCounterService.incrementUrlVisits(request.getRequestURI());
+            filterChain.doFilter(request, response);
+            return;
+        } filterChain.doFilter(request, response);
     }
 }
+

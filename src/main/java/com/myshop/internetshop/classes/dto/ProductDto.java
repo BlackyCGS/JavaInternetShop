@@ -15,7 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProductDto {
-    private Integer productId;
+    private Integer id;
     @NotBlank(message = "Product name can not be blank")
     private String name;
     @Min(value = 0, message = "Price must be more than 0")
@@ -26,7 +26,7 @@ public class ProductDto {
     private Motherboard motherboard;
 
     public ProductDto(Product product) {
-        this.productId = product.getId();
+        this.id = product.getId();
         this.name = product.getName();
         this.price = product.getPrice();
         this.gpu = product.getGpu();
@@ -38,7 +38,13 @@ public class ProductDto {
         product.setName(this.name);
         product.setPrice(this.price);
         product.setGpu(this.gpu);
-        this.gpu.setProductId(null);
+        product.setMotherBoard(this.motherboard);
+        if (product.getGpu() != null) {
+            this.gpu.setProductId(null);
+        }
+        if(product.getMotherBoard() != null) {
+            this.motherboard.setProductId(null);
+        }
         return product;
 
     }

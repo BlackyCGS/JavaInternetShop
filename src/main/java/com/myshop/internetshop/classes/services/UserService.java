@@ -1,5 +1,6 @@
 package com.myshop.internetshop.classes.services;
 
+import com.myshop.internetshop.classes.dto.SafeUserDto;
 import com.myshop.internetshop.classes.dto.UserDto;
 import com.myshop.internetshop.classes.entities.User;
 import com.myshop.internetshop.classes.enums.UserPermission;
@@ -11,7 +12,12 @@ import com.myshop.internetshop.classes.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -60,6 +66,12 @@ public class UserService {
     public UserDto updateUser(int id, UserDto userDto) {
         if (userRepository.existsById(id)) {
             User user = userRepository.findById(id);
+            Optional<User> userCheck = userRepository.findByEmail(userDto.getEmail());
+            if (userCheck.isPresent() && !Objects.equals(user.getId(),
+                    userCheck.get().getId())) {
+                    throw new ConflictException("User with that email already exists");
+                }
+
             if (userDto.getName() != null) {
                 user.setName(userDto.getName());
             }
@@ -87,7 +99,7 @@ public class UserService {
         }
     }
 
-    public UserDto updateUserRole(int id, String role) {
+    public SafeUserDto updateUserRole(int id, String role) {
         User user;
         if (userRepository.existsById(id)) {
             user = userRepository.findById(id);
@@ -95,22 +107,22 @@ public class UserService {
             throw new NotFoundException("User does not exist");
         }
         switch (role){
-            case "admin":
+            case "ADMIN":
                 user.setPermission(UserPermission.ADMIN.getPermissionType());
                 break;
-            case "user":
+            case "USER":
                 user.setPermission(UserPermission.USER.getPermissionType());
                 break;
-            case "merchant":
+            case "MERCHANT":
                 user.setPermission(UserPermission.MERCHANT.getPermissionType());
                 break;
-            case "delivery":
+            case "DELIVERY":
                 user.setPermission(UserPermission.DELIVERY.getPermissionType());
                 break;
                 default:
                     throw new ValidationException("Invalid role");
         }
-        return new UserDto(userRepository.save(user));
+        return new SafeUserDto(userRepository.save(user));
     }
 
     public Integer getIdByUsername(String name) {
@@ -122,11 +134,23 @@ public class UserService {
         }
     }
 
-    public UserDto getUserByName(String name) {
+    public SafeUserDto getUserByName(String name) {
         if (userRepository.existsByName(name)) {
             User user = userRepository.findByName(name);
-            return new UserDto(user);
+            return new SafeUserDto(user);
         }
         throw new InternalServerErrorException("Unexpected Error");
+    }
+
+    public List<SafeUserDto> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable).stream().map(SafeUserDto::new).toList();
+    }
+
+    public Integer getUserIdByName(String name) {
+        return userRepository.findByName(name).getId();
+    }
+
+    public Integer getUsersCount() {
+        return Math.toIntExact(userRepository.count());
     }
 }

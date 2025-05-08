@@ -17,10 +17,6 @@ public class VisitCounterService {
         urlVisits.computeIfAbsent(url, k -> new AtomicInteger(0)).incrementAndGet();
     }
 
-    public int getUrlVisitsByUrl(String url) {
-        return urlVisits.getOrDefault(url, new AtomicInteger(0)).get();
-    }
-
     public Map<String, Integer> getTotalVisits() {
         return urlVisits.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().get()));
     }

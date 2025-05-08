@@ -31,7 +31,7 @@ public class LogProcessor {
                             String taskId, Map<String, LogStatusDto> tasks) {
         LogStatusDto task = tasks.get(taskId);
         try {
-            sleep(45000);
+            sleep(15000);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate start = LocalDate.parse(startDate, formatter);
             LocalDate end = LocalDate.parse(endDate, formatter);

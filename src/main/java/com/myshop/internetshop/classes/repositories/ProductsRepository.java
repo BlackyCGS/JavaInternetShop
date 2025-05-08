@@ -2,9 +2,11 @@ package com.myshop.internetshop.classes.repositories;
 
 import com.myshop.internetshop.classes.entities.Product;
 import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -12,6 +14,9 @@ public interface ProductsRepository extends JpaRepository<Product, Long> {
     Product findById(long productId);
 
     void deleteById(int id);
+
+    @Query("SELECT g FROM Product g where g.motherBoard IS NOT NULL")
+    List<Product> getMotherboards(Pageable pageable);
 
     @Query("SELECT g FROM Product g where "
             + "g.gpu IS NOT NULL AND "
@@ -26,5 +31,13 @@ public interface ProductsRepository extends JpaRepository<Product, Long> {
                                   @Param("displayPort") Integer displayPort,
                                   @Param("hdmi") Integer hdmi,
                                   @Param("tdp") Integer tdp,
-                                  @Param("vram") Integer vram);
+                                  @Param("vram") Integer vram, Pageable pageable);
+
+
+    int countByGpuIsNotNullAndNameContainingIgnoreCase(String name);
+
+    int countByMotherBoardIsNotNullAndNameContainingIgnoreCase(String name);
+
+    int countAllByNameContainingIgnoreCase(String name);
+    List<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
 }

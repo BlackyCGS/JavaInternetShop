@@ -1,6 +1,7 @@
 package com.myshop.internetshop.classes.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.myshop.internetshop.classes.enums.OrderStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -15,6 +16,8 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -50,6 +53,9 @@ public class Order {
     private List<Product> products;
 
     @Column(nullable = false)
-    private int orderStatus;
+    private String orderStatus = OrderStatus.CREATED.getStatus();
 
+    public Order() {
+        products = new ArrayList<>();
+    }
 }

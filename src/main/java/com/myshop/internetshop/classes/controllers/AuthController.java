@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
     private final JwtService jwtService;
 
@@ -100,5 +100,10 @@ public class AuthController {
     public ResponseEntity<String> revoke(@PathVariable int id) {
         jwtService.revokeUser(id);
         return ResponseEntity.ok().body("Session revoked");
+    }
+
+    @GetMapping("/logout/success")
+    public ResponseEntity<String> logoutSuccess() {
+        return ResponseEntity.ok().body("Logout successful");
     }
 }

@@ -7,18 +7,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Validated
@@ -34,8 +28,13 @@ public class ProductsController {
 
     @Operation(summary = "Get all products")
     @GetMapping("")
-    public List<ProductDto> getAllProducts() {
-        return productsService.getAllProducts();
+    public List<ProductDto> getAllProducts(
+            @RequestParam(required = false, defaultValue = "0") int pageNumber,
+            @RequestParam(required = false, defaultValue = "20") int pageSize
+    ) {
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return productsService.getAllProducts(pageable);
     }
 
     @Operation(summary = "Get gpus using parameters. If parameter is null, it "
@@ -51,8 +50,21 @@ public class ProductsController {
                                     @RequestParam(required = false,
                                             defaultValue = "-1") Integer tdp,
                                     @RequestParam(required = false,
-                                            defaultValue = "-1") Integer vram) {
-        return productsService.getGpuByParams(producer, boostClock, displayPort, hdmi, tdp, vram);
+                                            defaultValue = "-1") Integer vram,
+                                    @RequestParam(required = false, defaultValue = "0") int pageNumber,
+                                    @RequestParam(required = false, defaultValue = "20") int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return productsService.getGpuByParams(producer, boostClock, displayPort, hdmi,
+                tdp, vram, pageable);
+    }
+
+    @GetMapping("/category/motherboard")
+    public List<ProductDto> getMotherboards(
+            @RequestParam(required = false, defaultValue = "0") int pageNumber,
+            @RequestParam(required = false, defaultValue = "20") int pageSize
+            ) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return productsService.getMotherboards(pageable);
     }
 
     @Operation(summary = "Get product data by id")
@@ -91,5 +103,31 @@ public class ProductsController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProduct(@PathVariable("id") long id) {
         productsService.deleteProductById(id);
+    }
+
+    @Operation(summary = "Get total number of products")
+    @GetMapping("/amount")
+    public ResponseEntity<Integer> getTotalProducts(
+            @RequestParam(required = true) String category,
+            @RequestParam(required = false, defaultValue = "") String name
+    ) {
+        return ResponseEntity.ok(productsService.getProductsCount(category, name));
+    }
+
+    @Operation(summary = "Modify a product")
+    @PutMapping("/")
+    ResponseEntity<ProductDto> updateProduct(@RequestBody ProductDto product) {
+        return ResponseEntity.ok(productsService.updateProduct(product));
+    }
+
+    @Operation(summary = "find by name")
+    @GetMapping("/name")
+    public ResponseEntity<List<ProductDto>> findProductByName(
+            @RequestParam String name,
+            @RequestParam(required = false, defaultValue = "0") int pageNumber,
+            @RequestParam(required = false, defaultValue = "20") int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return ResponseEntity.ok(productsService.searchByName(name, pageable));
     }
 }
