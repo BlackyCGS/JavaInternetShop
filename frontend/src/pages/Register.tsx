@@ -22,7 +22,7 @@ const RegisterPage = () => {
         name: '',
         form: ''
     })
-
+    const [loading, setLoading] = useState(false)
     const validateEmail = (email: string) => {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$///NOSONAR
         return re.test(email)
@@ -69,8 +69,9 @@ const RegisterPage = () => {
         e.preventDefault()
 
         if (!validateForm()) return
-
+        if (loading) return
         try {
+            setLoading(true)
             await axios.post(
                 '/api/auth/signup',
                 { email, name, password },
@@ -83,6 +84,9 @@ const RegisterPage = () => {
                 ...prev,
                 form: err.response?.data?.message || 'Ошибка регистрации'
             }))
+        }
+        finally {
+            setLoading(false)
         }
     }
 
@@ -105,7 +109,7 @@ const RegisterPage = () => {
                         align="center"
                         fontWeight={600}
                     >
-                        Регистрация
+                        Register
                     </Typography>
 
                     {errors.form && (
@@ -130,7 +134,7 @@ const RegisterPage = () => {
                             margin="normal"
                             required
                             fullWidth
-                            label="Имя пользователя"
+                            label="User name"
                             autoComplete="username"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
@@ -141,7 +145,7 @@ const RegisterPage = () => {
                             margin="normal"
                             required
                             fullWidth
-                            label="Пароль"
+                            label="Password"
                             type="password"
                             autoComplete="new-password"
                             value={password}
@@ -157,7 +161,7 @@ const RegisterPage = () => {
                             sx={{ mt: 3, py: 1.5 }}
                             disabled={!email || !name || !password}
                         >
-                            Зарегистрироваться
+                            Register
                         </Button>
 
                         <Box sx={{ mt: 2, textAlign: 'center' }}>
@@ -165,7 +169,7 @@ const RegisterPage = () => {
                                 onClick={() => navigate('/login')}
                                 sx={{ textTransform: 'none' }}
                             >
-                                Уже есть аккаунт? Войти
+                                Already have an account?. Log in
                             </Button>
                         </Box>
                     </Box>

@@ -17,8 +17,7 @@ import com.myshop.internetshop.classes.enums.LogStatusEnum;
 import com.myshop.internetshop.classes.exceptions.InternalServerErrorException;
 import com.myshop.internetshop.classes.exceptions.NotFoundException;
 import com.myshop.internetshop.classes.utilities.LogProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.myshop.internetshop.classes.exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -26,12 +25,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import static java.lang.Thread.sleep;
-
 @Service
 public class LogService {
-
-    Logger logger = LoggerFactory.getLogger(LogService.class);
     private final LogProcessor logProcessor;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private final Map<String, LogStatusDto> tasks = new ConcurrentHashMap<>();
@@ -42,7 +37,7 @@ public class LogService {
     }
 
     public ResponseEntity<InputStreamResource> getLogsByDate(String additional,
-                                                             String date) {
+                                                             String date)  {
         try {
             LocalDate localDate = LocalDate.parse(date, formatter);
             String fileName =
@@ -51,7 +46,8 @@ public class LogService {
             Path path = Paths.get(fileName);
 
             if (!Files.exists(path)) {
-                throw new NotFoundException("There is no file with name" + fileName);
+                throw new NotFoundException("There is no file with name " + additional + "-" + formatter.format(localDate) +
+                        ".log");
             }
 
             InputStreamResource resource =
@@ -62,7 +58,10 @@ public class LogService {
                     .contentType(MediaType.TEXT_PLAIN)
                     .body(resource);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            if(e.getMessage().contains("There is no file with name")) {
+                throw new NotFoundException(e.getMessage());
+            }
+            throw new BadRequestException("Bad Request");
         }
     }
 

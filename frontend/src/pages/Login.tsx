@@ -15,7 +15,7 @@ import { useAuth } from '../hooks/useAuth'
 const LoginPage = () => {
     const { refreshUser } = useAuth()
     const navigate = useNavigate()
-
+    const [loading, setLoading] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
@@ -23,8 +23,9 @@ const LoginPage = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setError('')
-
+        if (loading) return
         try {
+            setLoading(true)
             await axios.post(
                 '/api/auth/login',
                 { email, password },
@@ -35,6 +36,9 @@ const LoginPage = () => {
             navigate('/') // редирект на главную
         } catch (err: any) {
             setError(err.response?.data?.message || 'Ошибка входа')
+        }
+        finally {
+            setLoading(false)
         }
     }
 
@@ -51,7 +55,7 @@ const LoginPage = () => {
             <Box sx={{ width: '100%', maxWidth: 400 }}>
             <Paper elevation={3} sx={{ p: 4, borderRadius: 3, width: '100%', maxWidth: 400, mx: 'auto' }}>
                     <Typography variant="h4" component="h1" gutterBottom align="center" fontWeight={600}>
-                        Вход в аккаунт
+                        Log in
                     </Typography>
 
                     {error && (
@@ -65,7 +69,7 @@ const LoginPage = () => {
                             margin="normal"
                             required
                             fullWidth
-                            label="Логин"
+                            label="Email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
@@ -74,7 +78,7 @@ const LoginPage = () => {
                             margin="normal"
                             required
                             fullWidth
-                            label="Пароль"
+                            label="Password"
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}

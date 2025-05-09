@@ -58,8 +58,8 @@ export const updateProduct = async (product: Product): Promise<void> => {
 }
 
 export const createProduct = async (product: Product): Promise<void> => {
-    await axios.post('/api/products', {
-        product
+    await axios.post('/api/products', product, {
+
     })
 }
 

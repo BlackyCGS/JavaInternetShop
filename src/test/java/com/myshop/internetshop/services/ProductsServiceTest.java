@@ -16,8 +16,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,11 +69,11 @@ class ProductsServiceTest {
     @Test
     void getAllProducts_Success() {
         // Arrange
+        Pageable pageable = PageRequest.of(0, 10);
         List<Product> products = List.of(testProduct);
-        when(productsRepository.findAll()).thenReturn(products);
+        when(productsRepository.findAll(pageable)).thenReturn(new PageImpl<>(products));
 
         // Act
-        Pageable pageable = PageRequest.of(0, 10);
         List<ProductDto> result = productsService.getAllProducts(pageable);
 
         // Assert
@@ -83,11 +85,12 @@ class ProductsServiceTest {
     @Test
     void getAllProducts_Empty_ThrowsNotFoundException() {
         // Arrange
-        when(productsRepository.findAll()).thenReturn(new ArrayList<>());
+        Pageable pageable = PageRequest.of(0, 10);
+        when(productsRepository.findAll(pageable)).thenReturn(new PageImpl<>(new ArrayList<>()));
 
         // Act & Assert
-        Pageable pageable = PageRequest.of(0, 10);
-        assertThrows(NotFoundException.class, () -> productsService.getAllProducts(pageable));
+        assertThrows(NotFoundException.class,
+                () -> productsService.getAllProducts(pageable));
     }
 
     @Test
@@ -140,7 +143,7 @@ class ProductsServiceTest {
         List<Product> products = List.of(testProduct);
         Pageable pageable = PageRequest.of(0, 10);
         when(productsRepository.findGpuByParams(anyString(), anyInt(), anyInt(),
-                anyInt(), anyInt(), anyInt(), pageable))
+                anyInt(), anyInt(), anyInt(), eq(pageable)))
                 .thenReturn(products);
 
         // Act
@@ -157,7 +160,7 @@ class ProductsServiceTest {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
         when(productsRepository.findGpuByParams(anyString(), anyInt(), anyInt(),
-                anyInt(), anyInt(), anyInt(), pageable))
+                anyInt(), anyInt(), anyInt(), eq(pageable)))
                 .thenReturn(new ArrayList<>());
 
         // Act & Assert
@@ -193,6 +196,7 @@ class ProductsServiceTest {
 
     @Test
     @Transactional
+    @WithMockUser("hasRole('ADMIN')")
     void saveProduct_WithGpu_Success() {
         // Arrange
         testProductDto.setGpu(testGpu);
@@ -209,6 +213,7 @@ class ProductsServiceTest {
 
     @Test
     @Transactional
+    @WithMockUser("hasRole('ADMIN')")
     void saveProduct_WithMotherboard_Success() {
         // Arrange
         testProductDto.setMotherboard(testMotherboard);
@@ -224,6 +229,7 @@ class ProductsServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void saveProduct_InvalidCategoryCount_ThrowsValidationException() {
         // Arrange
         testProductDto.setGpu(testGpu);
@@ -235,6 +241,7 @@ class ProductsServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void saveProducts_Success() {
         // Arrange
         testProductDto.setGpu(testGpu);
@@ -253,6 +260,7 @@ class ProductsServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void existsById_ReturnsTrue() {
         // Arrange
         when(productsRepository.existsById(1L)).thenReturn(true);
@@ -265,6 +273,7 @@ class ProductsServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void existsById_ReturnsFalse() {
         // Arrange
         when(productsRepository.existsById(1L)).thenReturn(false);
@@ -277,6 +286,7 @@ class ProductsServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void clearCache_Success() {
         // Act
         productsService.clearCache();
@@ -286,6 +296,7 @@ class ProductsServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void deleteAll_Success() {
         // Act
         productsService.deleteAll();

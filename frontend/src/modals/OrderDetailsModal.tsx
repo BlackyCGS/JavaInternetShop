@@ -35,7 +35,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
         >
             <Box sx={modalStyle}>
                 <Typography variant="h6" component="h2" gutterBottom>
-                    Детали заказа #{order?.orderId}
+                    Order details #{order?.orderId}
                 </Typography>
 
                 {order?.products?.length ? (
@@ -47,19 +47,19 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                             {order.products.map((product, index) => (
                                 <Box key={index} sx={{ mb: 2, p: 1, borderBottom: '1px' + //NOSONAR
                                         ' solid #eee' }}>
-                                    <Typography><strong>Название:</strong> {product.name}</Typography>
-                                    <Typography><strong>Цена:</strong> ${product.price}</Typography>
+                                    <Typography><strong>Name:</strong> {product.name}</Typography>
+                                    <Typography><strong>Price:</strong> ${product.price}</Typography>
                                 </Box>
                             ))}
                         </Box>
                         <Typography sx={{ mt: 2 }}>
-                            <strong>Итого:</strong> $
+                            <strong>Total:</strong> $
                             {order.products.reduce((sum, product) =>
                                 sum + (product.price * (product.quantity ?? 1)), 0)}
                         </Typography>
                     </>
                 ) : (
-                    <Typography>Нет товаров в заказе</Typography>
+                    <Typography>No products in order</Typography>
                 )}
 
                 <Button
@@ -67,7 +67,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                     onClick={onClose}
                     sx={{ mt: 2 }}
                 >
-                    Закрыть
+                    Close
                 </Button>
             </Box>
         </Modal>

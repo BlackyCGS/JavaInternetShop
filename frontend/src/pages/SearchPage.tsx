@@ -8,6 +8,7 @@ import { useLocation } from 'react-router-dom'
 const HomePage = () => {
     const [products, setProducts] = useState<Product[]>([])
     const [loading, setLoading] = useState(true)
+    const [pageLoading, setPageLoading] = useState(true)
     const [totalPages, setTotalPages] = useState(0)
     const [page, setPage] = useState(0)
     const [pageSize] = useState(10)
@@ -30,23 +31,25 @@ const HomePage = () => {
 
     useEffect(() => {
         const loadProducts = async () => {
+            if (loading) return
             try {
                 setLoading(true)
                 const data = await fetchSearchedProducts(page, pageSize, searchQuery)
                 setProducts(data)
-                const number = await getTotalProducts("All")
+                const number = await getTotalProducts("All", searchQuery)
                 setTotalPages(Math.ceil(number / pageSize))
             } catch (error) {
                 console.error('Error loading products:', error)
             } finally {
                 setLoading(false)
+                setPageLoading(false)
             }
         }
 
         loadProducts()
     }, [page, searchQuery])
 
-    if (loading) {
+    if (pageLoading) {
         return (
             <Box display="flex" justifyContent="center" mt={10}>
                 <CircularProgress size={60} />
@@ -69,9 +72,9 @@ const HomePage = () => {
             </Paper>
 
             <Stack direction="row" spacing={2}>
-                <button onClick={handlePrevPage} disabled={page === 0}>Назад</button>
-                <button onClick={handleNextPage} disabled={page + 1 >= totalPages}>Вперёд</button>
-                <p>Страница {page + 1} из {totalPages}</p>
+                <button onClick={handlePrevPage} disabled={page === 0}>Previous</button>
+                <button onClick={handleNextPage} disabled={page + 1 >= totalPages}>Next</button>
+                <p>Page {page + 1} of {totalPages}</p>
             </Stack>
         </Container>
     )

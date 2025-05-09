@@ -11,11 +11,22 @@ import {
 
 const Profile = () => {
     const [user, setUser] = useState<User | null>(null)
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
+        if(loading) return
+        try{
+            setLoading(true)
         axios.get('/api/users/profile', { withCredentials: true })
             .then(res => setUser(res.data))
             .catch(err => console.error(err))
+        }
+        catch(err){
+        console.error(err)
+        }
+        finally {
+            setLoading(false)
+        }
     }, [])
 
     if (!user) {
@@ -33,12 +44,12 @@ const Profile = () => {
                 gutterBottom
                 sx={{ fontWeight: 600, textAlign: 'center', mb: 4 }}
             >
-                Профиль пользователя
+                Profile
             </Typography>
 
             <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
                 <Typography variant="h6" gutterBottom>
-                    Имя пользователя:
+                    User name:
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 2 }}>
                     {user.name}

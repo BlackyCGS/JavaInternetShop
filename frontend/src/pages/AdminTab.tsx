@@ -42,7 +42,7 @@ const AdminTab = () => {
     const [products, setProducts] = useState<Product[]>([])
     const [users, setUsers] = useState<User[]>([])
     const [orders, setOrders] = useState<Order[]>([])
-
+    const [loading, setLoading] = useState(false)
     const [openCreateProduct, setOpenCreateProduct] = useState(false)
     const [openEditProduct, setOpenEditProduct] = useState(false)
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
@@ -105,22 +105,32 @@ const AdminTab = () => {
     }, [user, navigate, tabIndex, productPage, userPage, orderPage])
 
     const loadData = async () => {
-        if (tabIndex === 1) {
-            const data = await fetchProducts(productPage, pageSize) // загружаем 100
-            // товаров
-            setProducts(data)
-            const number = await getTotalProducts("All", "")
-            setProductTotalPages(Math.ceil(number/pageSize))
-        } else if (tabIndex === 2) {
-            const data = await fetchAllUsers(userPage, pageSize)
-            setUsers(data)
-            const number = await getTotalUsers()
-            setUserTotalPages(Math.ceil(number/pageSize))
-        } else if (tabIndex === 0) {
-            const data = await fetchAllOrders(orderPage, pageSize)
-            setOrders(data)
-            const number = await getTotalOrders()
-            setOrderTotalPages(Math.ceil(number/pageSize))
+        if(loading) return
+        setLoading(true)
+        try {
+            if (tabIndex === 1) {
+                const data = await fetchProducts(productPage, pageSize) // загружаем 100
+                // товаров
+                setProducts(data)
+                const number = await getTotalProducts("All", "")
+                setProductTotalPages(Math.ceil(number / pageSize))
+            } else if (tabIndex === 2) {
+                const data = await fetchAllUsers(userPage, pageSize)
+                setUsers(data)
+                const number = await getTotalUsers()
+                setUserTotalPages(Math.ceil(number / pageSize))
+            } else if (tabIndex === 0) {
+                const data = await fetchAllOrders(orderPage, pageSize)
+                setOrders(data)
+                const number = await getTotalOrders()
+                setOrderTotalPages(Math.ceil(number / pageSize))
+            }
+        }
+        catch (error) {
+            console.error(error)
+        }
+        finally {
+            setLoading(false)
         }
     }
 
@@ -172,18 +182,18 @@ const AdminTab = () => {
         switch(user.role) {
             case 'ADMIN':
                 return [
-                    { label: "Продукты", value: 0 },
-                    { label: "Пользователи", value: 1 },
-                    { label: "Заказы", value: 2 }
+                    { label: "Products", value: 0 },
+                    { label: "Orders", value: 2 },
+                    { label: "Users", value: 1 }
                 ];
             case 'MERCHANT':
                 return [
-                    { label: "Продукты", value: 0 },
-                    { label: "Заказы", value: 2 }
+                    { label: "Products", value: 0 },
+                    { label: "Orders", value: 2 }
                 ];
             case 'DELIVERY':
                 return [
-                    { label: "Заказы", value: 2 }
+                    { label: "Orders", value: 2 }
                 ];
             default:
                 return [];
@@ -195,21 +205,20 @@ const AdminTab = () => {
 
         <Box>
             <Tabs value={tabIndex} onChange={(_,val) => setTabIndex(val)}>
-                {['ADMIN', 'MERCHANT', 'DELIVERY'].includes(user.role) && (
-                    <Tab label="Заказы" />
+                { (user && (user.role === 'ADMIN' || user.role === 'MERCHANT' || user.role === 'DELIVERY'))  && (
+                    <Tab label="Orders" />
                 )}
-                { user.role === 'ADMIN' && (
-                <Tab label="Пользователи" />
-                    )}
-                { (user.role === 'ADMIN' || user.role === 'MERCHANT') && (
-                    <Tab label="Продукты" />
+                { (user && (user.role === 'ADMIN' || user.role === 'MERCHANT')) && (
+                    <Tab label="Products" />
                 )}
-
+                { user && user.role === 'ADMIN' && (
+                    <Tab label="Users" />
+                )}
             </Tabs>
 
             {!user ? (
                     <Typography variant="h6" sx={{ p: 2 }}>
-                        Доступ запрещен. Пожалуйста, авторизуйтесь.
+                       Access Denied
                     </Typography>
                 ) : (
             <Box mt={2}>
@@ -219,7 +228,7 @@ const AdminTab = () => {
                             <Button
                                 sx = {{mr:5}}
                                 variant="contained" onClick={() => setOpenCreateProduct(true)}>
-                                Добавить продукт
+                                Add Product
                             </Button>
                         </Box>
 
@@ -228,9 +237,9 @@ const AdminTab = () => {
                                 <TableHead>
                                     <TableRow>
                                         <TableCell>ID</TableCell>
-                                        <TableCell>Название</TableCell>
-                                        <TableCell>Цена</TableCell>
-                                        <TableCell>Действия</TableCell>
+                                        <TableCell>Name</TableCell>
+                                        <TableCell>Price</TableCell>
+                                        <TableCell>Actions</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -247,7 +256,7 @@ const AdminTab = () => {
                                                             size="small"
                                                             onClick={() => handleOpenEditProduct(product)}
                                                         >
-                                                            Изменить
+                                                            Edit
                                                         </Button>
                                                     </Grid>
                                                     <Grid >
@@ -257,7 +266,7 @@ const AdminTab = () => {
                                                             size="small"
                                                             onClick={() => handleDeleteProduct(product.id)}
                                                         >
-                                                            Удалить
+                                                            Delete
                                                         </Button>
                                                     </Grid>
                                                 </Grid>
@@ -289,7 +298,7 @@ const AdminTab = () => {
                             direction="row" spacing={2}>
                             <button onClick={handlePrevProductPage} disabled={productPage === 0}>Назад</button>
                             <button onClick={handleNextProductPage} disabled={productPage + 1 >= productTotalPages}>Вперёд</button>
-                            <p>Страница {productPage + 1} из {productTotalPages}</p>
+                            <p>Page {productPage + 1} of {productTotalPages}</p>
                         </Stack>
                     </>
                 )}
@@ -301,9 +310,9 @@ const AdminTab = () => {
                                 <TableHead>
                                     <TableRow>
                                         <TableCell>ID</TableCell>
-                                        <TableCell>Имя</TableCell>
+                                        <TableCell>Name</TableCell>
                                         <TableCell>Email</TableCell>
-                                        <TableCell>Роль</TableCell>
+                                        <TableCell>Role</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -336,9 +345,9 @@ const AdminTab = () => {
                         <Stack
                             sx={{m:5}}
                             direction="row" spacing={2}>
-                            <button onClick={handlePrevUserPage} disabled={userPage === 0}>Назад</button>
-                            <button onClick={handleNextUserPage} disabled={userPage + 1 >= userTotalPages}>Вперёд</button>
-                            <p>Страница {userPage + 1} из {userTotalPages}</p>
+                            <button onClick={handlePrevUserPage} disabled={userPage === 0}>Previous</button>
+                            <button onClick={handleNextUserPage} disabled={userPage + 1 >= userTotalPages}>Next</button>
+                            <p>Page {userPage + 1} of {userTotalPages}</p>
                         </Stack>
                     </>
                 )}
@@ -399,9 +408,9 @@ const AdminTab = () => {
                         <Stack
                             sx={{m:5}}
                             direction="row" spacing={2}>
-                            <button onClick={handlePrevOrderPage} disabled={orderPage === 0}>Назад</button>
-                            <button onClick={handleNextOrderPage} disabled={orderPage + 1 >= orderTotalPages}>Вперёд</button>
-                            <p>Страница {orderPage + 1} из {orderTotalPages}</p>
+                            <button onClick={handlePrevOrderPage} disabled={orderPage === 0}>Previous</button>
+                            <button onClick={handleNextOrderPage} disabled={orderPage + 1 >= orderTotalPages}>Next</button>
+                            <p>Page {orderPage + 1} of {orderTotalPages}</p>
                         </Stack>
                     </>
                 )}

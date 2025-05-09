@@ -19,12 +19,15 @@ const Orders = () => {
     const [orders, setOrders] = useState<Order[] | null>(null)
     const [modalOpen, setModalOpen] = useState(false)
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
+    const [pageLoading, setPageLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
         const fetchOrders = async () => {
+            if(loading) return
             try {
+                setLoading(true)
                 const orders: Order[] = await getUserOrders()
                 setOrders(orders)
                 setError(null)
@@ -33,6 +36,7 @@ const Orders = () => {
                 console.error(err)
             } finally {
                 setLoading(false)
+                setPageLoading(false)
             }
         }
 
@@ -48,7 +52,7 @@ const Orders = () => {
         setModalOpen(false)
     }
 
-    if (loading) {
+    if (pageLoading) {
         return (
             <Box display="flex" justifyContent="center" p={4}>
                 <CircularProgress />

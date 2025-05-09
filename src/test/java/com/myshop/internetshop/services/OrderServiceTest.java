@@ -9,6 +9,7 @@ import com.myshop.internetshop.classes.dto.UserDto;
 import com.myshop.internetshop.classes.entities.Order;
 import com.myshop.internetshop.classes.entities.Product;
 import com.myshop.internetshop.classes.entities.User;
+import com.myshop.internetshop.classes.enums.OrderStatus;
 import com.myshop.internetshop.classes.exceptions.NotFoundException;
 import com.myshop.internetshop.classes.repositories.OrderRepository;
 import com.myshop.internetshop.classes.services.OrderService;
@@ -57,7 +58,7 @@ class OrderServiceTest {
             testOrder = new Order();
             testOrder.setId(1);
             testOrder.setUser(testUser);
-            testOrder.setOrderStatus(0);
+            testOrder.setOrderStatus(OrderStatus.PROCESSED.getStatus());
             testOrder.setProducts(new ArrayList<>());
         }
 
@@ -132,11 +133,11 @@ class OrderServiceTest {
             when(orderCache.contains("order-1")).thenReturn(true); // Добавляем мок для contains
 
             // Act
-            OrderDto result = orderService.changeStatus(1, 1);
+            OrderDto result = orderService.changeStatus(1, OrderStatus.CONFIRMED.getStatus());
 
             // Assert
             assertNotNull(result);
-            assertEquals(1, result.getOrderStatus());
+            assertEquals(OrderStatus.CONFIRMED.getStatus(), result.getOrderStatus());
             verify(orderCache).contains("order-1");
             verify(orderCache).remove("order-1");
             verify(orderCache).put("order-1", testOrder);
@@ -149,7 +150,7 @@ class OrderServiceTest {
 
             // Act & Assert
             assertThrows(NotFoundException.class, () ->
-                    orderService.changeStatus(1, 1));
+                    orderService.changeStatus(1, "CONFIRMED"));
         }
 
         @Test

@@ -6,7 +6,7 @@ import CartCard from "../components/CartCard.tsx";
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState<Product[]>([]);
-
+    const [loading, setLoading] = useState(false)
     const totalPrice = cartItems.reduce((acc, item) => acc + item.price, 0);
 
     const handleToOrder = async () => {
@@ -17,10 +17,16 @@ const Cart = () => {
 
     const loadProducts = async () => {
         try {
+            if(loading) return
+            setLoading(true)
+
             const data = await getCartById();
             setCartItems(data.products);
         } catch (error) {
             console.error('Error loading products:', error);
+        }
+        finally {
+            setLoading(false)
         }
     };
 
@@ -40,11 +46,11 @@ const Cart = () => {
     return (
         <div style={{ padding: '20px' }}>
             <Typography variant="h4" gutterBottom>
-                Корзина
+                Cart
             </Typography>
 
             {cartItems.length === 0 ? (
-                <Typography variant="h6">Ваша корзина пуста</Typography>
+                <Typography variant="h6">Your cart is empty.</Typography>
             ) : (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {cartItems.map((product) => (
@@ -56,7 +62,7 @@ const Cart = () => {
             {cartItems.length > 0 && (
                 <div style={{ marginTop: '20px' }}>
                     <Typography variant="h6" gutterBottom>
-                        Общая сумма: {totalPrice} $
+                        Total: {totalPrice} $
                     </Typography>
                     <Button
                         variant="contained"
@@ -64,7 +70,7 @@ const Cart = () => {
                         onClick={() => handleToOrder()}
                         size="large"
                     >
-                        Оформить заказ
+                        Place an order
                     </Button>
                 </div>
             )}

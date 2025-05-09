@@ -13,28 +13,37 @@ import {
 } from '@mui/material'
 import { fetchProductById } from '../api/ProductsApi'
 import { Product } from '../types/Product.ts'
+import {addProductToCart} from "../api/OrdersApi.ts";
 
 const ProductPage = () => {
     const { id } = useParams()
     const [product, setProduct] = useState<Product | null>(null)
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
+    const [pageLoading, setPageLoading] = useState(true)
 
     useEffect(() => {
         const loadProduct = async () => {
+            if(loading) return
             try {
+                setLoading(true)
                 const data = await fetchProductById(Number(id))
                 setProduct(data)
             } catch (error) {
                 console.error('Error loading product:', error)
             } finally {
                 setLoading(false)
+                setPageLoading(false)
             }
         }
 
         loadProduct()
     }, [id])
 
-    if (loading) {
+    const handleAddToCart = async (productId: number) => {
+        await addProductToCart(productId)
+    }
+
+    if (pageLoading) {
         return (
             <Box display="flex" justifyContent="center" mt={10}>
                 <CircularProgress size={60} />
@@ -45,7 +54,7 @@ const ProductPage = () => {
     if (!product) {
         return (
             <Container maxWidth="lg" sx={{ py: 4 }}>
-                <Typography variant="h5">Товар не найден</Typography>
+                <Typography variant="h5">Product not found</Typography>
             </Container>
         )
     }
@@ -63,7 +72,7 @@ const ProductPage = () => {
                     borderRadius: 2
                 }}
             >
-                Назад к каталогу
+                Back to list
             </Button>
 
             <Paper elevation={0} sx={{ p: 4, borderRadius: 3 }}>
@@ -85,13 +94,13 @@ const ProductPage = () => {
                 {gpu && (
                     <Box sx={{ mb: 4 }}>
                         <Typography variant="h5" gutterBottom sx={{ fontWeight: 500 }}>
-                            Характеристики видеокарты
+                            GPU specs
                         </Typography>
                         <Divider sx={{ mb: 2 }} />
                         <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-                            <Chip label={`Производитель: ${gpu.producer}`} />
+                            <Chip label={`Producer: ${gpu.producer}`} />
                             <Chip label={`VRAM: ${gpu.vram}GB`} />
-                            <Chip label={`Тактовая частота: ${gpu.boostClock}MHz`} />
+                            <Chip label={`Boost clock: ${gpu.boostClock}MHz`} />
                             <Chip label={`TDP: ${gpu.tdp}W`} />
                             <Chip label={`HDMI: ${gpu.hdmi}`} />
                             <Chip label={`DisplayPort: ${gpu.displayPort}`} />
@@ -102,15 +111,15 @@ const ProductPage = () => {
                 {motherboard && (
                     <Box>
                         <Typography variant="h5" gutterBottom sx={{ fontWeight: 500 }}>
-                            Характеристики материнской платы
+                            Motherboard specs
                         </Typography>
                         <Divider sx={{ mb: 2 }} />
                         <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-                            <Chip label={`Производитель: ${motherboard.producer}`} />
-                            <Chip label={`Сокет: ${motherboard.socket}`} />
-                            <Chip label={`Чипсет: ${motherboard.chipset}`} />
-                            <Chip label={`Форм-фактор: ${motherboard.formFactor}`} />
-                            <Chip label={`Слоты RAM: ${motherboard.ramSlots}`} />
+                            <Chip label={`Producer: ${motherboard.producer}`} />
+                            <Chip label={`Socket: ${motherboard.socket}`} />
+                            <Chip label={`Chipset: ${motherboard.chipset}`} />
+                            <Chip label={`Form factor: ${motherboard.formFactor}`} />
+                            <Chip label={`RAM slots: ${motherboard.ramSlots}`} />
                             <Chip label={`SATA: ${motherboard.sata}`} />
                         </Stack>
                     </Box>
@@ -126,8 +135,9 @@ const ProductPage = () => {
                         borderRadius: 2,
                         fontSize: '1.1rem'
                     }}
+                    onClick={() => handleAddToCart(product.id)}
                 >
-                    Добавить в корзину
+                    Add to cart
                 </Button>
             </Paper>
         </Container>

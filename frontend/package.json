@@ -1,8 +1,9 @@
 {
   "name": "frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.8.1",
   "type": "module",
+  "proxy": "http://backend:8080",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@eslint/js": "^9.22.0",
     "@types/js-cookie": "^3.0.6",
+    "@types/node": "^22.15.17",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",

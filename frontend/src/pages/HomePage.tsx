@@ -7,7 +7,8 @@ import { useLocation } from 'react-router-dom'
 
 const HomePage = () => {
     const [products, setProducts] = useState<Product[]>([])
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
+    const [pageLoading, setPageLoading] = useState(true)
     const [totalPages, setTotalPages] = useState(0)
     const [page, setPage] = useState(0)
     const [pageSize] = useState(10)
@@ -31,6 +32,7 @@ const HomePage = () => {
     useEffect(() => {
         const loadProducts = async () => {
             try {
+                if(loading) return
                 setLoading(true)
                 const data = await fetchSearchedProducts(page, pageSize, searchQuery)
                 setProducts(data)
@@ -40,13 +42,14 @@ const HomePage = () => {
                 console.error('Error loading products:', error)
             } finally {
                 setLoading(false)
+                setPageLoading(false)
             }
         }
 
         loadProducts()
     }, [page, searchQuery])
 
-    if (loading) {
+    if (pageLoading) {
         return (
             <Box display="flex" justifyContent="center" mt={10}>
                 <CircularProgress size={60} />
@@ -61,7 +64,7 @@ const HomePage = () => {
                 gutterBottom
                 sx={{ mb: 4, fontWeight: 600, color: 'text.primary' }}
             >
-                {searchQuery ? `Результаты поиска: "${searchQuery}"` : 'Каталог товаров'}
+                {searchQuery ? `Search results "${searchQuery}"` : 'Products'}
             </Typography>
 
             <Paper elevation={0} sx={{ p: 3, borderRadius: 3 }}>
@@ -69,9 +72,9 @@ const HomePage = () => {
             </Paper>
 
             <Stack direction="row" spacing={2}>
-                <button onClick={handlePrevPage} disabled={page === 0}>Назад</button>
-                <button onClick={handleNextPage} disabled={page + 1 >= totalPages}>Вперёд</button>
-                <p>Страница {page + 1} из {totalPages}</p>
+                <button onClick={handlePrevPage} disabled={page === 0}>Previous</button>
+                <button onClick={handleNextPage} disabled={page + 1 >= totalPages}>Next</button>
+                <p>Page {page + 1} of {totalPages}</p>
             </Stack>
         </Container>
     )

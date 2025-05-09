@@ -42,6 +42,7 @@ dist
 *.gz
 
 # temp file for git conflict merging
+.env
 *.orig
 *.log
 *.rej

@@ -6,6 +6,7 @@ import com.myshop.internetshop.classes.services.ParserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ class ParserServiceTest {
     private final ParserService parserService = new ParserService();
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void massGpuParser_Success() {
         // Arrange
         GpuRequest gpuRequest = new GpuRequest();
@@ -37,6 +39,7 @@ class ParserServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void massMotherboardParser_Success() {
         // Arrange
         MotherboardRequest motherboardRequest = new MotherboardRequest();
@@ -59,6 +62,7 @@ class ParserServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void convertToDto_Success() {
         // Arrange
         Product product = new Product();

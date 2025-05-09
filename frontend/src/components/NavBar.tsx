@@ -2,7 +2,7 @@ import {
     AppBar, Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem, Avatar, Divider, Badge, InputBase
 } from '@mui/material'
 import {
-    Search, ShoppingCart, AccountCircle, KeyboardArrowDown
+    Search, ShoppingCart, AccountCircle
 } from '@mui/icons-material'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -26,6 +26,7 @@ const NavBar = () => {
 
     const handleLogout = () => {
         logout()
+        navigate("/")
         handleClose()
     }
 
@@ -56,19 +57,17 @@ const NavBar = () => {
                             component={Link}
                             to="/gpus"
                             color="inherit"
-                            endIcon={<KeyboardArrowDown />}
                             sx={{ textTransform: 'none' }}
                         >
-                            Видеокарты
+                            Gpus
                         </Button>
                         <Button
                             component={Link}
                             to="/motherboards"
                             color="inherit"
-                            endIcon={<KeyboardArrowDown />}
                             sx={{ textTransform: 'none' }}
                         >
-                            Материнские платы
+                            Motherboards
                         </Button>
                     </Box>
                 </Box>
@@ -128,10 +127,10 @@ const NavBar = () => {
                                     </MenuItem>
                                 )}
                                 <Divider />
-                                <MenuItem onClick={handleLogout}>Выйти</MenuItem>
+                                <MenuItem onClick={handleLogout}>Log out</MenuItem>
                             </>
                         ) : (
-                            <MenuItem component={Link} to="/login" onClick={handleClose}>Войти</MenuItem>
+                            <MenuItem component={Link} to="/login" onClick={handleClose}>Log in</MenuItem>
                         )}
                     </Menu>
                 </Box>

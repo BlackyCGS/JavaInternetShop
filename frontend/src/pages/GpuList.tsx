@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react'
 import {
-    Box,
     Typography,
-    CircularProgress,
     Container,
-    Paper, Stack
+    Paper, Stack, Box, CircularProgress
 } from '@mui/material'
 import ProductList from '../components/ProductList'
 import {fetchGpuProducts, getTotalProducts} from '../api/ProductsApi'  // Предположим, у тебя есть отдельный метод для загрузки видеокарт
@@ -12,8 +10,9 @@ import { Product } from '../types/Product.ts'
 
 const GpuList = () => {
     const [gpus, setGpus] = useState<Product[]>([])
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
     const [totalPages, setTotalPages] = useState(0);
+    const [pageLoading, setPageLoading] = useState(true)
     const [page, setPage] = useState(0);
     const [pageSize] = useState(10);
 
@@ -33,6 +32,9 @@ const GpuList = () => {
     useEffect(() => {
         const loadGpuProducts = async () => {
             try {
+                if(loading) return
+                setLoading(true)
+
                 const data = await fetchGpuProducts(page, pageSize)
                 setGpus(data)
                 const number = await getTotalProducts("Gpu", "")
@@ -41,13 +43,14 @@ const GpuList = () => {
                 console.error('Error loading GPU products:', error)
             } finally {
                 setLoading(false)
+                setPageLoading(false)
             }
         }
 
         loadGpuProducts()
     }, [page])
 
-    if (loading) {
+    if (pageLoading) {
         return (
             <Box display="flex" justifyContent="center" mt={10}>
                 <CircularProgress size={60} />
@@ -66,16 +69,16 @@ const GpuList = () => {
                     color: 'text.primary'
                 }}
             >
-                Видеокарты
+                Gpus
             </Typography>
 
             <Paper elevation={0} sx={{ p: 3, borderRadius: 3 }}>
                 <ProductList products={gpus} />
             </Paper>
             <Stack direction="row" spacing={2}>
-                <button onClick={handlePrevPage} disabled={page === 0}>Назад</button>
-                <button onClick={handleNextPage} disabled={page + 1 >= totalPages}>Вперёд</button>
-                <p>Страница {page + 1} из {totalPages}</p>
+                <button onClick={handlePrevPage} disabled={page === 0}>Previous</button>
+                <button onClick={handleNextPage} disabled={page + 1 >= totalPages}>Next</button>
+                <p>Page {page + 1} of {totalPages}</p>
             </Stack>
         </Container>
     )

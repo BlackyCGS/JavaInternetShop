@@ -21,7 +21,7 @@ const AuthContext = createContext<AuthContextType>({
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const login = (userData: User) => {
         setUser(userData);
@@ -33,7 +33,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     const refreshUser = async () => {
+        if (loading) return
         try {
+            setLoading(true);
             const response = await axios.get<User>('/api/users/profile', {
                 withCredentials: true, // Убедитесь, что с запросом отправляются cookies
             });

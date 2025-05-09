@@ -1,0 +1,9 @@
+frontend
+logs
+.git
+.gitignore
+.idea
+.github
+.gitattributes
+HELP.md
+README.md

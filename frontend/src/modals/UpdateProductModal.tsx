@@ -11,10 +11,12 @@ import {
 import {Product} from '../types/Product.ts';
 
 interface EditProductModalProps {
+    onSubmit: (product: Product) => Promise<void>; // NOSONAR
     open: boolean,
     onClose: () => void,
     product: Product,
     onSave: (updatedProduct: Product) => void,
+    initialData?: Product // NOSONAR
 }
 
 const EditProductModal: React.FC<EditProductModalProps> = ({open, onClose, product, onSave}) => {
@@ -22,34 +24,44 @@ const EditProductModal: React.FC<EditProductModalProps> = ({open, onClose, produ
     const [price, setPrice] = useState(product.price);
     const [gpuData, setGpuData] = useState(product.gpu);
     const [motherboardData, setMotherboardData] = useState(product.motherboard);
-
+    const [loading, setLoading] = useState(false)
     const handleSave = () => {
-        const updatedProduct: Product = {
-            ...product,
-            name,
-            price,
-            gpu: gpuData,
-            motherboard: motherboardData
-        };
-        onSave(updatedProduct);
+        if (loading) return
+        try {
+            setLoading(true)
+            const updatedProduct: Product = {
+                ...product,
+                name,
+                price,
+                gpu: gpuData,
+                motherboard: motherboardData
+            };
+            onSave(updatedProduct);
+        }
+        catch (error) {
+            console.error(error);
+        }
+        finally {
+            setLoading(false)
+        }
     };
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-            <DialogTitle>Редактировать товар</DialogTitle>
+            <DialogTitle>Edit Product</DialogTitle>
             <DialogContent>
                 <Grid container spacing={2} sx={{mt: 1}}>
-                    <Grid item xs={12}>
+                    <Grid mx={{xs:"12"}}>
                         <TextField
-                            label="Название"
+                            label="Name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             fullWidth
                         />
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid mx={{xs:"12"}}>
                         <TextField
-                            label="Цена"
+                            label="Price"
                             type="number"
                             value={price}
                             onChange={(e) => setPrice(parseFloat(e.target.value))}
@@ -59,9 +71,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({open, onClose, produ
 
                     {gpuData && (
                         <>
-                            <Grid item xs={12}>
+                            <Grid mx={{xs:"12"}}>
                                 <TextField
-                                    label="Производитель GPU"
+                                    label="Producer"
                                     value={gpuData.producer}
                                     onChange={(e) =>
                                         setGpuData({...gpuData, producer: e.target.value})
@@ -69,9 +81,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({open, onClose, produ
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={6}>
+                            <Grid mx={{xs:"6"}}>
                                 <TextField
-                                    label="VRAM (ГБ)"
+                                    label="VRAM (GB)"
                                     type="number"
                                     value={gpuData.vram}
                                     onChange={(e) =>
@@ -83,7 +95,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({open, onClose, produ
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={6}>
+                            <Grid mx={{xs:"6"}}>
                                 <TextField
                                     label="Boost Clock (MHz)"
                                     type="number"
@@ -97,9 +109,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({open, onClose, produ
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={6}>
+                            <Grid mx={{xs:"6"}}>
                                 <TextField
-                                    label="TDP (Вт)"
+                                    label="TDP (W)"
                                     type="number"
                                     value={gpuData.tdp}
                                     onChange={(e) =>
@@ -111,7 +123,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({open, onClose, produ
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={6}>
+                            <Grid mx={{xs:"6"}}>
                                 <TextField
                                     label="HDMI"
                                     type="number"
@@ -125,7 +137,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({open, onClose, produ
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={6}>
+                            <Grid mx={{xs:"6"}}>
                                 <TextField
                                     label="DisplayPort"
                                     type="number"
@@ -139,7 +151,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({open, onClose, produ
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={6}>
+                            <Grid mx={{xs:"6"}}>
                                 <TextField
                                     label="DVI"
                                     type="number"
@@ -153,7 +165,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({open, onClose, produ
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={6}>
+                            <Grid mx={{xs:"6"}}>
                                 <TextField
                                     label="VGA"
                                     type="number"
@@ -172,9 +184,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({open, onClose, produ
 
                     {motherboardData && (
                         <>
-                            <Grid item xs={12}>
+                            <Grid mx={{xs:"12"}}>
                                 <TextField
-                                    label="Производитель Материнской платы"
+                                    label="Producer"
                                     value={motherboardData.producer}
                                     onChange={(e) =>
                                         setMotherboardData({
@@ -185,9 +197,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({open, onClose, produ
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={6}>
+                            <Grid mx={{xs:"6"}}>
                                 <TextField
-                                    label="Сокет"
+                                    label="Socket"
                                     value={motherboardData.socket}
                                     onChange={(e) =>
                                         setMotherboardData({
@@ -198,9 +210,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({open, onClose, produ
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={6}>
+                            <Grid mx={{xs:"6"}}>
                                 <TextField
-                                    label="Чипсет"
+                                    label="Chipset"
                                     value={motherboardData.chipset}
                                     onChange={(e) =>
                                         setMotherboardData({
@@ -211,9 +223,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({open, onClose, produ
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={6}>
+                            <Grid mx={{xs:"6"}}>
                                 <TextField
-                                    label="Форм-фактор"
+                                    label="Form Factor"
                                     value={motherboardData.formFactor}
                                     onChange={(e) =>
                                         setMotherboardData({
@@ -224,9 +236,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({open, onClose, produ
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={6}>
+                            <Grid mx={{xs:"6"}}>
                                 <TextField
-                                    label="Тип памяти"
+                                    label="Memory Type"
                                     value={motherboardData.memoryType}
                                     onChange={(e) =>
                                         setMotherboardData({
@@ -237,9 +249,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({open, onClose, produ
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={6}>
+                            <Grid mx={{xs:"6"}}>
                                 <TextField
-                                    label="Слоты под RAM"
+                                    label="RAM Slots"
                                     type="number"
                                     value={motherboardData.ramSlots}
                                     onChange={(e) =>
@@ -251,9 +263,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({open, onClose, produ
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={6}>
+                            <Grid mx={{xs:"6"}}>
                                 <TextField
-                                    label="SATA порты"
+                                    label="SATA Ports"
                                     type="number"
                                     value={motherboardData.sata}
                                     onChange={(e) =>
@@ -270,9 +282,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({open, onClose, produ
                 </Grid>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Отмена</Button>
+                <Button onClick={onClose}>Cancel</Button>
                 <Button onClick={handleSave} variant="contained" color="primary">
-                    Сохранить
+                    Save
                 </Button>
             </DialogActions>
         </Dialog>

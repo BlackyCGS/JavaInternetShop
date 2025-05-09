@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.test.context.support.WithMockUser;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -83,6 +84,7 @@ class UserServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void deleteUser_Success() {
         // Arrange
         when(userRepository.existsById(1)).thenReturn(true);
@@ -95,6 +97,7 @@ class UserServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void deleteUser_NotFound_ThrowsNotFoundException() {
         // Arrange
         when(userRepository.existsById(1)).thenReturn(false);
@@ -105,6 +108,7 @@ class UserServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void getUserById_Success() {
         // Arrange
         when(userRepository.existsById(1)).thenReturn(true);
@@ -120,6 +124,7 @@ class UserServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void getUserById_NotFound_ThrowsNotFoundException() {
         // Arrange
         when(userRepository.existsById(1)).thenReturn(false);
@@ -129,6 +134,7 @@ class UserServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void updateUser_Success() {
         // Arrange
         UserDto updateDto = new UserDto();
@@ -149,6 +155,7 @@ class UserServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void updateUser_PartialUpdate_Success() {
         // Arrange
         UserDto partialUpdateDto = new UserDto();
@@ -167,6 +174,7 @@ class UserServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void updateUser_NotFound_ThrowsNotFoundException() {
         // Arrange
         when(userRepository.existsById(1)).thenReturn(false);
@@ -177,6 +185,7 @@ class UserServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void existsById_ReturnsTrue() {
         // Arrange
         when(userRepository.existsById(1)).thenReturn(true);
@@ -189,6 +198,7 @@ class UserServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void existsById_ReturnsFalse() {
         // Arrange
         when(userRepository.existsById(1)).thenReturn(false);
@@ -201,6 +211,7 @@ class UserServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void findByUserId_Success() {
         // Arrange
         when(userRepository.existsById(1)).thenReturn(true);
@@ -215,6 +226,7 @@ class UserServiceTest {
     }
 
     @Test
+    @WithMockUser("hasRole('ADMIN')")
     void findByUserId_NotFound_ThrowsNotFoundException() {
         // Arrange
         when(userRepository.existsById(1)).thenReturn(false);
