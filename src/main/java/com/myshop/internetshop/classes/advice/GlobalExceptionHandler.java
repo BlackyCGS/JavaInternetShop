@@ -43,6 +43,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleAllExceptions(Exception ex) {
+        if (ex.getMessage().contains("No static resource")) {
+            logger.trace("No static resource found exception caught.");
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        }
         logger.warn("Unexpected exception caught: {}", ex.getMessage());
         return ResponseEntity.internalServerError().body("Unexpected error");
     }
