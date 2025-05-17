@@ -8,15 +8,21 @@ import com.myshop.internetshop.classes.services.AuthService;
 import com.myshop.internetshop.classes.services.JwtService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -76,21 +82,21 @@ public class AuthController {
     private ResponseEntity<String> prepareAndReturnCookies(List<String> jwtTokens) {
         ResponseCookie jwtAccess = ResponseCookie.from("jwt", jwtTokens.get(0))
                 .httpOnly(true)
-                .secure(true)
+                //.secure(true)
                 .sameSite("Strict")
                 .path("/")
-                .maxAge(jwtExpiration/1000)
+                .maxAge(jwtExpiration / 1000)
                 .build();
 
         ResponseCookie jwtRefresh = ResponseCookie.from("jwtr", jwtTokens.get(1))
                 .httpOnly(true)
-                .secure(true)
+                //.secure(true)
                 .sameSite("Strict")
                 .path("/")
-                .maxAge(refreshExpirationTime/1000)
+                .maxAge(refreshExpirationTime / 1000)
                 .build();
-        return ResponseEntity.ok().
-                header(HttpHeaders.SET_COOKIE, jwtAccess.toString())
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, jwtAccess.toString())
                 .header(HttpHeaders.SET_COOKIE, jwtRefresh.toString())
                 .body(jwtTokens.toString());
     }

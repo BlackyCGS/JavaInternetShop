@@ -52,8 +52,8 @@ export const fetchMotherboardProducts = async (pageNumber: number, pageSize: num
 }
 
 export const updateProduct = async (product: Product): Promise<void> => {
-    await axios.put('/api/products', {
-        product
+    await axios.put('/api/products/', product, {
+
     })
 }
 

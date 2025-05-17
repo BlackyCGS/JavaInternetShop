@@ -3,23 +3,23 @@ package com.myshop.internetshop.classes.config;
 import com.myshop.internetshop.classes.services.CustomUserDetailsService;
 import com.myshop.internetshop.classes.services.JwtService;
 import io.jsonwebtoken.JwtException;
-import jakarta.servlet.http.Cookie;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -56,16 +56,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 jwt = jwtTokens.get(0);
                 Cookie jwtAccess = new Cookie("jwt", jwt);
                 jwtAccess.setHttpOnly(true);
-                jwtAccess.setSecure(true);
+                //jwtAccess.setSecure(true)
                 jwtAccess.setPath("/");
-                jwtAccess.setMaxAge((int) jwtExpiration/1000);
+                jwtAccess.setMaxAge((int) jwtExpiration / 1000);
                 jwtAccess.setDomain("localhost");
 
                 jwtr = jwtTokens.get(1);
                 Cookie jwtRefresh = new Cookie("jwtr", jwtr);
                 jwtRefresh.setHttpOnly(true);
-                jwtRefresh.setSecure(true);                jwtRefresh.setPath("/");
-                jwtRefresh.setMaxAge((int) refreshExpiration/1000);
+                //jwtRefresh.setSecure(true)
+                jwtRefresh.setPath("/");
+                jwtRefresh.setMaxAge((int) refreshExpiration / 1000);
                 jwtRefresh.setDomain("localhost");
 
                 response.addCookie(jwtAccess);
@@ -89,7 +90,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     userDetails,
                     null,
-                    userDetails.getAuthorities()  // Исправлено!
+                    userDetails.getAuthorities()
             );
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
@@ -101,6 +102,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
     private String getJwtFromCookies(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {

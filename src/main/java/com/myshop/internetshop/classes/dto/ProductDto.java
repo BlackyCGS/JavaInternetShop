@@ -15,6 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProductDto {
+
     private Integer id;
     @NotBlank(message = "Product name can not be blank")
     private String name;
@@ -42,7 +43,7 @@ public class ProductDto {
         if (product.getGpu() != null) {
             this.gpu.setProductId(null);
         }
-        if(product.getMotherBoard() != null) {
+        if (product.getMotherBoard() != null) {
             this.motherboard.setProductId(null);
         }
         return product;

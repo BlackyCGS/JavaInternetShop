@@ -4,6 +4,7 @@ import { useTheme } from '@mui/material/styles'
 import { addProductToCart} from "../api/OrdersApi.ts";
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom';
+import {useCart} from "../hooks/useCart.tsx";
 
 
 const ProductCard = ({ product }: { product: Product }) => {
@@ -11,9 +12,13 @@ const ProductCard = ({ product }: { product: Product }) => {
     const { id, name, price, gpu, motherboard } = product
     const { user } = useAuth()
     const navigate = useNavigate()
+    const {updateCartCount, updateCartItems, cartItems} = useCart()
+    const isInCart = cartItems.includes(id);
 
     const handleAddToCart = async (productId: number) => {
-        await addProductToCart(productId)
+        await addProductToCart(productId);
+        updateCartCount();
+        updateCartItems();
     }
 
     return (
@@ -98,8 +103,9 @@ const ProductCard = ({ product }: { product: Product }) => {
                         borderRadius: 2
                     }}
                     onClick={() => handleAddToCart(product.id)}
+                    disabled={isInCart}
                 >
-                    Add to cart
+                    {isInCart ? 'Already in Cart' : 'Add to Cart'}
                 </Button>
                     ) : (
                         <Button

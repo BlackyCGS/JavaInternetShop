@@ -1,10 +1,11 @@
 package com.myshop.internetshop.classes.repositories;
 
 import com.myshop.internetshop.classes.entities.RefreshToken;
+
+import java.util.Date;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 @Repository
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Integer> {
@@ -20,4 +21,6 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Inte
     void deleteByToken(String refreshToken);
 
     void deleteAllByUserId(int id);
+
+    void deleteAllByExpirationTimeBefore(Date expirationTime);
 }

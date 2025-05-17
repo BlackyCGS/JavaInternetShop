@@ -1,11 +1,14 @@
 package com.myshop.internetshop.classes.advice;
 
-import com.myshop.internetshop.classes.exceptions.*;
-
+import com.myshop.internetshop.classes.exceptions.ForbiddenException;
+import com.myshop.internetshop.classes.exceptions.InternalServerErrorException;
+import com.myshop.internetshop.classes.exceptions.InvalidTokenException;
+import com.myshop.internetshop.classes.exceptions.NotFoundException;
+import com.myshop.internetshop.classes.exceptions.ValidationException;
+import io.jsonwebtoken.JwtException;
 import java.util.HashMap;
 import java.util.Map;
-
-import io.jsonwebtoken.JwtException;
+import javax.naming.AuthenticationException;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +19,6 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import javax.naming.AuthenticationException;
 
 @RestControllerAdvice
 @Slf4j
@@ -84,8 +85,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
     public ResponseEntity<String> handleAuthenticationCredentialsNotFoundException(
             AuthenticationCredentialsNotFoundException ex
-    )
-    {
+    ) {
         logger.info("Authentication credentials not found exception caught: {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
@@ -99,8 +99,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InternalServerErrorException.class)
     public ResponseEntity<String> handleInternalServerErrorException(
         InternalServerErrorException ex
-    )
-    {
+    ) {
         logger.error("Internal server error caught: {}", ex.getMessage());
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }

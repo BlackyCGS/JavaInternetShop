@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import {
     Box,
     Button,
@@ -38,26 +38,26 @@ const RegisterPage = () => {
         }
 
         if (!email) {
-            newErrors.email = 'Email обязателен'
+            newErrors.email = 'Email is required'
             valid = false
         } else if (!validateEmail(email)) {
-            newErrors.email = 'Введите корректный email'
+            newErrors.email = 'Enter correct email address'
             valid = false
         }
 
         if (!name) {
-            newErrors.name = 'Имя пользователя обязательно'
+            newErrors.name = 'Name is required'
             valid = false
         } else if (name.length < 3) {
-            newErrors.name = 'Имя должно быть не менее 3 символов'
+            newErrors.name = 'Name must have 3 characters or more'
             valid = false
         }
 
         if (!password) {
-            newErrors.password = 'Пароль обязателен'//NOSONAR
+            newErrors.password = 'Password is required'//NOSONAR
             valid = false
         } else if (password.length < 6) {
-            newErrors.password = 'Пароль должен быть не менее 6 символов'//NOSONAR
+            newErrors.password = 'Password must have 6 characters or more'//NOSONAR
             valid = false
         }
 
@@ -78,7 +78,7 @@ const RegisterPage = () => {
                 { withCredentials: true }
             )
 
-            navigate('/login') // Редирект на страницу входа после успешной регистрации
+            navigate('/login')
         } catch (err: any) {
             setErrors(prev => ({
                 ...prev,
@@ -164,12 +164,16 @@ const RegisterPage = () => {
                             Register
                         </Button>
 
-                        <Box sx={{ mt: 2, textAlign: 'center' }}>
+                        <Box sx={{ textAlign: 'center' }}>
                             <Button
-                                onClick={() => navigate('/login')}
-                                sx={{ textTransform: 'none' }}
-                            >
-                                Already have an account?. Log in
+                                component={Link}
+                                to="/login"
+                                /*variant="contained"*/
+                                fullWidth
+                                color="inherit"
+                                sx={{mt:3,  py:1.5, alignSelf: 'center', border: 1 }
+                                }>
+                                Already have an account? Log in
                             </Button>
                         </Box>
                     </Box>

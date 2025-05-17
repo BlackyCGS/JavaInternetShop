@@ -1,11 +1,10 @@
 package com.myshop.internetshop.classes.utilities;
 
+import java.util.Map;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
-import java.util.Map;
 
 public class Pagination {
 
@@ -35,7 +34,8 @@ public class Pagination {
     public static Pageable getPageable(Map<String, String> params) {
 
         int pageNum = (params.containsKey("pageNum")) ? Integer.parseInt(params.get("pageNum")) : 0;
-        int pageSize = (params.containsKey("pageSize")) ? Integer.parseInt(params.get("pageSize")) : 20;
+        int pageSize = (params.containsKey("pageSize")) ? Integer
+                .parseInt(params.get("pageSize")) : 20;
 
         return PageRequest.of(pageNum, pageSize);
     }

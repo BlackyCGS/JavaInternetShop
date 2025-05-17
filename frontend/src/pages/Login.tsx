@@ -95,8 +95,10 @@ const LoginPage = () => {
                         <Button
                             component={Link}
                             to="/register"
+                            /*variant="contained"*/
+                            fullWidth
                             color="inherit"
-                            sx={{textTransform: 'none'}
+                            sx={{mt:3,  py:1.5, alignSelf: 'center', border: 1 }
                         }>
                             Register
                         </Button>

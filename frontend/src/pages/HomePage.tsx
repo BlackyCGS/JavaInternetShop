@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Box, Typography, CircularProgress, Container, Paper, Stack } from '@mui/material'
+import React, { useState, useEffect } from 'react'
+import { Box, Typography, CircularProgress, Container, Paper, Stack, Button, TextField } from '@mui/material'
 import ProductList from '../components/ProductList'
 import { fetchSearchedProducts, getTotalProducts } from '../api/ProductsApi'
 import { Product } from '../types/Product.ts'
@@ -12,7 +12,6 @@ const HomePage = () => {
     const [totalPages, setTotalPages] = useState(0)
     const [page, setPage] = useState(0)
     const [pageSize] = useState(10)
-
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const searchQuery = searchParams.get('search') ?? '';
@@ -26,6 +25,12 @@ const HomePage = () => {
     const handlePrevPage = () => {
         if (page > 0) {
             setPage(prev => prev - 1)
+        }
+    }
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage >= 0 && newPage <= totalPages) {
+            setPage(newPage)
         }
     }
 
@@ -71,10 +76,41 @@ const HomePage = () => {
                 <ProductList products={products} />
             </Paper>
 
-            <Stack direction="row" spacing={2}>
-                <button onClick={handlePrevPage} disabled={page === 0}>Previous</button>
-                <button onClick={handleNextPage} disabled={page + 1 >= totalPages}>Next</button>
-                <p>Page {page + 1} of {totalPages}</p>
+            <Stack sx={{py: 5}} direction="row" spacing={2} alignItems="center">
+                <Button
+                    variant="contained"
+                    onClick={handlePrevPage}
+                    disabled={page === 0}
+                >
+                    Previous
+                </Button>
+                <Button
+                    variant="contained"
+                    onClick={handleNextPage}
+                    disabled={page + 1 >= totalPages}
+                >
+                    Next
+                </Button>
+                <Typography>Page</Typography>
+                <TextField
+                    type="number"
+                    size="small"
+                    defaultValue={page + 1}
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                        const target = e.target as HTMLInputElement;
+                        if (e.key === 'Enter') {
+                            const page = parseInt(target.value);
+                            if (!isNaN(page) && page >= 1 && page <= totalPages) {
+                                handlePageChange(page - 1);
+                            } else {
+                                target.value = (page + 1).toString();
+                            }
+                        }
+                    }}
+                    sx={{ width: '100px' }}
+                    key={`page-input-${page}`}
+                />
+                <Typography>of {totalPages}</Typography>
             </Stack>
         </Container>
     )

@@ -55,7 +55,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                         <Typography sx={{ mt: 2 }}>
                             <strong>Total:</strong> $
                             {order.products.reduce((sum, product) =>
-                                sum + (product.price * (product.quantity ?? 1)), 0)}
+                                sum + (product.price * (product.quantity ?? 1)), 0).toFixed(2)}
                         </Typography>
                     </>
                 ) : (

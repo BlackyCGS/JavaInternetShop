@@ -11,7 +11,7 @@ import {
 import {Product} from '../types/Product.ts';
 
 interface EditProductModalProps {
-    onSubmit: (product: Product) => Promise<void>; // NOSONAR
+    //onSubmit: (product: Product) => Promise<void>; // NOSONAR
     open: boolean,
     onClose: () => void,
     product: Product,

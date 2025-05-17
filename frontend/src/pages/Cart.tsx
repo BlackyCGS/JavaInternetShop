@@ -3,16 +3,22 @@ import { Button, Typography, Box } from '@mui/material';
 import { Product } from '../types/Product.ts';
 import { getCartById, toOrder, deleteProductFromCart } from "../api/OrdersApi.ts";
 import CartCard from "../components/CartCard.tsx";
+import {useNavigate} from "react-router-dom";
+import {Order} from "../types/Order.ts";
+import {useCart} from "../hooks/useCart.tsx";
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false)
     const totalPrice = cartItems.reduce((acc, item) => acc + item.price, 0);
+    const navigate = useNavigate();
+    const {updateCartCount} = useCart()
 
     const handleToOrder = async () => {
         await toOrder();
-
         setCartItems([]);
+        updateCartCount();
+        navigate("/orders")
     };
 
     const loadProducts = async () => {
@@ -20,7 +26,7 @@ const Cart = () => {
             if(loading) return
             setLoading(true)
 
-            const data = await getCartById();
+            const data: Order = await getCartById();
             setCartItems(data.products);
         } catch (error) {
             console.error('Error loading products:', error);
@@ -36,6 +42,9 @@ const Cart = () => {
             setCartItems((prevItems) => prevItems.filter(item => item.id !== productId));
         } catch (error) {
             console.error('Error deleting product:', error);
+        }
+        finally {
+            updateCartCount();
         }
     };
 
@@ -62,7 +71,7 @@ const Cart = () => {
             {cartItems.length > 0 && (
                 <div style={{ marginTop: '20px' }}>
                     <Typography variant="h6" gutterBottom>
-                        Total: {totalPrice} $
+                        Total: {totalPrice.toFixed(2)} $
                     </Typography>
                     <Button
                         variant="contained"

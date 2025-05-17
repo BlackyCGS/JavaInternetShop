@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Tab,
     Tabs,
@@ -16,7 +16,7 @@ import {
     Select,
     FormControl,
     Stack,
-    Typography
+    Typography, TextField
 } from '@mui/material'
 import CreateProductModal from '../modals/CreateProductModal'
 import EditProductModal from '../modals/UpdateProductModal'
@@ -72,6 +72,12 @@ const AdminTab = () => {
         }
     };
 
+    const handleProductPageChange = (newPage: number) => {
+        if (newPage >= 0 && newPage <= productTotalPages) {
+            setProductPage(newPage)
+        }
+    };
+
     const handleNextUserPage = () => {
         if (userPage + 1 < userTotalPages) {
             setUserPage(prev => prev + 1);
@@ -84,6 +90,12 @@ const AdminTab = () => {
         }
     };
 
+    const handleUserPageChange = (newPage: number) => {
+        if (newPage >= 0 && newPage <= userTotalPages) {
+            setUserPage(newPage)
+        }
+    };
+
     const handleNextOrderPage = () => {
         if (orderPage + 1 < orderTotalPages) {
             setOrderPage(prev => prev + 1);
@@ -93,6 +105,12 @@ const AdminTab = () => {
     const handlePrevOrderPage = () => {
         if (orderPage > 0) {
             setOrderPage(prev => prev - 1);
+        }
+    };
+
+    const handleOrderPageChange = (newPage: number) => {
+        if (newPage >= 0 && newPage <= orderTotalPages) {
+            setOrderPage(newPage)
         }
     };
 
@@ -287,18 +305,47 @@ const AdminTab = () => {
                             <EditProductModal
                                 open={openEditProduct}
                                 onClose={() => setOpenEditProduct(false)}
-                                onSubmit={handleEditProduct}
+                                //onSubmit={handleEditProduct}
                                 initialData={selectedProduct} product={selectedProduct}
                                 onSave={function (updatedProduct: Product): void {
-                                    handleCreateProduct(updatedProduct)
+                                    handleEditProduct(updatedProduct)
                                 }}                            />
                         )}
-                        <Stack
-                            sx={{m:5}}
-                            direction="row" spacing={2}>
-                            <button onClick={handlePrevProductPage} disabled={productPage === 0}>Назад</button>
-                            <button onClick={handleNextProductPage} disabled={productPage + 1 >= productTotalPages}>Вперёд</button>
-                            <p>Page {productPage + 1} of {productTotalPages}</p>
+                        <Stack sx={{m: 5}} direction="row" spacing={2} alignItems="center">
+                            <Button
+                                variant="contained"
+                                onClick={handlePrevProductPage}
+                                disabled={productPage === 0}
+                            >
+                                Previous
+                            </Button>
+                            <Button
+                                variant="contained"
+                                onClick={handleNextProductPage}
+                                disabled={productPage + 1 >= productTotalPages}
+                            >
+                                Next
+                            </Button>
+                            <Typography>Page</Typography>
+                            <TextField
+                                type="number"
+                                size="small"
+                                defaultValue={productPage + 1}
+                                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                                    const target = e.target as HTMLInputElement;
+                                    if (e.key === 'Enter') {
+                                        const page = parseInt(target.value);
+                                        if (!isNaN(page) && page >= 1 && page <= productTotalPages) {
+                                            handleProductPageChange(page - 1);
+                                        } else {
+                                            target.value = (page + 1).toString();
+                                        }
+                                    }
+                                }}
+                                sx={{ width: '100px' }}
+                                key={`page-input-${productPage}`}
+                            />
+                            <Typography>of {productTotalPages}</Typography>
                         </Stack>
                     </>
                 )}
@@ -342,12 +389,41 @@ const AdminTab = () => {
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        <Stack
-                            sx={{m:5}}
-                            direction="row" spacing={2}>
-                            <button onClick={handlePrevUserPage} disabled={userPage === 0}>Previous</button>
-                            <button onClick={handleNextUserPage} disabled={userPage + 1 >= userTotalPages}>Next</button>
-                            <p>Page {userPage + 1} of {userTotalPages}</p>
+                        <Stack sx={{m: 5}} direction="row" spacing={2} alignItems="center">
+                            <Button
+                                variant="contained"
+                                onClick={handlePrevUserPage}
+                                disabled={userPage === 0}
+                            >
+                                Previous
+                            </Button>
+                            <Button
+                                variant="contained"
+                                onClick={handleNextUserPage}
+                                disabled={userPage + 1 >= userTotalPages}
+                            >
+                                Next
+                            </Button>
+                            <Typography>Page</Typography>
+                            <TextField
+                                type="number"
+                                size="small"
+                                defaultValue={userPage + 1}
+                                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                                    const target = e.target as HTMLInputElement;
+                                    if (e.key === 'Enter') {
+                                        const page = parseInt(target.value);
+                                        if (!isNaN(page) && page >= 1 && page <= userTotalPages) {
+                                            handleUserPageChange(page - 1);
+                                        } else {
+                                            target.value = (page + 1).toString();
+                                        }
+                                    }
+                                }}
+                                sx={{ width: '100px' }}
+                                key={`page-input-${userPage}`}
+                            />
+                            <Typography>of {userTotalPages}</Typography>
                         </Stack>
                     </>
                 )}
@@ -405,12 +481,41 @@ const AdminTab = () => {
                             onClose={handleCloseModal}
                             order={selectedOrder}
                         />
-                        <Stack
-                            sx={{m:5}}
-                            direction="row" spacing={2}>
-                            <button onClick={handlePrevOrderPage} disabled={orderPage === 0}>Previous</button>
-                            <button onClick={handleNextOrderPage} disabled={orderPage + 1 >= orderTotalPages}>Next</button>
-                            <p>Page {orderPage + 1} of {orderTotalPages}</p>
+                        <Stack sx={{m: 5}} direction="row" spacing={2} alignItems="center">
+                            <Button
+                                variant="contained"
+                                onClick={handlePrevOrderPage}
+                                disabled={orderPage === 0}
+                            >
+                                Previous
+                            </Button>
+                            <Button
+                                variant="contained"
+                                onClick={handleNextOrderPage}
+                                disabled={orderPage + 1 >= orderTotalPages}
+                            >
+                                Next
+                            </Button>
+                            <Typography>Page</Typography>
+                            <TextField
+                                type="number"
+                                size="small"
+                                defaultValue={orderPage + 1}
+                                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                                    const target = e.target as HTMLInputElement;
+                                    if (e.key === 'Enter') {
+                                        const page = parseInt(target.value);
+                                        if (!isNaN(page) && page >= 1 && page <= orderTotalPages) {
+                                            handleOrderPageChange(page - 1);
+                                        } else {
+                                            target.value = (page + 1).toString();
+                                        }
+                                    }
+                                }}
+                                sx={{ width: '100px' }}
+                                key={`page-input-${orderPage}`}
+                            />
+                            <Typography>of {orderTotalPages}</Typography>
                         </Stack>
                     </>
                 )}

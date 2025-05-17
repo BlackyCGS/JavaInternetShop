@@ -7,10 +7,9 @@ import com.myshop.internetshop.classes.services.OrderService;
 import com.myshop.internetshop.classes.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
-
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -110,8 +109,9 @@ public class OrderController {
                 }
             }
         }
-            String name = jwtService.extractUsername(token);
-            return ResponseEntity.ok(orderService.addProductToCart(userService.getUserIdByName(name), productId));
+        String name = jwtService.extractUsername(token);
+        return ResponseEntity.ok(orderService
+                .addProductToCart(userService.getUserIdByName(name), productId));
     }
 
     @Operation(summary = "Get total number of orders")
@@ -131,12 +131,12 @@ public class OrderController {
                 }
             }
         }
-            String name = jwtService.extractUsername(token);
-            return ResponseEntity.ok(orderService.getCartById(userService.getUserIdByName(name)));
+        String name = jwtService.extractUsername(token);
+        return ResponseEntity.ok(orderService.getCartById(userService.getUserIdByName(name)));
     }
 
     @DeleteMapping("/cart/{productId}")
-    ResponseEntity<String> deleteProductFromCart(@PathVariable int productId,
+    ResponseEntity<OrderDto> deleteProductFromCart(@PathVariable int productId,
                                             HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         String token = null;
@@ -147,10 +147,10 @@ public class OrderController {
                 }
             }
         }
-            String name = jwtService.extractUsername(token);
-            orderService.deleteProductFromCart(userService.getUserIdByName(name),
-                    productId);
-            return ResponseEntity.ok("Deleted successfully");
+        String name = jwtService.extractUsername(token);
+
+        return ResponseEntity.ok(orderService.deleteProductFromCart(userService.getUserIdByName(name),
+                productId));
 
     }
 
@@ -168,7 +168,8 @@ public class OrderController {
         }
         String name = jwtService.extractUsername(token);
 
-        return ResponseEntity.ok(orderService.convertCartToOrder(userService.getUserIdByName(name)));
+        return ResponseEntity
+                .ok(orderService.convertCartToOrder(userService.getUserIdByName(name)));
     }
 
     @GetMapping("/myOrders")

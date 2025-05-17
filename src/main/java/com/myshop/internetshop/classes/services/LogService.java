@@ -1,7 +1,11 @@
 package com.myshop.internetshop.classes.services;
 
-
-
+import com.myshop.internetshop.classes.dto.LogStatusDto;
+import com.myshop.internetshop.classes.enums.LogStatusEnum;
+import com.myshop.internetshop.classes.exceptions.BadRequestException;
+import com.myshop.internetshop.classes.exceptions.InternalServerErrorException;
+import com.myshop.internetshop.classes.exceptions.NotFoundException;
+import com.myshop.internetshop.classes.utilities.LogProcessor;
 import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,13 +15,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.myshop.internetshop.classes.dto.LogStatusDto;
-import com.myshop.internetshop.classes.enums.LogStatusEnum;
-import com.myshop.internetshop.classes.exceptions.InternalServerErrorException;
-import com.myshop.internetshop.classes.exceptions.NotFoundException;
-import com.myshop.internetshop.classes.utilities.LogProcessor;
-import com.myshop.internetshop.classes.exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -41,13 +38,13 @@ public class LogService {
         try {
             LocalDate localDate = LocalDate.parse(date, formatter);
             String fileName =
-                    "logs/internetShop" + additional + "-" + formatter.format(localDate) +
-                            ".log";
+                    "logs/internetShop" + additional + "-" + formatter.format(localDate)
+                            + ".log";
             Path path = Paths.get(fileName);
 
             if (!Files.exists(path)) {
-                throw new NotFoundException("There is no file with name " + additional + "-" + formatter.format(localDate) +
-                        ".log");
+                throw new NotFoundException("There is no file with name " + additional
+                        + "-" + formatter.format(localDate) + ".log");
             }
 
             InputStreamResource resource =
@@ -58,14 +55,14 @@ public class LogService {
                     .contentType(MediaType.TEXT_PLAIN)
                     .body(resource);
         } catch (Exception e) {
-            if(e.getMessage().contains("There is no file with name")) {
+            if (e.getMessage().contains("There is no file with name")) {
                 throw new NotFoundException(e.getMessage());
             }
             throw new BadRequestException("Bad Request");
         }
     }
 
-    public String startGeneration(String additional, String start, String end){
+    public String startGeneration(String additional, String start, String end) {
         LocalDate startDate = LocalDate.parse(start, formatter);
         LocalDate endDate = LocalDate.parse(end, formatter);
         if (startDate.isAfter(endDate)) {
@@ -93,14 +90,14 @@ public class LogService {
 
     public ResponseEntity<InputStreamResource> getGeneratedLogsById(String id) {
 
-            LogStatusDto task = this.getTaskById(id);
-            if (task == null) {
-                throw new NotFoundException("Log file request does not exist");
-            }
-            if(task.getStatus() != LogStatusEnum.SUCCESS) {
-                throw new NotFoundException("Log file is not ready yet. Check its " +
-                        "status please");
-            }
+        LogStatusDto task = this.getTaskById(id);
+        if (task == null) {
+            throw new NotFoundException("Log file request does not exist");
+        }
+        if (task.getStatus() != LogStatusEnum.SUCCESS) {
+            throw new NotFoundException("Log file is not ready yet. Check its "
+                    + "status please");
+        }
         try {
             Path path = Paths.get(task.getLogPath());
 

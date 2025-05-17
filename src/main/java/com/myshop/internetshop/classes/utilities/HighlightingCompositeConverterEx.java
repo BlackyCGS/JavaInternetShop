@@ -6,7 +6,8 @@ import ch.qos.logback.core.pattern.color.ANSIConstants;
 import ch.qos.logback.core.pattern.color.ForegroundCompositeConverterBase;
 
 @SuppressWarnings("java:S110")
-public class HighlightingCompositeConverterEx extends ForegroundCompositeConverterBase<ILoggingEvent> {
+public class HighlightingCompositeConverterEx
+        extends ForegroundCompositeConverterBase<ILoggingEvent> {
 
     @Override
     protected String getForegroundColorCode(ILoggingEvent event) {
@@ -14,7 +15,8 @@ public class HighlightingCompositeConverterEx extends ForegroundCompositeConvert
         return switch (level.toInt()) {
             case Level.ERROR_INT ->
                     ANSIConstants.BOLD + ANSIConstants.RED_FG; // same as default color scheme
-            case Level.WARN_INT -> ANSIConstants.YELLOW_FG;// same as default color scheme
+            case Level.WARN_INT -> ANSIConstants.YELLOW_FG; // same as default color
+            // scheme
             case Level.INFO_INT -> ANSIConstants.GREEN_FG; // use CYAN instead of BLUE
             case Level.DEBUG_INT -> ANSIConstants.CYAN_FG;
             default -> ANSIConstants.DEFAULT_FG;

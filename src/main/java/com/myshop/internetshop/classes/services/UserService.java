@@ -10,14 +10,14 @@ import com.myshop.internetshop.classes.exceptions.NotFoundException;
 import com.myshop.internetshop.classes.exceptions.ValidationException;
 import com.myshop.internetshop.classes.repositories.UserRepository;
 import jakarta.transaction.Transactional;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -68,9 +68,9 @@ public class UserService {
             User user = userRepository.findById(id);
             Optional<User> userCheck = userRepository.findByEmail(userDto.getEmail());
             if (userCheck.isPresent() && !Objects.equals(user.getId(),
-                    userCheck.get().getId())) {
-                    throw new ConflictException("User with that email already exists");
-                }
+                userCheck.get().getId())) {
+                throw new ConflictException("User with that email already exists");
+            }
 
             if (userDto.getName() != null) {
                 user.setName(userDto.getName());
@@ -106,7 +106,7 @@ public class UserService {
         } else {
             throw new NotFoundException("User does not exist");
         }
-        switch (role){
+        switch (role) {
             case "ADMIN":
                 user.setPermission(UserPermission.ADMIN.getPermissionType());
                 break;
@@ -119,8 +119,8 @@ public class UserService {
             case "DELIVERY":
                 user.setPermission(UserPermission.DELIVERY.getPermissionType());
                 break;
-                default:
-                    throw new ValidationException("Invalid role");
+            default:
+                throw new ValidationException("Invalid role");
         }
         return new SafeUserDto(userRepository.save(user));
     }

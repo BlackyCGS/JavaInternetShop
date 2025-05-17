@@ -5,10 +5,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.NonNull;
-import java.util.Date;
 
 @Entity
 @Table(name = "refresh_tokens")

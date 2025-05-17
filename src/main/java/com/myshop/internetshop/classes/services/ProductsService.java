@@ -11,7 +11,6 @@ import com.myshop.internetshop.classes.repositories.ProductsRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,7 +158,8 @@ public class ProductsService {
         }
         if (categoryCount != 1) {
             throw new ValidationException("ProductDto with name: "
-                    + productDto.getName() + "is not valid because it has " + categoryCount + " categories");
+                    + productDto.getName()
+                    + "is not valid because it has " + categoryCount + " categories");
         }
     }
 
@@ -175,9 +175,12 @@ public class ProductsService {
     public Integer getProductsCount(String category, String name) {
 
         return switch (category) {
-            case "All" -> Math.toIntExact(productsRepository.countAllByNameContainingIgnoreCase(name));
-            case "Motherboard" -> productsRepository.countByMotherBoardIsNotNullAndNameContainingIgnoreCase(name);
-            case "Gpu" -> productsRepository.countByGpuIsNotNullAndNameContainingIgnoreCase(name);
+            case "All" -> Math.toIntExact(productsRepository
+                    .countAllByNameContainingIgnoreCase(name));
+            case "Motherboard" -> productsRepository
+                    .countByMotherBoardIsNotNullAndNameContainingIgnoreCase(name);
+            case "Gpu" -> productsRepository
+                    .countByGpuIsNotNullAndNameContainingIgnoreCase(name);
             default -> throw new ValidationException("Incorrect param");
         };
     }
@@ -189,17 +192,33 @@ public class ProductsService {
     @Transactional
     public ProductDto updateProduct(ProductDto productDto) {
         validateProductDto(productDto);
-        Product product = productDto.toEntity();
-        if (productsRepository.existsById((long) product.getId())) {
-            productsRepository.save(product);
-            return convertToDto(product);
+        Product product = new Product();
+        product.setName(productDto.getName());
+        product.setPrice(productDto.getPrice());
+        product.setId(productDto.getId());
+        if (productDto.getGpu() != null) {
+            Gpu gpu = productDto.getGpu();
+            gpu.setProductId(product.getId());
+            product.setGpu(productDto.getGpu());
+            gpu.setProduct(product);
         }
-        else {
+        if (productDto.getMotherboard() != null) {
+            Motherboard motherboard = productDto.getMotherboard();
+            motherboard.setProductId(product.getId());
+            product.setMotherBoard(productDto.getMotherboard());
+            motherboard.setProduct(product);
+        }
+        if (productsRepository.existsById((long) productDto.getId())) {
+        productsRepository.save(product);
+        return new ProductDto(product);
+        } else {
             throw new NotFoundException("Product with id " + product.getId() + " not found");
         }
     }
 
     public List<ProductDto> searchByName(String name, Pageable pageable) {
-        return productsRepository.findByNameContainingIgnoreCase(name, pageable).stream().map(this::convertToDto).toList();
+        return productsRepository
+                .findByNameContainingIgnoreCase(name, pageable)
+                .stream().map(this::convertToDto).toList();
     }
 }

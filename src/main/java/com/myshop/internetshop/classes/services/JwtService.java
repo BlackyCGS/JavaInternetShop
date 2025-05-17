@@ -9,15 +9,20 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.transaction.Transactional;
+import java.security.Key;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
-import java.util.*;
-import java.util.function.Function;
 
 @Service
 public class JwtService {
@@ -66,8 +71,7 @@ public class JwtService {
             Map<String, Object> extraClaims,
             UserDetails userDetails,
             long expiration
-    )
-    {
+    ) {
         extraClaims.put("roles", userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList());
@@ -111,11 +115,12 @@ public class JwtService {
     public boolean validateRefreshToken(String token) {
         if (refreshTokenRepository.existsByToken(token)) {
             RefreshToken refreshToken = refreshTokenRepository.findByToken(token);
-           return !refreshToken.isExpired();
+            return !refreshToken.isExpired();
         } else {
             throw new InvalidTokenException("Invalid Token");
         }
     }
+
     public boolean isRefreshTokenValid(String refreshToken) {
         String username = this.extractUsername(refreshToken);
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
@@ -123,17 +128,20 @@ public class JwtService {
     }
 
     @Transactional
-    public List<String> updateTokenPair(String refreshToken) {
+    public synchronized List<String> updateTokenPair(String refreshToken) {
         String username = this.extractUsername(refreshToken);
         if (this.isRefreshTokenValid(refreshToken)) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-            refreshTokenRepository.deleteByToken(refreshToken);
+            if(refreshTokenRepository.existsByToken(refreshToken)) {
+                refreshTokenRepository.deleteByToken(refreshToken);
+            }
             return generateTokenPair(userDetails);
         } else {
             throw new InvalidTokenException("Invalid Token");
         }
 
     }
+
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);

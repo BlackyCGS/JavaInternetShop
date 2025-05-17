@@ -13,46 +13,45 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
-        private final UserRepository userRepository;
-        private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-        private final AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-        @Autowired
-        public AuthService(
-                UserRepository userRepository,
-                AuthenticationManager authenticationManager,
-                PasswordEncoder passwordEncoder
-        ) {
-            this.authenticationManager = authenticationManager;
-            this.userRepository = userRepository;
-            this.passwordEncoder = passwordEncoder;
+    @Autowired
+    public AuthService(
+            UserRepository userRepository,
+            AuthenticationManager authenticationManager,
+            PasswordEncoder passwordEncoder
+    ) {
+        this.authenticationManager = authenticationManager;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    public User signUp(UserDto userRequest) {
+        if (userRepository.existsByEmail(userRequest.getEmail())) {
+            throw new ConflictException("User with that email already exists");
         }
-
-        public User signUp(UserDto userRequest) {
-            if (userRepository.existsByEmail(userRequest.getEmail())) {
-                throw new ConflictException("User with that email already exists");
-            }
-            if (userRepository.existsByName(userRequest.getName())) {
-                throw new ConflictException("User with that name already exists");
-            }
-            User user = new User();
-            user.setName(userRequest.getName());
-            user.setEmail(userRequest.getEmail());
-            user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
-            return userRepository.save(user);
+        if (userRepository.existsByName(userRequest.getName())) {
+            throw new ConflictException("User with that name already exists");
         }
+        User user = new User();
+        user.setName(userRequest.getName());
+        user.setEmail(userRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+        return userRepository.save(user);
+    }
 
-        public User authenticate(LoginRequest input) {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            input.getEmail(),
-                            input.getPassword()
-                    )
-            );
+    public User authenticate(LoginRequest input) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    input.getEmail(), input.getPassword()
+                )
+        );
 
-            return userRepository.findByEmail(input.getEmail())
+        return userRepository.findByEmail(input.getEmail())
                     .orElseThrow();
-        }
+    }
 }
 

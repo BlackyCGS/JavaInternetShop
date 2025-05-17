@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import {useParams, Link, useNavigate} from 'react-router-dom'
 import {
     Box,
     Typography,
@@ -14,12 +14,20 @@ import {
 import { fetchProductById } from '../api/ProductsApi'
 import { Product } from '../types/Product.ts'
 import {addProductToCart} from "../api/OrdersApi.ts";
+import {useAuth} from "../hooks/useAuth.tsx";
+import {useCart} from "../hooks/useCart.tsx";
 
 const ProductPage = () => {
     const { id } = useParams()
     const [product, setProduct] = useState<Product | null>(null)
     const [loading, setLoading] = useState(false)
     const [pageLoading, setPageLoading] = useState(true)
+    const navigate = useNavigate()
+    const { user } = useAuth()
+    const {updateCartCount, cartItems} = useCart()
+
+    const isInCart = cartItems.includes(product?.id as number);
+
 
     useEffect(() => {
         const loadProduct = async () => {
@@ -41,6 +49,7 @@ const ProductPage = () => {
 
     const handleAddToCart = async (productId: number) => {
         await addProductToCart(productId)
+        updateCartCount()
     }
 
     if (pageLoading) {
@@ -125,20 +134,38 @@ const ProductPage = () => {
                     </Box>
                 )}
 
-                <Button
-                    variant="contained"
-                    size="large"
-                    fullWidth
-                    sx={{
-                        mt: 4,
-                        py: 2,
-                        borderRadius: 2,
-                        fontSize: '1.1rem'
-                    }}
-                    onClick={() => handleAddToCart(product.id)}
-                >
-                    Add to cart
-                </Button>
+                {user ? (
+                    <Button
+                        variant="contained"
+                        size="large"
+                        fullWidth
+                        sx={{
+                            mt: 4,
+                            py: 2,
+                            borderRadius: 2,
+                            fontSize: '1.1rem'
+                        }}
+                        onClick={() => handleAddToCart(product.id)}
+                        disabled={isInCart}
+                    >
+                        {isInCart ? 'Already in Cart' : 'Add to Cart'}
+                    </Button>
+                ) : (
+                    <Button
+                        variant="contained"
+                        size="large"
+                        fullWidth
+                        sx={{
+                            mt: 4,
+                            py: 2,
+                            borderRadius: 2,
+                            fontSize: '1.1rem'
+                        }}
+                        onClick={() => navigate("/login")}
+                    >
+                        Log in to add Products to cart
+                    </Button>
+                )}
             </Paper>
         </Container>
     )

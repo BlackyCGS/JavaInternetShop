@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     Typography,
     Container,
-    Paper, Stack, Box, CircularProgress
+    Paper, Stack, Box, CircularProgress, Button, TextField
 } from '@mui/material'
 import ProductList from '../components/ProductList'
 import {fetchGpuProducts, getTotalProducts} from '../api/ProductsApi'  // Предположим, у тебя есть отдельный метод для загрузки видеокарт
@@ -27,6 +27,12 @@ const GpuList = () => {
             setPage(prev => prev - 1);
         }
     };
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage >= 0 && newPage <= totalPages) {
+            setPage(newPage)
+        }
+    }
 
 
     useEffect(() => {
@@ -75,10 +81,41 @@ const GpuList = () => {
             <Paper elevation={0} sx={{ p: 3, borderRadius: 3 }}>
                 <ProductList products={gpus} />
             </Paper>
-            <Stack direction="row" spacing={2}>
-                <button onClick={handlePrevPage} disabled={page === 0}>Previous</button>
-                <button onClick={handleNextPage} disabled={page + 1 >= totalPages}>Next</button>
-                <p>Page {page + 1} of {totalPages}</p>
+            <Stack sx={{py: 5}} direction="row" spacing={2} alignItems="center">
+                <Button
+                    variant="contained"
+                    onClick={handlePrevPage}
+                    disabled={page === 0}
+                >
+                    Previous
+                </Button>
+                <Button
+                    variant="contained"
+                    onClick={handleNextPage}
+                    disabled={page + 1 >= totalPages}
+                >
+                    Next
+                </Button>
+                <Typography>Page</Typography>
+                <TextField
+                    type="number"
+                    size="small"
+                    defaultValue={page + 1}
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                        const target = e.target as HTMLInputElement;
+                        if (e.key === 'Enter') {
+                            const page = parseInt(target.value);
+                            if (!isNaN(page) && page >= 1 && page <= totalPages) {
+                                handlePageChange(page - 1);
+                            } else {
+                                target.value = (page + 1).toString();
+                            }
+                        }
+                    }}
+                    sx={{ width: '100px' }}
+                    key={`page-input-${page}`}
+                />
+                <Typography>of {totalPages}</Typography>
             </Stack>
         </Container>
     )

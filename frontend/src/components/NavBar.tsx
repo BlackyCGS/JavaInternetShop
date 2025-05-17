@@ -1,18 +1,19 @@
 import {
-    AppBar, Toolbar, Typography, Button, Box, IconButton, Menu, MenuItem, Avatar, Divider, Badge, InputBase
+    AppBar, Toolbar, Button, Box, IconButton, Menu, MenuItem, Avatar, Divider, Badge, InputBase
 } from '@mui/material'
 import {
     Search, ShoppingCart, AccountCircle
 } from '@mui/icons-material'
-import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import {useState} from "react";
+import {useCart} from "../hooks/useCart.tsx";
 
 const NavBar = () => {
     const { user, logout } = useAuth()
+    const { cartCount } = useCart();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
     const open = Boolean(anchorEl)
-
     const [searchQuery, setSearchQuery] = useState(''); // новый стейт для поиска
     const navigate = useNavigate();
 
@@ -39,7 +40,7 @@ const NavBar = () => {
         <AppBar position="absolute" color="default" elevation={1}>
             <Toolbar sx={{ justifyContent: 'space-between' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <Typography
+                    {/*<Typography
                         variant="h6"
                         component={Link}
                         to="/"
@@ -50,7 +51,19 @@ const NavBar = () => {
                         }}
                     >
                         TechStore
-                    </Typography>
+                    </Typography>*/}
+                    <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <IconButton
+
+                            color="inherit"   sx={{
+                            borderRadius: 2,       // Прямоугольная кнопка
+                            overflow: 'hidden',
+                        }} TouchRippleProps={{center: false}} >
+                            <Badge color="error">
+                                <img src="/NavBarIcon.png" alt="Icon" style={{height: "60px"}}/>
+                            </Badge>
+                        </IconButton>
+                    </Link>
 
                     <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
                         <Button
@@ -87,7 +100,7 @@ const NavBar = () => {
                     >
                         <Search fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
                         <InputBase
-                            placeholder="Поиск товаров..."
+                            placeholder="Search..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             sx={{ width: 200 }}
@@ -96,7 +109,7 @@ const NavBar = () => {
 
                     <Link to="/cart" style={{ textDecoration: 'none', color: 'inherit' }}>
                         <IconButton color="inherit">
-                            <Badge color="error">
+                            <Badge badgeContent={cartCount} color="error">
                                 <ShoppingCart />
                             </Badge>
                         </IconButton>

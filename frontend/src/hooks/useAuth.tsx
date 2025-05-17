@@ -2,6 +2,8 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { User } from '../types/User';
 import { apiLogout } from '../api/AuthApi.ts'
+import {useCart} from "./useCart.tsx";
+import {getCartById} from "../api/OrdersApi.ts";
 
 interface AuthContextType {
     user: User | null;
@@ -22,6 +24,7 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(false);
+    const {updateCartCount, updateCartItems} = useCart()
 
     const login = (userData: User) => {
         setUser(userData);
@@ -30,6 +33,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const logout = async () => {
         await apiLogout();
         setUser(null);
+        localStorage.clear();
+        updateCartCount();
+        updateCartItems();
     };
 
     const refreshUser = async () => {
@@ -39,14 +45,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const response = await axios.get<User>('/api/users/profile', {
                 withCredentials: true, // Убедитесь, что с запросом отправляются cookies
             });
+            await getCartById();
             console.log('got user data', response.data);
             setUser(response.data);
         } catch (error) {
             console.log('exception caught');
 
             setUser(null);
+            localStorage.clear();
         } finally {
             setLoading(false);
+            updateCartCount();
+            updateCartItems();
         }
     };
 

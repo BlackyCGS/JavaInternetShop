@@ -13,10 +13,13 @@ import {Box, CssBaseline} from "@mui/material";
 import {AuthProvider} from "./hooks/useAuth.tsx";
 import Cart from "./pages/Cart.tsx";
 import Register from "./pages/Register.tsx";
+import {CartProvider} from "./hooks/useCart.tsx";
+
 
 function App() {
     return (
         <Router>
+            <CartProvider>
             <AuthProvider>
                 <Box sx={{
                     minHeight: '100vh',
@@ -29,7 +32,7 @@ function App() {
 
                     <Box component="main" sx={{
                         flex: 1,
-                        pt: '64px' // Высота NavBar
+                        pt: '70px' // Высота NavBar
                     }}>
                         <Routes>
                             <Route path="/" element={<HomePage />} />
@@ -48,6 +51,7 @@ function App() {
                     <Footer />
                 </Box>
             </AuthProvider>
+            </CartProvider>
         </Router>
     );
 }

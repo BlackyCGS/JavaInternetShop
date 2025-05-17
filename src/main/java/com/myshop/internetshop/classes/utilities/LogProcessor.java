@@ -1,5 +1,7 @@
 package com.myshop.internetshop.classes.utilities;
 
+import static java.lang.Thread.sleep;
+
 import com.myshop.internetshop.classes.dto.LogStatusDto;
 import com.myshop.internetshop.classes.enums.LogStatusEnum;
 import com.myshop.internetshop.classes.exceptions.NotFoundException;
@@ -18,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import static java.lang.Thread.sleep;
 
 
 @Component
@@ -26,6 +27,7 @@ import static java.lang.Thread.sleep;
 public class LogProcessor {
 
     Logger logger = LoggerFactory.getLogger(LogProcessor.class);
+
     @Async
     public void processLogs(String startDate, String endDate,
                             String taskId, Map<String, LogStatusDto> tasks) {
@@ -38,17 +40,19 @@ public class LogProcessor {
             List<Path> logFiles = new ArrayList<>();
             for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
                 String fileName =
-                        "logs/internetShop" + task.getAdditional() + "-" + formatter.format(date) +
-                                ".log";
+                        "logs/internetShop" + task.getAdditional() + "-" + formatter.format(date)
+                                + ".log";
                 Path path = Paths.get(fileName);
                 if (Files.exists(path)) {
                     logFiles.add(path);
                 }
             }
-            if(logFiles.isEmpty()) {
-                throw new NotFoundException("There are no logs with this period: "+ startDate + " - " + endDate);
+            if (logFiles.isEmpty()) {
+                throw new NotFoundException("There are no logs with this period: "
+                        + startDate + " - " + endDate);
             }
-            Path logPath = Paths.get("logs/internetShopGeneratedLog-"+task.getId()+".log");
+            Path logPath = Paths.get("logs/internetShopGeneratedLog-" + task.getId()
+                    + ".log");
             try (BufferedWriter writer = Files.newBufferedWriter(logPath)) {
                 for (Path path : logFiles) {
                     List<String> lines = Files.readAllLines(path);
@@ -60,19 +64,19 @@ public class LogProcessor {
             }
             task.setStatus(LogStatusEnum.SUCCESS);
             task.setLogPath(logPath.toString());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             task.setStatus(LogStatusEnum.FAIL);
             task.setErrorMsg(e.getMessage());
             logger.error("Error generationg logs in date range: {}", e.getMessage());
             Thread.currentThread().interrupt();
         }
     }
+
     @Async
     public void deleteLogFileByUid(String id, Map<String, LogStatusDto> tasks) {
         try {
             LogStatusDto task = tasks.get(id);
-            sleep(15000);
+            sleep(150000);
             if (task == null) {
                 return;
             }
@@ -82,8 +86,7 @@ public class LogProcessor {
             }
 
             tasks.remove(id);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
             Thread.currentThread().interrupt();
         }

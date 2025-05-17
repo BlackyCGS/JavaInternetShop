@@ -11,7 +11,6 @@ import com.myshop.internetshop.classes.repositories.OrderRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -58,14 +57,15 @@ public class OrderService {
         }
     }
 
-    public void deleteProductFromOrder(int orderId, Integer productId) {
+    public Order deleteProductFromOrder(int orderId, Integer productId) {
         if (orderRepository.existsById(orderId)) {
             Order order = orderRepository.findById(orderId);
             List<Product> products = order.getProducts();
             products.removeIf(p -> p.getId() == productId);
             order.setProducts(products);
-            orderRepository.save(order);
+            return orderRepository.save(order);
         }
+        throw new NotFoundException("There is no order");
     }
 
     public void deleteOrder(int orderId) {
@@ -157,7 +157,8 @@ public class OrderService {
     }
 
     public OrderDto addProductToCart(Integer userId, int productId) {
-        Optional<Order> cart = orderRepository.findByUserIdAndOrderStatus(userId, OrderStatus.CART.getStatus());
+        Optional<Order> cart = orderRepository
+                .findByUserIdAndOrderStatus(userId, OrderStatus.CART.getStatus());
         if (cart.isEmpty()) {
             cart = Optional.ofNullable(createCart(userId));
         }
@@ -166,21 +167,24 @@ public class OrderService {
             orderRepository.save(cart.get());
             return new OrderDto(cart.get());
         }
-        throw new NotFoundException("There is to user or product with respective ids: "+ userId + ", " + productId);
+        throw new NotFoundException("There is to user or product with respective ids: "
+                + userId + ", " + productId);
     }
 
-    public void deleteProductFromCart(Integer userId, Integer productId) {
-        Optional<Order> cart = orderRepository.findByUserIdAndOrderStatus(userId, OrderStatus.CART.getStatus());
+    public OrderDto deleteProductFromCart(Integer userId, Integer productId) {
+        Optional<Order> cart = orderRepository
+                .findByUserIdAndOrderStatus(userId, OrderStatus.CART.getStatus());
 
         if (cart.isEmpty()) {
             throw new NotFoundException("There is no such cart.");
         }
-            deleteProductFromOrder(cart.get().getId(), productId);
+        return new OrderDto(deleteProductFromOrder(cart.get().getId(), productId));
     }
 
     public OrderDto getCartById(int userId) {
-        Optional<Order> cart = orderRepository.findByUserIdAndOrderStatus(userId, OrderStatus.CART.getStatus());
-        if(cart.isEmpty()) {
+        Optional<Order> cart = orderRepository
+                .findByUserIdAndOrderStatus(userId, OrderStatus.CART.getStatus());
+        if (cart.isEmpty()) {
             cart = Optional.ofNullable(createCart(userId));
         }
         if (cart.isPresent()) {
