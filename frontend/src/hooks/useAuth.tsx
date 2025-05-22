@@ -46,7 +46,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 withCredentials: true, // Убедитесь, что с запросом отправляются cookies
             });
             await getCartById();
-            console.log('got user data', response.data);
             setUser(response.data);
         } catch (error) {
             console.log('exception caught');

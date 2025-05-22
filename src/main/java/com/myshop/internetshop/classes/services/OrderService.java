@@ -4,7 +4,8 @@ import com.myshop.internetshop.classes.cache.Cache;
 import com.myshop.internetshop.classes.dto.OrderDto;
 import com.myshop.internetshop.classes.dto.UserDto;
 import com.myshop.internetshop.classes.entities.Order;
-import com.myshop.internetshop.classes.entities.Product;
+import com.myshop.internetshop.classes.entities.OrderProduct;
+import com.myshop.internetshop.classes.entities.OrdersProductsId;
 import com.myshop.internetshop.classes.enums.OrderStatus;
 import com.myshop.internetshop.classes.exceptions.NotFoundException;
 import com.myshop.internetshop.classes.repositories.OrderRepository;
@@ -35,33 +36,46 @@ public class OrderService {
         this.orderCache = orderCache;
     }
 
-    public OrderDto addProductsToOrder(int orderId, List<Integer> productsId) {
+    public OrderDto addProductsToOrder(int orderId, List<Integer> productsId,
+                                       List<Integer> quantities) {
         if (orderRepository.existsById(orderId)) {
             Order order = orderRepository.findById(orderId);
-            List<Product> products = order.getProducts();
-            for (Integer productId : productsId) {
-                if (productsService.existsById(productId)) {
-                    products.add(productsService.getProductById(productId));
-                }
+            List<OrderProduct> products = order.getProducts();
+            for (int i = 0; i < productsId.size(); i++) {
+                Integer productId = productsId.get(i);
+                    Optional<OrderProduct> product = order.getProductById(productId);
+                    if(product.isPresent()) {
+                        product.get().setQuantity(quantities.get(i));
+                        Optional<OrderProduct> finalProduct = product;
+                        products.replaceAll(listProduct ->
+                                listProduct.getProduct().getId() == productId
+                                        ? finalProduct.get()
+                                        : listProduct
+                        );
+                    } else {
+                        product = Optional.of(new OrderProduct());
+                        OrdersProductsId id = new OrdersProductsId(orderId, productId);
+                        product.get().setOrdersProductsId(id);
+                        product.get().setOrder(order);
+                        product.get().setProduct(productsService.getProductById(productId));
+                        product.get().setQuantity(quantities.get(i));
+                        products.add(product.get());
+                    }
             }
             order.setProducts(products);
             order = orderRepository.save(order);
             String cacheKey = ORDER_CACHE_KEY + orderId;
-            if (orderCache.contains(cacheKey)) {
-                orderCache.remove(cacheKey);
-            }
             orderCache.put(cacheKey, order);
             return new OrderDto(order);
-        } else {
-            throw new NotFoundException(NOT_FOUND_MESSAGE + orderId);
         }
+        throw new NotFoundException(NOT_FOUND_MESSAGE + orderId);
     }
 
     public Order deleteProductFromOrder(int orderId, Integer productId) {
         if (orderRepository.existsById(orderId)) {
             Order order = orderRepository.findById(orderId);
-            List<Product> products = order.getProducts();
-            products.removeIf(p -> p.getId() == productId);
+            List<OrderProduct> products = order.getProducts();
+            products.removeIf(p -> p.getProduct().getId() == productId);
             order.setProducts(products);
             return orderRepository.save(order);
         }
@@ -156,15 +170,14 @@ public class OrderService {
         throw new NotFoundException("There is no such user. Id: " + userId);
     }
 
-    public OrderDto addProductToCart(Integer userId, int productId) {
+    public OrderDto addProductToCart(Integer userId, int productId, int quantity) {
         Optional<Order> cart = orderRepository
                 .findByUserIdAndOrderStatus(userId, OrderStatus.CART.getStatus());
         if (cart.isEmpty()) {
             cart = Optional.ofNullable(createCart(userId));
         }
         if (cart.isPresent()) {
-            addProductsToOrder(cart.get().getId(), List.of(productId));
-            orderRepository.save(cart.get());
+            addProductsToOrder(cart.get().getId(), List.of(productId), List.of(quantity));
             return new OrderDto(cart.get());
         }
         throw new NotFoundException("There is to user or product with respective ids: "
@@ -198,19 +211,14 @@ public class OrderService {
     }
 
     public OrderDto convertCartToOrder(int userId) {
-        OrderDto orderDto = getCartById(userId);
-        Order order = toEntity(orderDto);
+        Optional<Order> cart = orderRepository
+                .findByUserIdAndOrderStatus(userId, OrderStatus.CART.getStatus());
+        if (cart.isEmpty()) {
+            throw new NotFoundException("There is no such cart.");
+        }
+        Order order = cart.get();
         order.setOrderStatus(OrderStatus.CREATED.getStatus());
         return new OrderDto(orderRepository.save(order));
-    }
-
-    private Order toEntity(OrderDto orderDto) {
-        Order order = new Order();
-        order.setOrderStatus(orderDto.getOrderStatus());
-        order.setUser(userService.findByUserId(orderDto.getUserId()));
-        order.setProducts(orderDto.getProducts());
-        order.setId(orderDto.getOrderId());
-        return order;
     }
 
     public List<OrderDto> getOrdersByUserId(int userId) {

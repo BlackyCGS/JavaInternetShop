@@ -1,19 +1,29 @@
-import { Box, Typography, Chip, Link, Button } from '@mui/material';
-import { Product } from '../types/Product.ts';
+import {Box, Typography, Chip, Link, Button, TextField} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import {ProductItem} from "../types/ProductItem.ts";
+import {useState} from "react";
 
 interface CartCardProps {
-    product: Product;
+    product: ProductItem;
     onDelete: (productId: number) => void;
+    onQuantityChange: (productId: number, newQuantity: number) => void;
 }
 
-const CartCard = ({ product, onDelete }: CartCardProps) => {
+const CartCard = ({ product, onDelete, onQuantityChange }: CartCardProps) => {
     const theme = useTheme();
-    const { id, name, price, gpu, motherboard } = product;
+    const { id, name, gpu, motherboard } = product.product;
+    let {price} = product.product;
+    const [quantity, setQuantity] = useState(product.quantity);
 
     const handleDeletion = async () => {
         onDelete(id);
     };
+
+    const handleQuantityChange = async (newQuantity: number) => {
+        onQuantityChange(id, newQuantity);
+    }
+
+
 
     return (
         <Box
@@ -70,8 +80,37 @@ const CartCard = ({ product, onDelete }: CartCardProps) => {
                         color: theme.palette.primary.main
                     }}
                 >
-                    ${price.toLocaleString()}
+                    ${(price*quantity).toLocaleString()}
                 </Typography>
+                <TextField
+                    type="number"
+                    size="small"
+                    defaultValue={quantity}
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                        const target = e.target as HTMLInputElement;
+                        if (e.key === 'Enter') {
+                            const newQuantity = parseInt(target.value);
+                            if (!isNaN(newQuantity) && newQuantity >= 1 && newQuantity != quantity) {
+                                setQuantity(newQuantity);
+                                handleQuantityChange(newQuantity);
+                            } else {
+                                target.value = (quantity).toString();
+                            }
+                        }
+                    }}
+                    onBlur={(e) => {
+                        const target = e.target as HTMLInputElement;
+                            const newQuantity = parseInt(target.value);
+                            if (!isNaN(newQuantity) && newQuantity >= 1 && newQuantity != quantity) {
+                                setQuantity(newQuantity);
+                                handleQuantityChange(newQuantity);
+                            } else {
+                                target.value = (quantity).toString();
+                            }
+                    }}
+                    sx={{ width: '100px' }}
+                    key={`page-input-${quantity}`}
+                />
                 <Button
                     variant="contained"
                     size="small"

@@ -1,5 +1,6 @@
 // src/types/Product.ts
 export interface Product {
+    quantity: ReactNode;
     id: number;
     name: string;
     price: number;

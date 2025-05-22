@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, Box, Typography, Button } from '@mui/material';
+import {Order} from "../types/Order.ts";
 
 const modalStyle = {
     position: 'absolute',
@@ -15,14 +16,14 @@ const modalStyle = {
 interface OrderDetailsModalProps {
     open: boolean;
     onClose: () => void;
-    order: {
+    order: Order | null/*{
         orderId: number;
         products: Array<{
             name: string;
             price: number;
-            quantity?: number;
+            quantity: number;
         }>;
-    } | null;
+    } | null;*/
 }
 
 const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, order }) => {
@@ -41,21 +42,22 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, onClose, or
                 {order?.products?.length ? (
                     <>
                         <Typography variant="subtitle1" gutterBottom>
-                            Товары:
+                            Products:
                         </Typography>
                         <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
                             {order.products.map((product, index) => (
                                 <Box key={index} sx={{ mb: 2, p: 1, borderBottom: '1px' + //NOSONAR
                                         ' solid #eee' }}>
-                                    <Typography><strong>Name:</strong> {product.name}</Typography>
-                                    <Typography><strong>Price:</strong> ${product.price}</Typography>
+                                    <Typography><strong>Name:</strong> {product.product.name}</Typography>
+                                    <Typography><strong>Quantity:</strong> {product.quantity}</Typography>
+                                    <Typography><strong>Price:</strong> ${product.product.price*(product.quantity ?? 1)}</Typography>
                                 </Box>
                             ))}
                         </Box>
                         <Typography sx={{ mt: 2 }}>
                             <strong>Total:</strong> $
                             {order.products.reduce((sum, product) =>
-                                sum + (product.price * (product.quantity ?? 1)), 0).toFixed(2)}
+                                sum + (product.product.price * (product.quantity ?? 1)), 0).toFixed(2)}
                         </Typography>
                     </>
                 ) : (

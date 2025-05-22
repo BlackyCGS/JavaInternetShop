@@ -1,9 +1,9 @@
 import axios from 'axios'
-import { Order } from "../types/Order.ts"
-import {Product} from "./SpringApi.tsx";
+import {Order} from "../types/Order.ts"
+import {ProductItem} from "../types/ProductItem.ts";
 
 export const fetchAllOrders = async (pageNumber = 0, pageSize = 10): Promise<Order[]> => {
-    const response= await axios.get('api/orders/list', {
+    const response = await axios.get('api/orders/list', {
         params: {
             pageNumber,
             pageSize,
@@ -36,6 +36,14 @@ export const addProductToCart = async (productId: number): Promise<void> => {
     localStorage.setItem("cartItems", await localStoragePrep(response.data.products))
 }
 
+export const changeCartQuantity = async (productId: number, quantity: number): Promise<Order> => {
+    const response = await axios.post(`/api/orders/cart/${productId}?quantity=${quantity}`, {
+        withCredentials: true
+    })
+    localStorage.setItem("cartItems", await localStoragePrep(response.data.products))
+    return response.data;
+}
+
 export const getCartById: () => Promise<Order> = async (): Promise<Order> => {
     const response = await axios.get(`/api/orders/cart`, {
         withCredentials: true
@@ -47,36 +55,34 @@ export const getCartById: () => Promise<Order> = async (): Promise<Order> => {
     return response.data
 }
 
-export const deleteProductFromCart = async (productId:number): Promise<void> => {
-    const response = await axios.delete(`/api/orders/cart/${productId}`, {
+export const deleteProductFromCart = async (productId:number): Promise<Order> => {
+    const response: Order = await axios.delete(`/api/orders/cart/${productId}`, {
         withCredentials: true
     })
 
-    localStorage.setItem("cartItems", await localStoragePrep(response.data.products))
-    return response.data
+    localStorage.setItem("cartItems", await localStoragePrep(response.products))
+    return response
 }
 
 export const toOrder = async () => {
-    const response = await axios.put(`/api/orders/cart/toOrder`, null, {
+    const response: Order = await axios.put(`/api/orders/cart/toOrder`, null, {
         withCredentials: true
     })
     localStorage.removeItem("cartItems")
-    return response.data
+    return response
 }
 
 export const getUserOrders = async () => {
-    const response = await axios.get('api/orders/myOrders', {
+    const orders = await axios.get('api/orders/myOrders', {
         withCredentials: true
     })
-    const orders: Order[] = response.data
-    return orders
+    return orders.data
 }
 
-export const localStoragePrep: (products: Product[]) => Promise<string> = async (products: Product[]) => {
+export const localStoragePrep: (productItems: ProductItem[]) => Promise<string> = async (productItems: ProductItem[]) => {
     const productIds: number[] = []
-
-    for(const product of products) {
-        productIds.push(product.id)
+    for(const productItem of productItems) {
+        productIds.push(productItem.product.id)
     }
 
     return productIds.toString()

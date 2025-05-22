@@ -60,27 +60,8 @@ public class Gpu {
     public Gpu() { /* Default constructor */
     }
 
-    public void setBaseInfo(int productId, String name, String producer, int boostClock,
-                        int vram) {
-        this.productId = productId;
-        this.name = name;
-        this.producer = producer;
-        this.boostClock = boostClock;
-        this.vram = vram;
-    }
-
-    public void setAdditionalInfo(int displayPort, int dvi, int hdmi, int tdp, int vga) {
-        this.displayPort = displayPort;
-        this.dvi = dvi;
-        this.hdmi = hdmi;
-        this.tdp = tdp;
-        this.vga = vga;
-
-    }
-
-    public Product parseToProduct() {
-        Product returnProduct = new Product();
-        returnProduct.setName(this.name);
-        return returnProduct;
+    @JsonIgnore
+    public Product getProduct() {
+        return product;
     }
 }

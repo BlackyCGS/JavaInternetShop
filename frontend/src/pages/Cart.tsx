@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Typography, Box } from '@mui/material';
-import { Product } from '../types/Product.ts';
-import { getCartById, toOrder, deleteProductFromCart } from "../api/OrdersApi.ts";
+import {
+    getCartById,
+    toOrder,
+    deleteProductFromCart,
+    changeCartQuantity
+} from "../api/OrdersApi.ts";
 import CartCard from "../components/CartCard.tsx";
 import {useNavigate} from "react-router-dom";
 import {Order} from "../types/Order.ts";
 import {useCart} from "../hooks/useCart.tsx";
+import {ProductItem} from "../types/ProductItem.ts";
 
 const Cart = () => {
-    const [cartItems, setCartItems] = useState<Product[]>([]);
+    const [cartItems, setCartItems] = useState<ProductItem[]>([]);
     const [loading, setLoading] = useState(false)
-    const totalPrice = cartItems.reduce((acc, item) => acc + item.price, 0);
+    const totalPrice = cartItems.reduce((acc, item) => acc + item.product.price*item.quantity, 0);
     const navigate = useNavigate();
     const {updateCartCount} = useCart()
 
@@ -20,6 +25,11 @@ const Cart = () => {
         updateCartCount();
         navigate("/orders")
     };
+
+    const handleQuantityChange = async (id: number,newQuantity: number) => {
+        const data: Order = await changeCartQuantity(id, newQuantity);
+        setCartItems(data.products);
+    }
 
     const loadProducts = async () => {
         try {
@@ -39,7 +49,7 @@ const Cart = () => {
     const handleDeleteProduct = async (productId: number) => {
         try {
             await deleteProductFromCart(productId);
-            setCartItems((prevItems) => prevItems.filter(item => item.id !== productId));
+            setCartItems((prevItems) => prevItems.filter(item => item.product.id !== productId));
         } catch (error) {
             console.error('Error deleting product:', error);
         }
@@ -63,7 +73,7 @@ const Cart = () => {
             ) : (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {cartItems.map((product) => (
-                        <CartCard key={product.id} product={product} onDelete={handleDeleteProduct} />
+                        <CartCard key={product.product.id} product={product} onDelete={handleDeleteProduct} onQuantityChange={handleQuantityChange} />
                     ))}
                 </Box>
             )}

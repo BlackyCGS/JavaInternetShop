@@ -1,6 +1,7 @@
 package com.myshop.internetshop.classes.controllers;
 
 import com.myshop.internetshop.classes.dto.OrderDto;
+import com.myshop.internetshop.classes.dto.OrderRequest;
 import com.myshop.internetshop.classes.dto.UserDto;
 import com.myshop.internetshop.classes.services.JwtService;
 import com.myshop.internetshop.classes.services.OrderService;
@@ -81,8 +82,10 @@ public class OrderController {
     @Operation(summary = "Add product to order with entered id")
     @PutMapping("/{id}/addProducts")
     OrderDto addProductsToOrder(@PathVariable("id") int id,
-                                @RequestBody List<Integer> productsId) {
-        return orderService.addProductsToOrder(id, productsId);
+                                @RequestBody List<OrderRequest> products) {
+        return orderService.addProductsToOrder(id,
+                products.stream().map(OrderRequest::getProductId).toList(),
+                products.stream().map(OrderRequest::getQuantity).toList());
     }
 
     @Operation(summary = "Get all orders")
@@ -99,7 +102,8 @@ public class OrderController {
     @Operation(summary = "Add product to cart")
     @PostMapping("cart/{productId}")
     ResponseEntity<OrderDto> addProductToCart(@PathVariable int productId,
-                                              HttpServletRequest request) {
+            @RequestParam(required = false, defaultValue = "1") int quantity,
+            HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         String token = null;
         if (cookies != null) {
@@ -111,7 +115,7 @@ public class OrderController {
         }
         String name = jwtService.extractUsername(token);
         return ResponseEntity.ok(orderService
-                .addProductToCart(userService.getUserIdByName(name), productId));
+                .addProductToCart(userService.getUserIdByName(name), productId, quantity));
     }
 
     @Operation(summary = "Get total number of orders")

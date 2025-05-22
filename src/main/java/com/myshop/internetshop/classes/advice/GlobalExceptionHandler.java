@@ -6,6 +6,8 @@ import com.myshop.internetshop.classes.exceptions.InvalidTokenException;
 import com.myshop.internetshop.classes.exceptions.NotFoundException;
 import com.myshop.internetshop.classes.exceptions.ValidationException;
 import io.jsonwebtoken.JwtException;
+
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import javax.naming.AuthenticationException;
@@ -19,6 +21,7 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestControllerAdvice
 @Slf4j
@@ -46,7 +49,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleAllExceptions(Exception ex) {
         if (ex.getMessage().contains("No static resource")) {
             logger.trace("No static resource found exception caught.");
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentContextPath()
+                    .path("/swagger-ui/index.html")
+                    .build()
+                    .toUri();
+            return ResponseEntity.status(HttpStatus.PERMANENT_REDIRECT).location(location).build();
         }
         logger.warn("Unexpected exception caught: {}", ex.getMessage());
         return ResponseEntity.internalServerError().body("Unexpected error");

@@ -4,12 +4,14 @@ import com.myshop.internetshop.classes.entities.Gpu;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
+@NoArgsConstructor
 public class GpuDto {
-    private int productId;
+    private Integer productId;
     @NotBlank(message = "name can not be blank")
     private String name;
     @NotBlank(message = "producer can not be blank")
@@ -39,10 +41,6 @@ public class GpuDto {
     @Min(value = 0)
     private float price;
 
-    public GpuDto() {
-        /*Default Constructor*/
-    }
-
     public GpuDto(Gpu gpu) {
         this.productId = gpu.getProductId();
         this.name = gpu.getName();
@@ -56,26 +54,19 @@ public class GpuDto {
         this.vram = gpu.getVram();
     }
 
-    public void setBaseInfo(int productId, String name, String producer) {
-        this.productId = productId;
-        this.name = name;
-        this.producer = producer;
+    public Gpu toEntity() {
+        Gpu gpu = new Gpu();
+        gpu.setProductId(null);
+        gpu.setName(this.name);
+        gpu.setProducer(this.producer);
+        gpu.setBoostClock(this.boostClock);
+        gpu.setDisplayPort(this.displayPort);
+        gpu.setDvi(this.dvi);
+        gpu.setHdmi(this.hdmi);
+        gpu.setTdp(this.tdp);
+        gpu.setVga(this.vga);
+        gpu.setVram(this.vram);
+        return gpu;
     }
-
-    public void setAdditionalInfo(int boostClock, int displayPort,
-        int tdp, int vram, float price) {
-        this.boostClock = boostClock;
-        this.displayPort = displayPort;
-        this.tdp = tdp;
-        this.vram = vram;
-        this.price = price;
-    }
-
-    public void setPorts(int hdmi, int dvi, int vga) {
-        this.hdmi = hdmi;
-        this.dvi = dvi;
-        this.vga = vga;
-    }
-
 
 }

@@ -95,17 +95,13 @@ public class ProductsService {
     @Transactional
     public ProductDto saveProduct(ProductDto productDto) {
         validateProductDto(productDto);
-        Product product = new Product();
-        product.setName(productDto.getName());
-        product.setPrice(productDto.getPrice());
+        Product product = productDto.toEntity();
         if (productDto.getGpu() != null) {
-            product.setGpu(productDto.getGpu());
-            Gpu gpu = productDto.getGpu();
+            Gpu gpu = product.getGpu();
             gpu.setProduct(product);
         }
         if (productDto.getMotherboard() != null) {
-            product.setMotherBoard(productDto.getMotherboard());
-            Motherboard motherboard = productDto.getMotherboard();
+            Motherboard motherboard = product.getMotherBoard();
             motherboard.setProduct(product);
         }
         productsRepository.save(product);
@@ -119,7 +115,7 @@ public class ProductsService {
         List<Product> products = productDtos.stream()
                 .map(ProductDto::toEntity).toList();
         List<Product> finalProducts = products;
-        List<Gpu> gpus = productDtos.stream().map(ProductDto::getGpu).toList();
+        List<Gpu> gpus = products.stream().map(Product::getGpu).toList();
         gpus.forEach(gpu -> {
             if (gpu != null) {
                 gpu.setProduct(finalProducts.get(gpus.indexOf(gpu)));
@@ -127,7 +123,7 @@ public class ProductsService {
             }
         );
         List<Motherboard> motherboards =
-                productDtos.stream().map(ProductDto::getMotherboard).toList();
+                products.stream().map(Product::getMotherBoard).toList();
         motherboards.forEach(motherboard -> {
             if (motherboard != null) {
                 motherboard.setProduct(finalProducts.get(motherboards.indexOf(motherboard)));
@@ -197,15 +193,15 @@ public class ProductsService {
         product.setPrice(productDto.getPrice());
         product.setId(productDto.getId());
         if (productDto.getGpu() != null) {
-            Gpu gpu = productDto.getGpu();
+            Gpu gpu = productDto.getGpu().toEntity();
             gpu.setProductId(product.getId());
-            product.setGpu(productDto.getGpu());
+            product.setGpu(productDto.getGpu().toEntity());
             gpu.setProduct(product);
         }
         if (productDto.getMotherboard() != null) {
-            Motherboard motherboard = productDto.getMotherboard();
+            Motherboard motherboard = productDto.getMotherboard().toEntity();
             motherboard.setProductId(product.getId());
-            product.setMotherBoard(productDto.getMotherboard());
+            product.setMotherBoard(productDto.getMotherboard().toEntity());
             motherboard.setProduct(product);
         }
         if (productsRepository.existsById((long) productDto.getId())) {
