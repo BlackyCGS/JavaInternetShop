@@ -3,7 +3,7 @@ import { Box, Typography, CircularProgress, Container, Paper, Stack, Button, Tex
 import ProductList from '../components/ProductList'
 import { fetchSearchedProducts, getTotalProducts } from '../api/ProductsApi'
 import { Product } from '../types/Product.ts'
-import { useLocation } from 'react-router-dom'
+import {useLocation, useNavigate} from 'react-router-dom'
 
 const HomePage = () => {
     const [products, setProducts] = useState<Product[]>([])
@@ -11,10 +11,42 @@ const HomePage = () => {
     const [pageLoading, setPageLoading] = useState(true)
     const [totalPages, setTotalPages] = useState(0)
     const [page, setPage] = useState(0)
+    const [error, setError] = useState(false)
+    const navigate = useNavigate()
     const [pageSize] = useState(10)
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const searchQuery = searchParams.get('search') ?? '';
+
+
+
+    const loadProducts = async (search: string) => {
+        try {
+            if(loading) return
+            console.log(searchParams.toString())
+            setPageLoading(true)
+            setLoading(true)
+
+            const data = await fetchSearchedProducts(page, pageSize, search).catch(
+                error => {
+                    setError(true)
+                    console.log(error);
+                }
+            )
+            console.log(data)
+            setProducts(data)
+            console.log("set data")
+            const number = await getTotalProducts("All", search)
+            setTotalPages(Math.ceil(number / pageSize))
+        } catch (error) {
+            console.error('Error loading products:', error)
+        } finally {
+            setLoading(false)
+            setPageLoading(false)
+
+        }
+    }
+
 
     const handleNextPage = () => {
         if (page + 1 < totalPages) {
@@ -34,24 +66,20 @@ const HomePage = () => {
         }
     }
 
-    useEffect(() => {
-        const loadProducts = async () => {
-            try {
-                if(loading) return
-                setLoading(true)
-                const data = await fetchSearchedProducts(page, pageSize, searchQuery)
-                setProducts(data)
-                const number = await getTotalProducts("All", searchQuery)
-                setTotalPages(Math.ceil(number / pageSize))
-            } catch (error) {
-                console.error('Error loading products:', error)
-            } finally {
-                setLoading(false)
-                setPageLoading(false)
-            }
-        }
+    const handleSearchReset = () => {
+        setPage(0)
+        navigate(location.pathname, { replace: true });
+        setPageLoading(true)
+        setError(false)
+    }
 
-        loadProducts()
+
+    useEffect(() => {
+        console.log("yoyo");
+        if (!error) {
+            console.log("yo");
+            loadProducts(searchQuery)
+        }
     }, [page, searchQuery])
 
     if (pageLoading) {
@@ -62,7 +90,28 @@ const HomePage = () => {
         )
     }
 
+    if(error) {
+        return (
+            <Box >
+                <Box display="flex" justifyContent="center" mt={10}>
+                <Typography variant="h2" >
+                No Products found with name "{searchQuery}"
+                </Typography>
+                </Box>
+                <Box display="flex" justifyContent="center" mt={10}>
+                <Button size="large"
+                    variant="contained"
+                    onClick={handleSearchReset}
+                >
+                    Back to Main Page
+                </Button>
+                </Box>
+            </Box>
+        )
+    }
+
     return (
+
         <Container maxWidth="lg" sx={{ py: 4 }}>
             <Typography
                 variant="h4"

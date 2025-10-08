@@ -213,8 +213,12 @@ public class ProductsService {
     }
 
     public List<ProductDto> searchByName(String name, Pageable pageable) {
-        return productsRepository
+        List<ProductDto> productDtos = productsRepository
                 .findByNameContainingIgnoreCase(name, pageable)
                 .stream().map(this::convertToDto).toList();
+        if(productDtos.isEmpty()) {
+            throw new NotFoundException("Products with name " + name + " not found");
+        }
+        return productDtos;
     }
 }

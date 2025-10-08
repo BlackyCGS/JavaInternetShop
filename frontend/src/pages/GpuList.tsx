@@ -64,6 +64,7 @@ const GpuList = () => {
         )
     }
 
+
     return (
         <Container maxWidth="lg" sx={{ py: 4 }}>
             <Typography

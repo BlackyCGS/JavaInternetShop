@@ -49,7 +49,7 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>11.0.7</version>
+            <version>11.0.8</version>
         </dependency>
         <dependency>
             <groupId>net.minidev</groupId>
@@ -125,7 +125,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
-            <version>6.4.4</version>
+            <version>6.4.10</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -150,6 +150,10 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
             <version>0.11.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
     </dependencies>
 

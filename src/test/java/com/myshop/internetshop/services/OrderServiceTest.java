@@ -66,6 +66,7 @@ class OrderServiceTest {
     void addProductsToOrder_OrderExists_AddsProducts() {
         // Arrange
         List<Integer> productIds = List.of(1, 2);
+        List<Integer> quantities = List.of(1, 1);
         when(orderRepository.existsById(1)).thenReturn(true);
         when(orderRepository.findById(1)).thenReturn(testOrder);
 
@@ -84,7 +85,7 @@ class OrderServiceTest {
         when(orderCache.contains("order-1")).thenReturn(true);
 
         // Act
-        OrderDto result = orderService.addProductsToOrder(1, productIds);
+        OrderDto result = orderService.addProductsToOrder(1, productIds, quantities);
 
         // Assert
         assertNotNull(result);
@@ -101,11 +102,12 @@ class OrderServiceTest {
     void addProductsToOrder_OrderNotExists_ThrowsException() {
         // Arrange
         List<Integer> testList = List.of(1);
+        List<Integer> quantities = List.of(1, 1);
         when(orderRepository.existsById(1)).thenReturn(false);
 
         // Act
         NotFoundException exception = assertThrows(NotFoundException.class, () ->
-                orderService.addProductsToOrder(1, testList));
+                orderService.addProductsToOrder(1, testList, quantities));
 
         // Assert
         assertEquals("There is no order with id 1", exception.getMessage());

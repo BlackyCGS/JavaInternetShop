@@ -19,14 +19,15 @@ import {useCart} from "../hooks/useCart.tsx";
 
 const ProductPage = () => {
     const { id } = useParams()
-    const [product, setProduct] = useState<Product | null>(null)
+    const [product, setProduct] = useState<Product>()
     const [loading, setLoading] = useState(false)
     const [pageLoading, setPageLoading] = useState(true)
     const navigate = useNavigate()
     const { user } = useAuth()
     const {updateCartCount, cartItems} = useCart()
 
-    const isInCart = cartItems.includes(product?.id as number);
+    //const isInCart = cartItems.includes(product?.id as number);
+    const [isInCart, setIsInCart] = useState(false)
 
 
     useEffect(() => {
@@ -36,6 +37,9 @@ const ProductPage = () => {
                 setLoading(true)
                 const data = await fetchProductById(Number(id))
                 setProduct(data)
+                if (cartItems.includes(product?.id as number)) {
+                    setIsInCart(true);
+                }
             } catch (error) {
                 console.error('Error loading product:', error)
             } finally {
@@ -45,11 +49,12 @@ const ProductPage = () => {
         }
 
         loadProduct()
-    }, [id])
+    }, [id, cartItems])
 
     const handleAddToCart = async (productId: number) => {
         await addProductToCart(productId)
         updateCartCount()
+        setIsInCart(true)
     }
 
     if (pageLoading) {

@@ -5,6 +5,7 @@ import { addProductToCart} from "../api/OrdersApi.ts";
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom';
 import {useCart} from "../hooks/useCart.tsx";
+import {useEffect, useState} from "react";
 
 
 const ProductCard = ({ product }: { product: Product }) => {
@@ -13,13 +14,20 @@ const ProductCard = ({ product }: { product: Product }) => {
     const { user } = useAuth()
     const navigate = useNavigate()
     const {updateCartCount, updateCartItems, cartItems} = useCart()
-    const isInCart = cartItems.includes(id);
-
+    //const isInCart = cartItems.includes(id);
+    const [isInCart, setIsInCart] = useState(false)
     const handleAddToCart = async (productId: number) => {
         await addProductToCart(productId);
         updateCartCount();
         updateCartItems();
+        setIsInCart(true);
     }
+
+    useEffect(() => {
+        if(cartItems.includes(id)) {
+            setIsInCart(true);
+        }
+    }, [cartItems]);
 
     return (
         <Box

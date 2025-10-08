@@ -4,6 +4,7 @@ import { User } from '../types/User';
 import { apiLogout } from '../api/AuthApi.ts'
 import {useCart} from "./useCart.tsx";
 import {getCartById} from "../api/OrdersApi.ts";
+import {useLocation} from "react-router-dom";
 
 interface AuthContextType {
     user: User | null;
@@ -25,6 +26,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(false);
     const {updateCartCount, updateCartItems} = useCart()
+    const { pathname } = useLocation();
 
     const login = (userData: User) => {
         setUser(userData);
@@ -60,12 +62,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     useEffect(() => {
-        if (!window.location.pathname.includes('/register') &&
-            !window.location.pathname.includes('/login')) {
+        if (!pathname.includes('/register') &&
+            !pathname.includes('/login')) {
             refreshUser();
         } else {
             setLoading(false);
-        }    }, []);
+        }    }, [pathname]);
 
     return (
         <AuthContext.Provider value={{ user, loading, login, logout, refreshUser }}> {/*NOSONAR*/}

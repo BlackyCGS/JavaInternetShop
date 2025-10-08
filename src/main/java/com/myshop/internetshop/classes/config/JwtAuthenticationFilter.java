@@ -2,7 +2,6 @@ package com.myshop.internetshop.classes.config;
 
 import com.myshop.internetshop.classes.services.CustomUserDetailsService;
 import com.myshop.internetshop.classes.services.JwtService;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -46,9 +45,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         try {
             String jwt = getJwtFromCookies(request);
-            if (jwt == null) {
+            if (jwt == null || jwtService.isTokenExpired(jwt)) {
                 String jwtr = getJwtRefreshFromCookies(request);
-                if (jwtr == null) {
+                if (jwtr == null || jwtService.isTokenExpired(jwtr)) {
                     filterChain.doFilter(request, response);
                     return;
                 }
@@ -71,11 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 response.addCookie(jwtAccess);
                 response.addCookie(jwtRefresh);
-
-            }
-            if (jwt == null) {
-                filterChain.doFilter(request, response);
-                return;
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
             }
             String username = jwtService.extractUsername(jwt);
             if (username == null) {
@@ -95,8 +90,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
 
-        } catch (JwtException e) {
-            response.sendError(HttpStatus.UNAUTHORIZED.value(), "Invalid token");
+        } catch(Exception e) {
+            logger.debug("Jwt Auth exception caught" + e.getMessage());
+            Cookie jwtAccess = new Cookie("jwt", null);
+            jwtAccess.setHttpOnly(true);
+            //jwtAccess.setSecure(true)
+            jwtAccess.setPath("/");
+            jwtAccess.setMaxAge(0);
+            jwtAccess.setDomain("localhost");
+
+            Cookie jwtRefresh = new Cookie("jwtr", null);
+            jwtRefresh.setHttpOnly(true);
+            //jwtRefresh.setSecure(true)
+            jwtRefresh.setPath("/");
+            jwtRefresh.setMaxAge(0);
+            jwtRefresh.setDomain("localhost");
+
+            response.addCookie(jwtAccess);
+            response.addCookie(jwtRefresh);
+            filterChain.doFilter(request, response);
             return;
         }
 

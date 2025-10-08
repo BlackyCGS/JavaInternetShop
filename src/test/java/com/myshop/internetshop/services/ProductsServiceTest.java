@@ -1,6 +1,8 @@
 package com.myshop.internetshop.services;
 
 import com.myshop.internetshop.classes.cache.Cache;
+import com.myshop.internetshop.classes.dto.GpuDto;
+import com.myshop.internetshop.classes.dto.MotherboardDto;
 import com.myshop.internetshop.classes.dto.ProductDto;
 import com.myshop.internetshop.classes.entities.Gpu;
 import com.myshop.internetshop.classes.entities.Motherboard;
@@ -199,7 +201,7 @@ class ProductsServiceTest {
     @WithMockUser("hasRole('ADMIN')")
     void saveProduct_WithGpu_Success() {
         // Arrange
-        testProductDto.setGpu(testGpu);
+        testProductDto.setGpu(new GpuDto(testGpu));
         when(productsRepository.save(any(Product.class))).thenReturn(testProduct);
 
         // Act
@@ -216,7 +218,7 @@ class ProductsServiceTest {
     @WithMockUser("hasRole('ADMIN')")
     void saveProduct_WithMotherboard_Success() {
         // Arrange
-        testProductDto.setMotherboard(testMotherboard);
+        testProductDto.setMotherboard(new MotherboardDto(testMotherboard));
         when(productsRepository.save(any(Product.class))).thenReturn(testProduct);
 
         // Act
@@ -232,8 +234,8 @@ class ProductsServiceTest {
     @WithMockUser("hasRole('ADMIN')")
     void saveProduct_InvalidCategoryCount_ThrowsValidationException() {
         // Arrange
-        testProductDto.setGpu(testGpu);
-        testProductDto.setMotherboard(testMotherboard);
+        testProductDto.setGpu(new GpuDto(testGpu));
+        testProductDto.setMotherboard(new MotherboardDto(testMotherboard));
 
         // Act & Assert
         assertThrows(ValidationException.class, () -> productsService.saveProduct(testProductDto));
@@ -244,7 +246,7 @@ class ProductsServiceTest {
     @WithMockUser("hasRole('ADMIN')")
     void saveProducts_Success() {
         // Arrange
-        testProductDto.setGpu(testGpu);
+        testProductDto.setGpu(new GpuDto(testGpu));
         testProduct.setGpu(testGpu);
         List<ProductDto> productDtos = List.of(testProductDto);
         List<Product> products = List.of(testProduct);

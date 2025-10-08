@@ -74,6 +74,10 @@ export const fetchSearchedProducts = async (pageNumber: number, pageSize: number
             pageSize,
             name
         }
+    }).catch((error) => {
+        if(error.response.status === 404) {
+            throw error.response.data.message
+        }
     })
-    return response.data
+    return response?.data
 }
