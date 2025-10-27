@@ -29,23 +29,83 @@ export const fetchProductById = async (id: number): Promise<Product> => {
     return response.data
 }
 
-export const fetchGpuProducts = async (pageNumber: number, pageSize: number) => {
+export const fetchGpuProducts = async (pageNumber: number, pageSize: number, minPrice: number | undefined,
+                                       maxPrice: number | undefined, minBoostClock: number | undefined,
+                                       maxBoostClock: number | undefined, minVram: number | undefined
+    , maxVram: number | undefined,
+                                       minTdp: number | undefined, maxTdp: number | undefined) => {
     const response = await axios.get('/api/products/category/gpu',
         {
             params: {
                     pageNumber,
-                    pageSize
+                    pageSize,
+                    minPrice,
+                    maxPrice,
+                    minBoostClock,
+                    maxBoostClock,
+                    minVram,
+                    maxVram,
+                    minTdp,
+                    maxTdp
 
             }
         })
     return response.data
 }
 
-export const fetchMotherboardProducts = async (pageNumber: number, pageSize: number) => {
+export const getTotalGpus = async (minPrice: number | undefined,
+                                   maxPrice: number | undefined, minBoostClock: number | undefined,
+                                   maxBoostClock: number | undefined, minVram: number | undefined
+    , maxVram: number | undefined,
+                                   minTdp: number | undefined, maxTdp: number | undefined) => {
+    const response = await axios.get('/api/products/category/gpu/amount',
+        {
+            params: {
+                minPrice,
+                maxPrice,
+                minBoostClock,
+                maxBoostClock,
+                minVram,
+                maxVram,
+                minTdp,
+                maxTdp
+
+            }
+        })
+    return response.data
+}
+
+export const fetchMotherboardProducts = async (pageNumber: number, pageSize: number,
+                                               minPrice: number | undefined, maxPrice: number | undefined,
+                                               socket: string | undefined, chipset: string | undefined,
+                                               formFactor: string | undefined, memoryType: string | undefined) => {
     const response = await axios.get('/api/products/category/motherboard', {
         params: {
                 pageNumber,
-                pageSize
+                pageSize,
+                minPrice,
+                maxPrice,
+                socket,
+                chipset,
+                formFactor,
+                memoryType
+        }
+    })
+    return response.data
+}
+
+export const getTotalMotherboards = async (
+                                               minPrice: number | undefined, maxPrice: number | undefined,
+                                               socket: string | undefined, chipset: string | undefined,
+                                               formFactor: string | undefined, memoryType: string | undefined) => {
+    const response = await axios.get('/api/products/category/motherboard/amount', {
+        params: {
+            minPrice,
+            maxPrice,
+            socket,
+            chipset,
+            formFactor,
+            memoryType
         }
     })
     return response.data

@@ -93,10 +93,16 @@ public class OrderController {
     @PreAuthorize("hasAnyRole('ADMIN', 'MERCHANT', 'DELIVERY')")
     ResponseEntity<List<OrderDto>> getAllOrders(
             @RequestParam(required = false, defaultValue = "0") int pageNumber,
-            @RequestParam(required = false, defaultValue = "20") int pageSize
+            @RequestParam(required = false, defaultValue = "20") int pageSize,
+            @RequestParam(required = false, defaultValue = "all") String status
     ) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        return ResponseEntity.ok(orderService.getAllOrders(pageable));
+        if (status.equals("all")) {
+            return ResponseEntity.ok(orderService.getAllOrders(pageable));
+        }
+        else {
+            return ResponseEntity.ok(orderService.getAllOrdersByStatus(status, pageable));
+        }
     }
 
     @Operation(summary = "Add product to cart")
@@ -120,8 +126,12 @@ public class OrderController {
 
     @Operation(summary = "Get total number of orders")
     @GetMapping("/amount")
-    public ResponseEntity<Integer> getTotalOrders() {
-        return ResponseEntity.ok(orderService.getOrdersCount());
+    public ResponseEntity<Integer> getTotalOrders(@RequestParam(required = false,
+            defaultValue = "all") String status) {
+        if (status.equals("all")) {
+            return ResponseEntity.ok(orderService.getOrdersCount());
+        }
+        return ResponseEntity.ok(orderService.getOrdersCountByStatus(status));
     }
 
     @GetMapping("/cart")

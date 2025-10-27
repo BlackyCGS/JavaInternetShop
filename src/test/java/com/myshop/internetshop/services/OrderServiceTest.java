@@ -225,7 +225,7 @@ class OrderServiceTest {
         void getByStatusAndUserId_OrdersExist_ReturnsOrderDtos() {
             // Arrange
             List<Order> orders = List.of(testOrder);
-            when(orderRepository.findByOrderStatus(1, 0)).thenReturn(orders);
+            when(orderRepository.findByOrderStatusAndUserId(1, 0)).thenReturn(orders);
 
             // Act
             List<OrderDto> result = orderService.getByStatusAndUserId(0, 1);
@@ -238,7 +238,7 @@ class OrderServiceTest {
         @Test
         void getByStatusAndUserId_NoOrders_ThrowsException() {
             // Arrange
-            when(orderRepository.findByOrderStatus(1, 0)).thenReturn(new ArrayList<>());
+            when(orderRepository.findByOrderStatusAndUserId(1, 0)).thenReturn(new ArrayList<>());
 
             // Act & Assert
             assertThrows(NotFoundException.class, () ->

@@ -1,6 +1,8 @@
 package com.myshop.internetshop.classes.services;
 
 import com.myshop.internetshop.classes.cache.Cache;
+import com.myshop.internetshop.classes.dto.GpuFilter;
+import com.myshop.internetshop.classes.dto.MotherboardFilter;
 import com.myshop.internetshop.classes.dto.ProductDto;
 import com.myshop.internetshop.classes.entities.Gpu;
 import com.myshop.internetshop.classes.entities.Motherboard;
@@ -8,6 +10,7 @@ import com.myshop.internetshop.classes.entities.Product;
 import com.myshop.internetshop.classes.exceptions.NotFoundException;
 import com.myshop.internetshop.classes.exceptions.ValidationException;
 import com.myshop.internetshop.classes.repositories.ProductsRepository;
+import com.myshop.internetshop.classes.specifications.ProductSpecifications;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 
@@ -220,5 +224,61 @@ public class ProductsService {
             throw new NotFoundException("Products with name " + name + " not found");
         }
         return productDtos;
+    }
+
+    public  List<ProductDto> gpuFilter(Pageable pageable, GpuFilter gpuFilter) {
+
+        Specification<Product> specs = Specification
+                .where(ProductSpecifications.categoryEquals("GPU"))
+                .and(ProductSpecifications.priceBetween(gpuFilter.getMinPrice(),
+                        gpuFilter.getMaxPrice()))
+                .and(ProductSpecifications.gpuSpecs(gpuFilter.getMinVram(),
+                        gpuFilter.getMaxVram(), gpuFilter.getMinTdp(),
+                        gpuFilter.getMaxTdp(), gpuFilter.getMinBoostClock(), gpuFilter.getMaxBoostClock()));
+        List<ProductDto> productDtos =
+                productsRepository.findAll(specs, pageable).stream().map(this::convertToDto).toList();
+        if(productDtos.isEmpty()) {
+            throw new NotFoundException("Products not found");
+        }
+        return productDtos;
+    }
+
+    public List<ProductDto> motherboardFilter(Pageable pageable, MotherboardFilter motherboardFilter) {
+        Specification<Product> specs = Specification
+                .where(ProductSpecifications.categoryEquals("motherboard"))
+                .and(ProductSpecifications.priceBetween(motherboardFilter.getMinPrice()
+                        , motherboardFilter.getMaxPrice()))
+                .and(ProductSpecifications.motherboardSpecs(motherboardFilter.getSocket()
+                        , motherboardFilter.getChipset()
+                        , motherboardFilter.getFormFactor()
+                        , motherboardFilter.getMemoryType()));
+        List<ProductDto> productDtos = productsRepository.findAll(specs, pageable).stream().map(this::convertToDto).toList();
+        if(productDtos.isEmpty()) {
+            throw new NotFoundException("Products not found");
+        }
+        return productDtos;
+    }
+
+    public long getTotalGpusFiltered(GpuFilter gpuFilter) {
+        Specification<Product> specs = Specification
+                .where(ProductSpecifications.categoryEquals("GPU"))
+                .and(ProductSpecifications.priceBetween(gpuFilter.getMinPrice(),
+                        gpuFilter.getMaxPrice()))
+                .and(ProductSpecifications.gpuSpecs(gpuFilter.getMinVram(),
+                        gpuFilter.getMaxVram(), gpuFilter.getMinTdp(),
+                        gpuFilter.getMaxTdp(), gpuFilter.getMinBoostClock(), gpuFilter.getMaxBoostClock()));
+        return productsRepository.count(specs);
+    }
+
+    public Long getTotalMotherboardsFiltered(MotherboardFilter motherboardFilter) {
+        Specification<Product> specs = Specification
+                .where(ProductSpecifications.categoryEquals("motherboard"))
+                .and(ProductSpecifications.priceBetween(motherboardFilter.getMinPrice()
+                        , motherboardFilter.getMaxPrice()))
+                .and(ProductSpecifications.motherboardSpecs(motherboardFilter.getSocket()
+                        , motherboardFilter.getChipset()
+                        , motherboardFilter.getFormFactor()
+                        , motherboardFilter.getMemoryType()));
+        return productsRepository.count(specs);
     }
 }

@@ -1,5 +1,7 @@
 package com.myshop.internetshop.classes.controllers;
 
+import com.myshop.internetshop.classes.dto.GpuFilter;
+import com.myshop.internetshop.classes.dto.MotherboardFilter;
 import com.myshop.internetshop.classes.dto.ProductDto;
 import com.myshop.internetshop.classes.services.ProductsService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,34 +51,42 @@ public class ProductsController {
     @Operation(summary = "Get gpus using parameters. If parameter is null, it "
             + "doesnt involved in search")
     @GetMapping("/category/gpu")
-    public List<ProductDto> getGpus(@RequestParam(required = false) String producer,
-                                    @RequestParam(required = false,
-                                            defaultValue = "-1") Integer boostClock,
-                                    @RequestParam(required = false,
-                                            defaultValue = "-1") Integer displayPort,
-                                    @RequestParam(required = false,
-                                            defaultValue = "-1") Integer hdmi,
-                                    @RequestParam(required = false,
-                                            defaultValue = "-1") Integer tdp,
-                                    @RequestParam(required = false,
-                                            defaultValue = "-1") Integer vram,
+    public List<ProductDto> getGpus(
+
+                                    @RequestParam(required = false) Float minPrice,
+                                    @RequestParam(required = false) Float maxPrice,
+                                    @RequestParam(required = false) Integer minBoostClock,
+                                    @RequestParam(required = false) Integer maxBoostClock,
+                                    @RequestParam(required = false) Integer minVram,
+                                    @RequestParam(required = false) Integer maxVram,
+                                    @RequestParam(required = false) Integer minTdp,
+                                    @RequestParam(required = false) Integer maxTdp,
                                     @RequestParam(required = false,
                                             defaultValue = "0") int pageNumber,
                                     @RequestParam(required = false,
                                             defaultValue = "20") int pageSize
     ) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        return productsService.getGpuByParams(producer, boostClock, displayPort, hdmi,
-                tdp, vram, pageable);
+        GpuFilter filter = new GpuFilter(minPrice, maxPrice, minBoostClock,
+                maxBoostClock, minVram, maxVram, minTdp, maxTdp);
+        return productsService.gpuFilter(pageable, filter);
     }
 
     @GetMapping("/category/motherboard")
     public List<ProductDto> getMotherboards(
+            @RequestParam(required = false) Float minPrice,
+            @RequestParam(required = false) Float maxPrice,
+            @RequestParam(required = false) String socket,
+            @RequestParam(required = false) String chipset,
+            @RequestParam(required = false) String formFactor,
+            @RequestParam(required = false) String memoryType,
             @RequestParam(required = false, defaultValue = "0") int pageNumber,
             @RequestParam(required = false, defaultValue = "20") int pageSize
     ) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        return productsService.getMotherboards(pageable);
+        MotherboardFilter filter = new MotherboardFilter(minPrice, maxPrice, socket,
+                chipset, formFactor, memoryType);
+        return productsService.motherboardFilter(pageable, filter);
     }
 
     @Operation(summary = "Get product data by id")
@@ -120,10 +130,42 @@ public class ProductsController {
     @Operation(summary = "Get total number of products")
     @GetMapping("/amount")
     public ResponseEntity<Integer> getTotalProducts(
-            @RequestParam(required = true) String category,
+            @RequestParam String category,
             @RequestParam(required = false, defaultValue = "") String name
     ) {
         return ResponseEntity.ok(productsService.getProductsCount(category, name));
+    }
+
+    @Operation(summary = "Get total amount of gpus")
+    @GetMapping("/category/gpu/amount")
+    public ResponseEntity<Long> getTotalGpusFiltered(
+            @RequestParam(required = false) Float minPrice,
+            @RequestParam(required = false) Float maxPrice,
+            @RequestParam(required = false) Integer minBoostClock,
+            @RequestParam(required = false) Integer maxBoostClock,
+            @RequestParam(required = false) Integer minVram,
+            @RequestParam(required = false) Integer maxVram,
+            @RequestParam(required = false) Integer minTdp,
+            @RequestParam(required = false) Integer maxTdp
+    ) {
+        GpuFilter filter = new GpuFilter(minPrice, maxPrice, minBoostClock,
+                maxBoostClock, minVram, maxVram, minTdp, maxTdp);
+        return ResponseEntity.ok(productsService.getTotalGpusFiltered(filter));
+    }
+
+    @Operation(summary = "Get total amount of motherboards")
+    @GetMapping("/category/motherboard/amount")
+    public ResponseEntity<Long> getTotalMotherboardsFiltered(
+            @RequestParam(required = false) Float minPrice,
+            @RequestParam(required = false) Float maxPrice,
+            @RequestParam(required = false) String socket,
+            @RequestParam(required = false) String chipset,
+            @RequestParam(required = false) String formFactor,
+            @RequestParam(required = false) String memoryType
+    ) {
+        MotherboardFilter filter = new MotherboardFilter(minPrice, maxPrice, socket,
+                chipset, formFactor, memoryType);
+        return ResponseEntity.ok(productsService.getTotalMotherboardsFiltered(filter));
     }
 
     @Operation(summary = "Modify a product")

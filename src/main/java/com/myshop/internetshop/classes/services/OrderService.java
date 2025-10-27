@@ -139,7 +139,7 @@ public class OrderService {
     }
 
     public List<OrderDto> getByStatusAndUserId(Integer status, Integer userId) {
-        List<Order> orders = orderRepository.findByOrderStatus(userId, status);
+        List<Order> orders = orderRepository.findByOrderStatusAndUserId(userId, status);
         List<OrderDto> orderDtos = new ArrayList<>();
         if (orders.isEmpty()) {
             throw new NotFoundException("There is no such orders");
@@ -154,6 +154,13 @@ public class OrderService {
     public List<OrderDto> getAllOrders(Pageable pageable) {
         return orderRepository.findByOrderStatusNot(OrderStatus.CART.getStatus(),
                 pageable)
+                .stream()
+                .map(OrderDto::new)
+                .toList();
+    }
+
+    public List<OrderDto> getAllOrdersByStatus(String status, Pageable pageable) {
+        return  orderRepository.findByOrderStatus(status, pageable)
                 .stream()
                 .map(OrderDto::new)
                 .toList();
@@ -208,6 +215,10 @@ public class OrderService {
 
     public int getOrdersCount() {
         return orderRepository.countByOrderStatusNot(OrderStatus.CART.getStatus());
+    }
+
+    public int getOrdersCountByStatus(String status) {
+        return orderRepository.countByOrderStatus(status);
     }
 
     public OrderDto convertCartToOrder(int userId) {

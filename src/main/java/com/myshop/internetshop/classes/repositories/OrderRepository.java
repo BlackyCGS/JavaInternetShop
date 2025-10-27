@@ -19,14 +19,19 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
                     + "WHERE (:id IS NULL OR a.id = :id) AND "
                     + "(:status IS NULL OR o.order_status = :status)",
         nativeQuery = true)
-    List<Order> findByOrderStatus(@Param("id") Integer id,
-                                  @Param("status") Integer status);
+    List<Order> findByOrderStatusAndUserId(@Param("id") Integer id,
+                                           @Param("status") Integer status);
 
     Optional<Order> findByUserIdAndOrderStatus(Integer userId, String orderStatus);
 
     List<Order> findByOrderStatusNot(String orderStatus, Pageable pageable);
 
+    List<Order> findByOrderStatus(String orderStatus, Pageable pageable);
+
     List<Order> findByUserIdAndOrderStatusNot(Integer userId, String orderStatus);
 
     Integer countByOrderStatusNot(String orderStatus);
+
+    Integer countByOrderStatus(String orderStatus);
+
 }

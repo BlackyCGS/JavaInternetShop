@@ -48,6 +48,7 @@ const AdminTab = () => {
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
     const userRoles = ['USER', 'ADMIN', 'MERCHANT', 'DELIVERY']
     const orderStatuses = ['CREATED', 'CONFIRMED', 'PROCESSED', 'DELIVERED', 'CANCELLED']
+    const orderSortStatuses = ['ALL', 'CREATED', 'CONFIRMED', 'PROCESSED', 'DELIVERED', 'CANCELLED']
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [productTotalPages, setProductTotalPages] = useState(0);
@@ -59,6 +60,7 @@ const AdminTab = () => {
     const [pageSize] = useState(100);
     const { user } = useAuth();
     const navigate = useNavigate();
+    const [filterType, setFilterType] = useState<string>('ALL');
 
     const handleNextProductPage = () => {
         if (productPage + 1 < productTotalPages) {
@@ -182,6 +184,14 @@ const AdminTab = () => {
     const handleStatusChange = async (orderId: number, newStatus: string) => {
         await changeOrderStatus(orderId, newStatus)
         await loadData()
+    }
+
+    const handleFilterChange = async (filter: string) => {
+        setFilterType(filter)
+        const data = await fetchAllOrders(orderPage, pageSize, filter)
+        setOrders(data)
+        const number = await getTotalOrders(filter)
+        setOrderTotalPages(Math.ceil(number / pageSize))
     }
 
     const handleOpenModal = (order: Order) => {
@@ -430,6 +440,20 @@ const AdminTab = () => {
 
                 {tabIndex === 0 && ['ADMIN', 'MERCHANT', 'DELIVERY'].includes(user.role) &&(
                     <>
+                        {/*<FormControl fullWidth size="medium">*/}
+                            <Select sx={{width: 200, marginLeft: 2}}
+                                value={filterType}
+                                onChange={(e) =>
+                                    handleFilterChange(e.target.value as string)
+                                }
+                            >
+                                {orderSortStatuses.map((status) => (
+                                    <MenuItem key={status} value={status}>
+                                        {status}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        {/*</FormControl>*/}
                         <TableContainer component={Paper}>
                             <Table>
                                 <TableHead>

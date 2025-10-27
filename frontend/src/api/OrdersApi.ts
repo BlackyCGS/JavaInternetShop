@@ -2,11 +2,12 @@ import axios from 'axios'
 import {Order} from "../types/Order.ts"
 import {ProductItem} from "../types/ProductItem.ts";
 
-export const fetchAllOrders = async (pageNumber = 0, pageSize = 10): Promise<Order[]> => {
+export const fetchAllOrders = async (pageNumber = 0, pageSize = 10, status: string = "all"): Promise<Order[]> => {
     const response = await axios.get('api/orders/list', {
         params: {
             pageNumber,
             pageSize,
+            status,
         },
         withCredentials: true
     },)
@@ -22,9 +23,11 @@ export const changeOrderStatus = async (orderId: number, status: string): Promis
     })
 }
 
-export const getTotalOrders = async () => {
+export const getTotalOrders = async (status: string = "all") => {
     const response = await axios.get('api/orders/amount', {
-        withCredentials: true
+        params: {
+            status
+        },
     })
     return response.data
 }
