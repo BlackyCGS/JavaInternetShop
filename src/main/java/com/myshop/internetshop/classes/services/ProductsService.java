@@ -1,12 +1,8 @@
 package com.myshop.internetshop.classes.services;
 
 import com.myshop.internetshop.classes.cache.Cache;
-import com.myshop.internetshop.classes.dto.GpuFilter;
-import com.myshop.internetshop.classes.dto.MotherboardFilter;
-import com.myshop.internetshop.classes.dto.ProductDto;
-import com.myshop.internetshop.classes.entities.Gpu;
-import com.myshop.internetshop.classes.entities.Motherboard;
-import com.myshop.internetshop.classes.entities.Product;
+import com.myshop.internetshop.classes.dto.*;
+import com.myshop.internetshop.classes.entities.*;
 import com.myshop.internetshop.classes.exceptions.NotFoundException;
 import com.myshop.internetshop.classes.exceptions.ValidationException;
 import com.myshop.internetshop.classes.repositories.ProductsRepository;
@@ -108,6 +104,30 @@ public class ProductsService {
             Motherboard motherboard = product.getMotherBoard();
             motherboard.setProduct(product);
         }
+        if (productDto.getPcCase() != null) {
+            PcCase pcCase = product.getPcCase();
+            pcCase.setProduct(product);
+        }
+        if (productDto.getRam() != null) {
+            Ram ram = product.getRam();
+            ram.setProduct(product);
+        }
+        if (productDto.getCpu() != null) {
+            Cpu cpu = product.getCpu();
+            cpu.setProduct(product);
+        }
+        if (productDto.getPsu() != null) {
+            Psu psu = product.getPsu();
+            psu.setProduct(product);
+        }
+        if (productDto.getHdd() != null) {
+            Hdd hdd = product.getHdd();
+            hdd.setProduct(product);
+        }
+        if (productDto.getSsd() != null) {
+            Ssd ssd = product.getSsd();
+            ssd.setProduct(product);
+        }
         productsRepository.save(product);
         return new ProductDto(product);
     }
@@ -133,7 +153,44 @@ public class ProductsService {
                 motherboard.setProduct(finalProducts.get(motherboards.indexOf(motherboard)));
             }
         });
+        List<PcCase> pcCases = products.stream().map(Product::getPcCase).toList();
+        pcCases.forEach(pcCase -> {
+            if (pcCase != null) {
+                pcCase.setProduct(finalProducts.get(pcCases.indexOf(pcCase)));
+            }
+        });
+        List<Ram> rams = products.stream().map(Product::getRam).toList();
+        rams.forEach(ram -> {
+            if (ram != null) {
+                ram.setProduct(finalProducts.get(rams.indexOf(ram)));
+            }
+        });
+        List<Cpu> cpus = products.stream().map(Product::getCpu).toList();
+        cpus.forEach(cpu -> {
+            if (cpu != null) {
+                cpu.setProduct(finalProducts.get(cpus.indexOf(cpu)));
+            }
+        });
+        List<Psu> psus = products.stream().map(Product::getPsu).toList();
+        psus.forEach(psu -> {
+            if (psu != null) {
+                psu.setProduct(finalProducts.get(psus.indexOf(psu)));
+            }
+        });
+        List<Hdd> hdds = products.stream().map(Product::getHdd).toList();
+        hdds.forEach(hdd -> {
+            if (hdd != null) {
+                hdd.setProduct(finalProducts.get(hdds.indexOf(hdd)));
+            }
+        });
+        List<Ssd> ssds = products.stream().map(Product::getSsd).toList();
+        ssds.forEach(ssd -> {
+            if (ssd != null) {
+                ssd.setProduct(finalProducts.get(ssds.indexOf(ssd)));
+            }
+        });
         products = productsRepository.saveAll(products);
+
         return products.stream().map(this::convertToDto).toList();
 
     }
@@ -154,6 +211,24 @@ public class ProductsService {
             categoryCount++;
         }
         if (productDto.getMotherboard() != null) {
+            categoryCount++;
+        }
+        if (productDto.getPcCase() !=null) {
+            categoryCount++;
+        }
+        if (productDto.getRam() != null) {
+            categoryCount++;
+        }
+        if (productDto.getCpu() != null) {
+            categoryCount++;
+        }
+        if (productDto.getPsu() != null) {
+            categoryCount++;
+        }
+        if (productDto.getHdd() != null) {
+            categoryCount++;
+        }
+        if (productDto.getSsd() != null) {
             categoryCount++;
         }
         if (categoryCount != 1) {
@@ -185,6 +260,7 @@ public class ProductsService {
         };
     }
 
+    @Transactional
     public void deleteAll() {
         productsRepository.deleteAll();
     }
@@ -208,6 +284,42 @@ public class ProductsService {
             product.setMotherBoard(productDto.getMotherboard().toEntity());
             motherboard.setProduct(product);
         }
+        if (productDto.getPcCase() != null) {
+            PcCase pcCase = productDto.getPcCase().toEntity();
+            pcCase.setProductId(product.getId());
+            product.setPcCase(pcCase);
+            pcCase.setProduct(product);
+        }
+        if (productDto.getRam() != null) {
+            Ram ram = productDto.getRam().toEntity();
+            ram.setProductId(product.getId());
+            product.setRam(ram);
+            ram.setProduct(product);
+        }
+        if (productDto.getCpu() != null) {
+            Cpu cpu = productDto.getCpu().toEntity();
+            cpu.setProductId(product.getId());
+            product.setCpu(cpu);
+            cpu.setProduct(product);
+        }
+        if (productDto.getPsu() != null) {
+            Psu psu = productDto.getPsu().toEntity();
+            psu.setProductId(product.getId());
+            product.setPsu(psu);
+            psu.setProduct(product);
+        }
+        if (productDto.getHdd() != null) {
+            Hdd hdd = productDto.getHdd().toEntity();
+            hdd.setProductId(product.getId());
+            product.setHdd(hdd);
+            hdd.setProduct(product);
+        }
+        if (productDto.getSsd() != null) {
+            Ssd ssd = productDto.getSsd().toEntity();
+            ssd.setProductId(product.getId());
+            product.setSsd(ssd);
+            ssd.setProduct(product);
+        }
         if (productsRepository.existsById((long) productDto.getId())) {
         productsRepository.save(product);
         return new ProductDto(product);
@@ -226,15 +338,13 @@ public class ProductsService {
         return productDtos;
     }
 
-    public  List<ProductDto> gpuFilter(Pageable pageable, GpuFilter gpuFilter) {
+    public  List<ProductDto> gpuFilter(Pageable pageable, GpuFilter filter) {
 
         Specification<Product> specs = Specification
                 .where(ProductSpecifications.categoryEquals("GPU"))
-                .and(ProductSpecifications.priceBetween(gpuFilter.getMinPrice(),
-                        gpuFilter.getMaxPrice()))
-                .and(ProductSpecifications.gpuSpecs(gpuFilter.getMinVram(),
-                        gpuFilter.getMaxVram(), gpuFilter.getMinTdp(),
-                        gpuFilter.getMaxTdp(), gpuFilter.getMinBoostClock(), gpuFilter.getMaxBoostClock()));
+                .and(ProductSpecifications.priceBetween(filter.getMinPrice(),
+                        filter.getMaxPrice()))
+                .and(ProductSpecifications.gpuSpecs(filter));
         List<ProductDto> productDtos =
                 productsRepository.findAll(specs, pageable).stream().map(this::convertToDto).toList();
         if(productDtos.isEmpty()) {
@@ -243,15 +353,12 @@ public class ProductsService {
         return productDtos;
     }
 
-    public List<ProductDto> motherboardFilter(Pageable pageable, MotherboardFilter motherboardFilter) {
+    public List<ProductDto> motherboardFilter(Pageable pageable, MotherboardFilter filter) {
         Specification<Product> specs = Specification
                 .where(ProductSpecifications.categoryEquals("motherboard"))
-                .and(ProductSpecifications.priceBetween(motherboardFilter.getMinPrice()
-                        , motherboardFilter.getMaxPrice()))
-                .and(ProductSpecifications.motherboardSpecs(motherboardFilter.getSocket()
-                        , motherboardFilter.getChipset()
-                        , motherboardFilter.getFormFactor()
-                        , motherboardFilter.getMemoryType()));
+                .and(ProductSpecifications.priceBetween(filter.getMinPrice()
+                        , filter.getMaxPrice()))
+                .and(ProductSpecifications.motherboardSpecs(filter));
         List<ProductDto> productDtos = productsRepository.findAll(specs, pageable).stream().map(this::convertToDto).toList();
         if(productDtos.isEmpty()) {
             throw new NotFoundException("Products not found");
@@ -259,26 +366,153 @@ public class ProductsService {
         return productDtos;
     }
 
-    public long getTotalGpusFiltered(GpuFilter gpuFilter) {
+    public long getTotalGpusFiltered(GpuFilter filter) {
         Specification<Product> specs = Specification
                 .where(ProductSpecifications.categoryEquals("GPU"))
-                .and(ProductSpecifications.priceBetween(gpuFilter.getMinPrice(),
-                        gpuFilter.getMaxPrice()))
-                .and(ProductSpecifications.gpuSpecs(gpuFilter.getMinVram(),
-                        gpuFilter.getMaxVram(), gpuFilter.getMinTdp(),
-                        gpuFilter.getMaxTdp(), gpuFilter.getMinBoostClock(), gpuFilter.getMaxBoostClock()));
+                .and(ProductSpecifications.priceBetween(filter.getMinPrice(),
+                        filter.getMaxPrice()))
+                .and(ProductSpecifications.gpuSpecs(filter));
         return productsRepository.count(specs);
     }
 
-    public Long getTotalMotherboardsFiltered(MotherboardFilter motherboardFilter) {
+    public Long getTotalMotherboardsFiltered(MotherboardFilter filter) {
         Specification<Product> specs = Specification
                 .where(ProductSpecifications.categoryEquals("motherboard"))
-                .and(ProductSpecifications.priceBetween(motherboardFilter.getMinPrice()
-                        , motherboardFilter.getMaxPrice()))
-                .and(ProductSpecifications.motherboardSpecs(motherboardFilter.getSocket()
-                        , motherboardFilter.getChipset()
-                        , motherboardFilter.getFormFactor()
-                        , motherboardFilter.getMemoryType()));
+                .and(ProductSpecifications.priceBetween(filter.getMinPrice()
+                        , filter.getMaxPrice()))
+                .and(ProductSpecifications.motherboardSpecs(filter));
+        return productsRepository.count(specs);
+    }
+
+    public List<ProductDto> pcCaseFilter(Pageable pageable,PcCaseFilter filter) {
+        Specification<Product> specs = Specification
+                .where(ProductSpecifications.categoryEquals("pcCase"))
+                .and(ProductSpecifications.priceBetween(filter.getMinPrice()
+                        , filter.getMaxPrice()))
+                .and(ProductSpecifications.pcCaseSpecs(filter));
+        List<ProductDto> productDtos = productsRepository.findAll(specs, pageable).stream().map(this::convertToDto).toList();
+        if(productDtos.isEmpty()) {
+            throw new NotFoundException("Products not found");
+        }
+        return productDtos;
+    }
+
+    public long getTotalPcCaseFiltered(PcCaseFilter filter) {
+        Specification<Product> specs = Specification
+                .where(ProductSpecifications.categoryEquals("pcCase"))
+                .and(ProductSpecifications.priceBetween(filter.getMinPrice()
+                        , filter.getMaxPrice()))
+                .and(ProductSpecifications.pcCaseSpecs(filter));
+        return productsRepository.count(specs);
+    }
+
+    public List<ProductDto> ramFilter(Pageable pageable, RamFilter filter) {
+        Specification<Product> specs = Specification
+                .where(ProductSpecifications.categoryEquals("ram"))
+                .and(ProductSpecifications.priceBetween(filter.getMinPrice()
+                        , filter.getMaxPrice()))
+                .and(ProductSpecifications.ramSpecs(filter));
+        List<ProductDto> productDtos = productsRepository.findAll(specs, pageable).stream().map(this::convertToDto).toList();
+        if(productDtos.isEmpty()) {
+            throw new NotFoundException("Products not found");
+        }
+        return productDtos;
+    }
+
+    public long getTotalRamFiltered(RamFilter filter) {
+        Specification<Product> specs = Specification
+                .where(ProductSpecifications.categoryEquals("ram"))
+                .and(ProductSpecifications.priceBetween(filter.getMinPrice()
+                        , filter.getMaxPrice()))
+                .and(ProductSpecifications.ramSpecs(filter));
+        return productsRepository.count(specs);
+    }
+
+    public List<ProductDto> cpuFilter(Pageable pageable, CpuFilter filter) {
+        Specification<Product> specs = Specification
+                .where(ProductSpecifications.categoryEquals("cpu"))
+                .and(ProductSpecifications.priceBetween(filter.getMinPrice()
+                        , filter.getMaxPrice()))
+                .and(ProductSpecifications.cpuSpecs(filter));
+        List<ProductDto> productDtos = productsRepository.findAll(specs, pageable).stream().map(this::convertToDto).toList();
+        if(productDtos.isEmpty()) {
+            throw new NotFoundException("Products not found");
+        }
+        return productDtos;
+    }
+
+    public long getTotalCpuFiltered(CpuFilter filter) {
+        Specification<Product> specs = Specification
+                .where(ProductSpecifications.categoryEquals("cpu"))
+                .and(ProductSpecifications.priceBetween(filter.getMinPrice()
+                        , filter.getMaxPrice()))
+                .and(ProductSpecifications.cpuSpecs(filter));
+        return productsRepository.count(specs);
+    }
+
+    public List<ProductDto> psuFilter(Pageable pageable, PsuFilter filter) {
+        Specification<Product> specs = Specification
+                .where(ProductSpecifications.categoryEquals("psu"))
+                .and(ProductSpecifications.priceBetween(filter.getMinPrice()
+                        , filter.getMaxPrice()))
+                .and(ProductSpecifications.psuSpecs(filter));
+        List<ProductDto> productDtos = productsRepository.findAll(specs, pageable).stream().map(this::convertToDto).toList();
+        if(productDtos.isEmpty()) {
+            throw new NotFoundException("Products not found");
+        }
+        return productDtos;
+    }
+
+    public long getTotalPsuFiltered(PsuFilter filter) {
+        Specification<Product> specs = Specification
+                .where(ProductSpecifications.categoryEquals("psu"))
+                .and(ProductSpecifications.priceBetween(filter.getMinPrice()
+                        , filter.getMaxPrice()))
+                .and(ProductSpecifications.psuSpecs(filter));
+        return productsRepository.count(specs);
+    }
+
+    public List<ProductDto> hddFilter(Pageable pageable, HddFilter filter) {
+        Specification<Product> specs = Specification
+                .where(ProductSpecifications.categoryEquals("hdd"))
+                .and(ProductSpecifications.priceBetween(filter.getMinPrice()
+                        , filter.getMaxPrice()))
+                .and(ProductSpecifications.hddSpecs(filter));
+        List<ProductDto> productDtos = productsRepository.findAll(specs, pageable).stream().map(this::convertToDto).toList();
+        if(productDtos.isEmpty()) {
+            throw new NotFoundException("Products not found");
+        }
+        return productDtos;
+    }
+
+    public long getTotalHddFiltered(HddFilter filter) {
+        Specification<Product> specs = Specification
+                .where(ProductSpecifications.categoryEquals("hdd"))
+                .and(ProductSpecifications.priceBetween(filter.getMinPrice()
+                        , filter.getMaxPrice()))
+                .and(ProductSpecifications.hddSpecs(filter));
+        return productsRepository.count(specs);
+    }
+
+    public List<ProductDto> ssdFilter(Pageable pageable, SsdFilter filter) {
+        Specification<Product> specs = Specification
+                .where(ProductSpecifications.categoryEquals("ssd"))
+                .and(ProductSpecifications.priceBetween(filter.getMinPrice()
+                        , filter.getMaxPrice()))
+                .and(ProductSpecifications.ssdSpecs(filter));
+        List<ProductDto> productDtos = productsRepository.findAll(specs, pageable).stream().map(this::convertToDto).toList();
+        if(productDtos.isEmpty()) {
+            throw new NotFoundException("Products not found");
+        }
+        return productDtos;
+    }
+
+    public long getTotalSsdFiltered(SsdFilter filter) {
+        Specification<Product> specs = Specification
+                .where(ProductSpecifications.categoryEquals("ssd"))
+                .and(ProductSpecifications.priceBetween(filter.getMinPrice()
+                        , filter.getMaxPrice()))
+                .and(ProductSpecifications.ssdSpecs(filter));
         return productsRepository.count(specs);
     }
 }

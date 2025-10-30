@@ -1,8 +1,6 @@
 package com.myshop.internetshop.classes.controllers;
 
-import com.myshop.internetshop.classes.dto.GpuFilter;
-import com.myshop.internetshop.classes.dto.MotherboardFilter;
-import com.myshop.internetshop.classes.dto.ProductDto;
+import com.myshop.internetshop.classes.dto.*;
 import com.myshop.internetshop.classes.services.ProductsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -89,6 +87,102 @@ public class ProductsController {
         return productsService.motherboardFilter(pageable, filter);
     }
 
+    @GetMapping("/category/pcCase")
+    public List<ProductDto> getPCCases(
+            @RequestParam(required = false) Float minPrice,
+            @RequestParam(required = false) Float maxPrice,
+            @RequestParam(required = false) String motherboard,
+            @RequestParam(required = false) String powerSupply,
+            @RequestParam(required = false, defaultValue = "0") int pageNumber,
+            @RequestParam(required = false, defaultValue = "20") int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        PcCaseFilter filter = new PcCaseFilter(minPrice, maxPrice, motherboard, powerSupply);
+        return productsService.pcCaseFilter(pageable, filter);
+    }
+
+    @GetMapping("/category/ram")
+    public List<ProductDto> getRams(
+            @RequestParam(required = false) Float minPrice,
+            @RequestParam(required = false) Float maxPrice,
+            @RequestParam(required = false) Integer minSize,
+            @RequestParam(required = false) Integer maxSize,
+            @RequestParam(required = false) String ramType,
+            @RequestParam(required = false) String timings,
+            @RequestParam(required = false, defaultValue = "0") int pageNumber,
+            @RequestParam(required = false, defaultValue = "20") int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        RamFilter filter = new RamFilter(minPrice, maxPrice, minSize, maxSize, ramType, timings);
+        return productsService.ramFilter(pageable, filter);
+    }
+
+    @GetMapping("/category/cpu")
+    public List<ProductDto> getCpus (
+            @RequestParam(required = false) Float minPrice,
+            @RequestParam(required = false) Float maxPrice,
+            @RequestParam(required = false) Integer minCores,
+            @RequestParam(required = false) Integer maxCores,
+            @RequestParam(required = false) Integer minThreads,
+            @RequestParam(required = false) Integer maxThreads,
+            @RequestParam(required = false) Integer minTdp,
+            @RequestParam(required = false) Integer maxTdp,
+            @RequestParam(required = false) String socket,
+            @RequestParam(required = false, defaultValue = "0") int pageNumber,
+            @RequestParam(required = false, defaultValue = "20") int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        CpuFilter filter = new CpuFilter(minPrice, maxPrice, minCores, maxCores,
+                minThreads, maxThreads, minTdp, maxTdp, socket);
+        return productsService.cpuFilter(pageable, filter);
+    }
+
+    @GetMapping("/category/psu")
+    public List<ProductDto> getPsus(
+            @RequestParam(required = false) Float minPrice,
+            @RequestParam(required = false) Float maxPrice,
+            @RequestParam(required = false) Integer minWatt,
+            @RequestParam(required = false) Integer maxWatt,
+            @RequestParam(required = false) String size,
+            @RequestParam(required = false) String efficiencyRating,
+            @RequestParam(required = false, defaultValue = "0") int pageNumber,
+            @RequestParam(required = false, defaultValue = "20") int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        PsuFilter filter = new PsuFilter(minPrice, maxPrice, minWatt ,maxWatt, size, efficiencyRating);
+        return productsService.psuFilter(pageable, filter);
+    }
+
+    @GetMapping("category/hdd")
+    public List<ProductDto> getHdds(
+            @RequestParam(required = false) Float minPrice,
+            @RequestParam(required = false) Float maxPrice,
+            @RequestParam(required = false) Integer minSize,
+            @RequestParam(required = false) Integer maxSize,
+            @RequestParam(required = false, defaultValue = "0") int pageNumber,
+            @RequestParam(required = false, defaultValue = "20") int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        HddFilter filter = new HddFilter(minPrice, maxPrice, minSize, maxSize);
+        return productsService.hddFilter(pageable, filter);
+    }
+
+    @GetMapping("/category/ssd")
+    public List<ProductDto> getSsds(
+            @RequestParam(required = false) Float minPrice,
+            @RequestParam(required = false) Float maxPrice,
+            @RequestParam(required = false) Integer minSize,
+            @RequestParam(required = false) Integer maxSize,
+            @RequestParam(required = false) String protocol,
+            @RequestParam(required = false) String formFactor,
+            @RequestParam(required = false, defaultValue = "0") int pageNumber,
+            @RequestParam(required = false, defaultValue = "20") int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        SsdFilter filter = new SsdFilter(minPrice, maxPrice, minSize, maxSize, protocol, formFactor);
+        return productsService.ssdFilter(pageable, filter);
+    }
+
     @Operation(summary = "Get product data by id")
     @GetMapping("/{id}")
     public ProductDto getProductById(@PathVariable("id") int id) {
@@ -166,6 +260,85 @@ public class ProductsController {
         MotherboardFilter filter = new MotherboardFilter(minPrice, maxPrice, socket,
                 chipset, formFactor, memoryType);
         return ResponseEntity.ok(productsService.getTotalMotherboardsFiltered(filter));
+    }
+
+    @Operation(summary = "Get total amount of motherboards")
+    @GetMapping("/categoty/pcCase/amount")
+    public ResponseEntity<Long> getTotalPcCaseFiltered(
+            @RequestParam(required = false) Float minPrice,
+            @RequestParam(required = false) Float maxPrice,
+            @RequestParam(required = false) String motherboard,
+            @RequestParam(required = false) String powerSupply
+    ) {
+        PcCaseFilter filter = new PcCaseFilter(minPrice, maxPrice, motherboard, powerSupply);
+        return ResponseEntity.ok(productsService.getTotalPcCaseFiltered(filter));
+    }
+
+    @GetMapping("/category/ram/amount")
+    public ResponseEntity<Long> getTotalRamsFiltered(
+            @RequestParam(required = false) Float minPrice,
+            @RequestParam(required = false) Float maxPrice,
+            @RequestParam(required = false) Integer minSize,
+            @RequestParam(required = false) Integer maxSize,
+            @RequestParam(required = false) String ramType,
+            @RequestParam(required = false) String timings
+    ) {
+        RamFilter filter = new RamFilter(minPrice, maxPrice, minSize, maxSize, ramType, timings);
+        return ResponseEntity.ok(productsService.getTotalRamFiltered(filter));
+    }
+
+    @GetMapping("/category/cpu/amount")
+    public ResponseEntity<Long> getTotalCpusFiltered (
+            @RequestParam(required = false) Float minPrice,
+            @RequestParam(required = false) Float maxPrice,
+            @RequestParam(required = false) Integer minCores,
+            @RequestParam(required = false) Integer maxCores,
+            @RequestParam(required = false) Integer minThreads,
+            @RequestParam(required = false) Integer maxThreads,
+            @RequestParam(required = false) Integer minTdp,
+            @RequestParam(required = false) Integer maxTdp,
+            @RequestParam(required = false) String socket
+    ) {
+        CpuFilter filter = new CpuFilter(minPrice, maxPrice, minCores, maxCores,
+                minThreads, maxThreads, minTdp, maxTdp, socket);
+        return ResponseEntity.ok(productsService.getTotalCpuFiltered(filter));
+    }
+
+    @GetMapping("/category/psu/amount")
+    public ResponseEntity<Long> getTotalPsuFiltered(
+            @RequestParam(required = false) Float minPrice,
+            @RequestParam(required = false) Float maxPrice,
+            @RequestParam(required = false) Integer minWatt,
+            @RequestParam(required = false) Integer maxWatt,
+            @RequestParam(required = false) String size,
+            @RequestParam(required = false) String efficiencyRating
+    ) {
+        PsuFilter filter = new PsuFilter(minPrice, maxPrice, minWatt, maxWatt, size, efficiencyRating);
+        return ResponseEntity.ok(productsService.getTotalPsuFiltered(filter));
+    }
+
+    @GetMapping("category/hdd/amount")
+    public ResponseEntity<Long> getTotalHddFiltered(
+            @RequestParam(required = false) Float minPrice,
+            @RequestParam(required = false) Float maxPrice,
+            @RequestParam(required = false) Integer minSize,
+            @RequestParam(required = false) Integer maxSize
+    ) {
+        HddFilter filter = new HddFilter(minPrice, maxPrice, minSize, maxSize);
+        return ResponseEntity.ok(productsService.getTotalHddFiltered(filter));
+    }
+
+    @GetMapping("/category/ssd/amount")
+    public ResponseEntity<Long> getTotalSsdFiltered(
+            @RequestParam(required = false) Float minPrice,
+            @RequestParam(required = false) Float maxPrice,
+            @RequestParam(required = false) Integer minSize,
+            @RequestParam(required = false) Integer maxSize,
+            @RequestParam(required = false) String protocol,
+            @RequestParam(required = false) String formFactor
+    ) {
+        SsdFilter filter = new SsdFilter(minPrice, maxPrice, minSize, maxSize, protocol, formFactor);
+        return ResponseEntity.ok(productsService.getTotalSsdFiltered(filter));
     }
 
     @Operation(summary = "Modify a product")

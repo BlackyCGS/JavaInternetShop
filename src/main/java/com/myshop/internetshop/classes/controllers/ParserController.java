@@ -1,8 +1,6 @@
 package com.myshop.internetshop.classes.controllers;
 
-import com.myshop.internetshop.classes.dto.GpuRequest;
-import com.myshop.internetshop.classes.dto.MotherboardRequest;
-import com.myshop.internetshop.classes.dto.ProductDto;
+import com.myshop.internetshop.classes.dto.*;
 import com.myshop.internetshop.classes.services.ParserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,4 +34,41 @@ public class ParserController {
     public List<ProductDto> parseMotherboards(@RequestBody List<MotherboardRequest> motherboards) {
         return parserService.massMotherboardParser(motherboards);
     }
+
+    @Operation(summary = "Parse multiple cases to product")
+    @PostMapping("/case")
+    public List<ProductDto> parseCases(@RequestBody List<CaseRequest> cases) {
+        return parserService.massCaseParser(cases);
+    }
+
+    @Operation(summary = "Parse multiple rams to product")
+    @PostMapping("/ram")
+    public List<ProductDto> parseRam(@RequestBody List<RamRequest> rams) {
+        return parserService.massRamParser(rams);
+    }
+
+    @Operation(summary = "Parse multiple cpus to product")
+    @PostMapping("/cpu")
+    public List<ProductDto> parseCpu(@RequestBody List<CpuRequest> cpus) {
+        return parserService.massCpuParser(cpus);
+    }
+
+    @Operation(summary = "Parse multiple psus to product")
+    @PostMapping("/psu")
+    public List<ProductDto> parsePsu(@RequestBody List<PsuRequest> psus) {
+        return parserService.massPsuParser(psus);
+    }
+
+    @Operation(summary = "Parse multiple hdds to product")
+    @PostMapping("/hdd")
+    public List<ProductDto> parseHdd(@RequestBody List<HddRequest> hdds) {
+        return parserService.massHddParser(hdds);
+    }
+
+    @Operation(summary = "Parse multiple ssds to product")
+    @PostMapping("/ssd")
+    public List<ProductDto> parseSsd(@RequestBody List<SsdRequest> ssds) {
+        return parserService.massSsdParser(ssds);
+    }
+
 }

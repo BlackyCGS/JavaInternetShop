@@ -38,6 +38,48 @@ public class Product {
     @PrimaryKeyJoinColumn
     private Motherboard motherBoard;
 
+    @Getter
+    @Setter
+    @SuppressWarnings("java:S7027")
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @PrimaryKeyJoinColumn
+    private PcCase pcCase;
+
+    @Getter
+    @Setter
+    @SuppressWarnings("java:S7027")
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @PrimaryKeyJoinColumn
+    private Ram ram;
+
+    @Getter
+    @Setter
+    @SuppressWarnings("java:S7027")
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @PrimaryKeyJoinColumn
+    private Cpu cpu;
+
+    @Getter
+    @Setter
+    @SuppressWarnings("java:S7027")
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @PrimaryKeyJoinColumn
+    private Hdd hdd;
+
+    @Getter
+    @Setter
+    @SuppressWarnings("java:S7027")
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @PrimaryKeyJoinColumn
+    private Psu psu;
+
+    @Getter
+    @Setter
+    @SuppressWarnings("java:S7027")
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @PrimaryKeyJoinColumn
+    private Ssd ssd;
+
     @OneToMany(
             mappedBy = "product",
             cascade =
