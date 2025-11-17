@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class OrderService {
@@ -221,6 +222,7 @@ public class OrderService {
         return orderRepository.countByOrderStatus(status);
     }
 
+    @Transactional
     public OrderDto convertCartToOrder(int userId) {
         Optional<Order> cart = orderRepository
                 .findByUserIdAndOrderStatus(userId, OrderStatus.CART.getStatus());
@@ -228,6 +230,10 @@ public class OrderService {
             throw new NotFoundException("There is no such cart.");
         }
         Order order = cart.get();
+        List<OrderProduct> products = order.getProducts();
+        for (OrderProduct product : products) {
+            productsService.decreaseStock(product.getProduct().getId(), product.getQuantity());
+        }
         order.setOrderStatus(OrderStatus.CREATED.getStatus());
         return new OrderDto(orderRepository.save(order));
     }

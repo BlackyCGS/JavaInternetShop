@@ -19,7 +19,7 @@ import {
     Typography, TextField
 } from '@mui/material'
 import CreateProductModal from '../modals/CreateProductModal'
-import EditProductModal from '../modals/UpdateProductModal'
+import UpdateProductModal from '../modals/UpdateProductModal'
 import OrderDetailsModal from '../modals/OrderDetailsModal'
 import {useNavigate} from "react-router-dom";
 
@@ -312,11 +312,10 @@ const AdminTab = () => {
                             onSave={handleCreateProduct}
                         />
                         {selectedProduct && (
-                            <EditProductModal
+                            <UpdateProductModal
                                 open={openEditProduct}
                                 onClose={() => setOpenEditProduct(false)}
-                                //onSubmit={handleEditProduct}
-                                initialData={selectedProduct} product={selectedProduct}
+                                product={selectedProduct}
                                 onSave={function (updatedProduct: Product): void {
                                     handleEditProduct(updatedProduct)
                                 }}                            />

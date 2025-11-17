@@ -1,9 +1,13 @@
 package com.myshop.internetshop.classes.controllers;
 
 import com.myshop.internetshop.classes.dto.*;
+import com.myshop.internetshop.classes.services.JwtService;
 import com.myshop.internetshop.classes.services.ProductsService;
+import com.myshop.internetshop.classes.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,10 +34,15 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Products", description = "Manage products data")
 public class ProductsController {
     private final ProductsService productsService;
+    private final JwtService jwtService;
+    private final UserService userService;
 
     @Autowired
-    public ProductsController(ProductsService productsService) {
+    public ProductsController(ProductsService productsService, JwtService jwtService,
+                              UserService userService) {
         this.productsService = productsService;
+        this.jwtService = jwtService;
+        this.userService = userService;
     }
 
     @Operation(summary = "Get all products")
@@ -45,6 +55,16 @@ public class ProductsController {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         return productsService.getAllProducts(pageable);
     }
+
+    @Operation(summary = "Add stock to products")
+    @PutMapping("/stock/{id}")
+    public ResponseEntity<ProductDto> addStockToProduct(
+            @PathVariable Integer id,
+            @RequestParam Integer quantity
+    ) {
+        return ResponseEntity.ok(productsService.increaseStock(id, quantity));
+    }
+
 
     @Operation(summary = "Get gpus using parameters. If parameter is null, it "
             + "doesnt involved in search")
@@ -263,7 +283,7 @@ public class ProductsController {
     }
 
     @Operation(summary = "Get total amount of motherboards")
-    @GetMapping("/categoty/pcCase/amount")
+    @GetMapping("/category/pcCase/amount")
     public ResponseEntity<Long> getTotalPcCaseFiltered(
             @RequestParam(required = false) Float minPrice,
             @RequestParam(required = false) Float maxPrice,
@@ -356,5 +376,45 @@ public class ProductsController {
     ) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         return ResponseEntity.ok(productsService.searchByName(name, pageable));
+    }
+
+    @PostMapping("review")
+    public ResponseEntity<ProductDto> addReview(
+            @RequestBody ReviewRequest review,
+            @RequestParam int productId,
+            HttpServletRequest request
+    ) {
+        Cookie[] cookies = request.getCookies();
+        String token = null;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("jwt".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                }
+            }
+        }
+        String name = jwtService.extractUsername(token);
+        return ResponseEntity.ok(productsService.addReview(userService.getIdByUsername(name), productId,
+                review));
+    }
+
+    @DeleteMapping("review")
+    @PreAuthorize("hasRole('ADMIN') || #name == authentication.name")
+    public ResponseEntity<String> deleteReview(
+            @RequestParam int id,
+            @RequestParam String name,
+            HttpServletRequest request
+    ) {
+        Cookie[] cookies = request.getCookies();
+        String token = null;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("jwt".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                }
+            }
+        }
+        productsService.deleteReview(userService.getIdByUsername(name), id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

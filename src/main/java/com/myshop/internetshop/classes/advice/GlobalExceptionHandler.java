@@ -1,10 +1,6 @@
 package com.myshop.internetshop.classes.advice;
 
-import com.myshop.internetshop.classes.exceptions.ForbiddenException;
-import com.myshop.internetshop.classes.exceptions.InternalServerErrorException;
-import com.myshop.internetshop.classes.exceptions.InvalidTokenException;
-import com.myshop.internetshop.classes.exceptions.NotFoundException;
-import com.myshop.internetshop.classes.exceptions.ValidationException;
+import com.myshop.internetshop.classes.exceptions.*;
 import io.jsonwebtoken.JwtException;
 
 import java.net.URI;
@@ -18,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -43,6 +40,12 @@ public class GlobalExceptionHandler {
                 errors.put(field.getField(), field.getDefaultMessage())
         );
         return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<String> handleBadRequestException(BadRequestException ex) {
+        logger.info("Bad request caught: {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
@@ -110,5 +113,13 @@ public class GlobalExceptionHandler {
     ) {
         logger.error("Internal server error caught: {}", ex.getMessage());
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<String> handleBadCredentialsException(
+            BadCredentialsException ex
+    ) {
+        logger.info("Bad credentials exception caught: {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 }

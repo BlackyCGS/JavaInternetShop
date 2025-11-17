@@ -82,6 +82,54 @@ const NavBar = () => {
                         >
                             Motherboards
                         </Button>
+                        <Button
+                            component={Link}
+                            to="/cpus"
+                            color="inherit"
+                            sx={{ textTransform: 'none' }}
+                        >
+                            Cpus
+                        </Button>
+                        <Button
+                            component={Link}
+                            to="/psus"
+                            color="inherit"
+                            sx={{ textTransform: 'none' }}
+                        >
+                            Psu
+                        </Button>
+                        <Button
+                            component={Link}
+                            to="/hdds"
+                            color="inherit"
+                            sx={{ textTransform: 'none' }}
+                        >
+                            HDD
+                        </Button>
+                        <Button
+                            component={Link}
+                            to="/ssds"
+                            color="inherit"
+                            sx={{ textTransform: 'none' }}
+                        >
+                            SSD
+                        </Button>
+                        <Button
+                            component={Link}
+                            to="/ram"
+                            color="inherit"
+                            sx={{ textTransform: 'none' }}
+                        >
+                            RAM
+                        </Button>
+                        <Button
+                            component={Link}
+                            to="/pcCases"
+                            color="inherit"
+                            sx={{ textTransform: 'none' }}
+                        >
+                            PcCases
+                        </Button>
                     </Box>
                 </Box>
 

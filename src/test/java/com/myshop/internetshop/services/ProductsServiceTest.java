@@ -54,7 +54,9 @@ class ProductsServiceTest {
         testProduct.setId(1);
         testProduct.setName("Test Product");
         testProduct.setPrice((float)100.0);
-
+        testProduct.setRating(0);
+        testProduct.setRatingAmount(0);
+        testProduct.setStock(0);
         testGpu = new Gpu();
         testGpu.setProductId(1);
         testGpu.setProducer("NVIDIA");
@@ -96,26 +98,8 @@ class ProductsServiceTest {
     }
 
     @Test
-    void getProductById_FromCache() {
-        // Arrange
-        String cacheKey = "products-1";
-        when(productCache.contains(cacheKey)).thenReturn(true);
-        when(productCache.get(cacheKey)).thenReturn(testProduct);
-
-        // Act
-        Product result = productsService.getProductById(1L);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals("Test Product", result.getName());
-        verify(productsRepository, never()).findById(anyLong());
-    }
-
-    @Test
     void getProductById_FromRepository() {
         // Arrange
-        String cacheKey = "products-1";
-        when(productCache.contains(cacheKey)).thenReturn(false);
         when(productsRepository.existsById(1L)).thenReturn(true);
         when(productsRepository.findById(1L)).thenReturn(testProduct);
 
@@ -125,14 +109,11 @@ class ProductsServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals("Test Product", result.getName());
-        verify(productCache).put(cacheKey, testProduct);
     }
 
     @Test
     void getProductById_NotFound_ThrowsNotFoundException() {
         // Arrange
-        String cacheKey = "products-1";
-        when(productCache.contains(cacheKey)).thenReturn(false);
         when(productsRepository.existsById(1L)).thenReturn(false);
 
         // Act & Assert

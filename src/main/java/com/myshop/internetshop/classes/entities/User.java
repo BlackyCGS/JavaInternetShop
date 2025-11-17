@@ -47,6 +47,10 @@ public class User implements UserDetails {
             fetch = FetchType.LAZY)
     private List<Order> orders; // NOSONAR
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true,
+            fetch = FetchType.LAZY)
+    private List<Review> reviews;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + this.permission));

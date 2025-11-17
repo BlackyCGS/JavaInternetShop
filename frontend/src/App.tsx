@@ -14,6 +14,12 @@ import {AuthProvider} from "./hooks/useAuth.tsx";
 import Cart from "./pages/Cart.tsx";
 import Register from "./pages/Register.tsx";
 import {CartProvider} from "./hooks/useCart.tsx";
+import CpuList from "./pages/CpuList.tsx";
+import PcCaseList from './pages/PcCaseList.tsx'
+import SsdList from "./pages/SsdList.tsx";
+import PsuList from "./pages/PsuList.tsx";
+import HddList from "./pages/HddList.tsx";
+import RamList from "./pages/RamList.tsx";
 
 
 function App() {
@@ -40,6 +46,12 @@ function App() {
                             <Route path="/orders" element={<Orders />} />
                             <Route path="/motherboards" element={<MotherboardList />} />
                             <Route path="/gpus" element={<GpuList />} />
+                            <Route path="/cpus" element={<CpuList />} />
+                            <Route path="/hdds" element={<HddList />} />
+                            <Route path="/ssds" element={<SsdList />} />
+                            <Route path="/pcCases" element={<PcCaseList />} />
+                            <Route path="/psus" element={<PsuList />} />
+                            <Route path="/ram" element={<RamList />} />
                             <Route path="/products/:id" element={<ProductPage />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/register" element={<Register/>} />

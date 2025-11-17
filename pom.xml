@@ -11,7 +11,7 @@
     </parent>
     <groupId>com.MyShop</groupId>
     <artifactId>InternetShop</artifactId>
-    <version>0.10.0</version>
+    <version>1.0.0</version>
     <name>InternetShop</name>
     <description>InternetShop</description>
     <url/>

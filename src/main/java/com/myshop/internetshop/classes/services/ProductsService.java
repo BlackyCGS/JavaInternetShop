@@ -3,13 +3,17 @@ package com.myshop.internetshop.classes.services;
 import com.myshop.internetshop.classes.cache.Cache;
 import com.myshop.internetshop.classes.dto.*;
 import com.myshop.internetshop.classes.entities.*;
+import com.myshop.internetshop.classes.exceptions.ConflictException;
 import com.myshop.internetshop.classes.exceptions.NotFoundException;
 import com.myshop.internetshop.classes.exceptions.ValidationException;
+import com.myshop.internetshop.classes.exceptions.BadRequestException;
 import com.myshop.internetshop.classes.repositories.ProductsRepository;
+import com.myshop.internetshop.classes.repositories.ReviewRepository;
 import com.myshop.internetshop.classes.specifications.ProductSpecifications;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +26,19 @@ import org.springframework.stereotype.Service;
 public class ProductsService {
     private final Logger logger = LoggerFactory.getLogger(ProductsService.class);
     private final ProductsRepository productsRepository;
+    private final ReviewRepository reviewRepository;
+    private final UserService userService;
     private final Cache<Product> productCache;
     private static final String PRODUCTS_CACHE_NAME = "products-";
 
     @Autowired
     public ProductsService(ProductsRepository productsRepository,
-                           Cache<Product> productCache) {
+                           Cache<Product> productCache, UserService userService,
+                           ReviewRepository reviewRepository) {
         this.productsRepository = productsRepository;
         this.productCache = productCache;
+        this.userService = userService;
+        this.reviewRepository = reviewRepository;
     }
 
     public List<ProductDto> getAllProducts(Pageable pageable) {
@@ -51,10 +60,7 @@ public class ProductsService {
 
     public Product getProductById(long productId) {
         String cacheKey = PRODUCTS_CACHE_NAME + productId;
-        if (productCache.contains(cacheKey)) {
-            logger.info("getProductById return from cache");
-            return productCache.get(cacheKey);
-        }
+
         if (productsRepository.existsById(productId)) {
             Product product = productsRepository.findById(productId);
             productCache.put(cacheKey, product);
@@ -272,16 +278,17 @@ public class ProductsService {
         product.setName(productDto.getName());
         product.setPrice(productDto.getPrice());
         product.setId(productDto.getId());
+        product.setStock(productDto.getStock());
         if (productDto.getGpu() != null) {
             Gpu gpu = productDto.getGpu().toEntity();
             gpu.setProductId(product.getId());
-            product.setGpu(productDto.getGpu().toEntity());
+            product.setGpu(gpu);
             gpu.setProduct(product);
         }
         if (productDto.getMotherboard() != null) {
             Motherboard motherboard = productDto.getMotherboard().toEntity();
             motherboard.setProductId(product.getId());
-            product.setMotherBoard(productDto.getMotherboard().toEntity());
+            product.setMotherBoard(motherboard);
             motherboard.setProduct(product);
         }
         if (productDto.getPcCase() != null) {
@@ -321,7 +328,11 @@ public class ProductsService {
             ssd.setProduct(product);
         }
         if (productsRepository.existsById((long) productDto.getId())) {
-        productsRepository.save(product);
+            Product tmp = productsRepository.findById(productDto.getId());
+            product.setReviews(tmp.getReviews());
+            product.setRating(tmp.getRating());
+            product.setRatingAmount(tmp.getRatingAmount());
+            productsRepository.save(product);
         return new ProductDto(product);
         } else {
             throw new NotFoundException("Product with id " + product.getId() + " not found");
@@ -514,5 +525,105 @@ public class ProductsService {
                         , filter.getMaxPrice()))
                 .and(ProductSpecifications.ssdSpecs(filter));
         return productsRepository.count(specs);
+    }
+
+    public float applyRating(int productId, int newRating) {
+        Product product = productsRepository.findById(productId);
+        if(product == null) {
+            throw new NotFoundException("Product not found");
+        }
+        int amount = product.getRatingAmount();
+        float rating = product.getRating();
+        float ratingTmp = rating*amount;
+        ratingTmp += newRating;
+        amount++;
+        rating = ratingTmp / amount;
+        product.setRatingAmount(amount);
+        product.setRating(rating);
+        productsRepository.save(product);
+        return rating;
+    }
+
+    public float removeRating(int productId, int newRating) {
+        Product product = productsRepository.findById(productId);
+        if(product == null) {
+            throw new NotFoundException("Product not found");
+        }
+        int amount = product.getRatingAmount();
+        float rating = product.getRating();
+        float ratingTmp = rating*amount;
+        ratingTmp -= newRating;
+        amount--;
+        if(amount != 0) {
+            rating = ratingTmp / amount;
+        }
+        else {
+            rating = 0;
+        }
+        product.setRatingAmount(amount);
+        product.setRating(rating);
+        productsRepository.save(product);
+        return rating;
+    }
+
+    public ProductDto addReview(int userId, int productId, ReviewRequest reviewRequest) {
+        Product product = productsRepository.findById(productId);
+        if(reviewRepository.existsByProductAndUser(product,
+                userService.findByUserId(userId))) {
+            throw new ConflictException("Review on this product already exists");
+        }
+        if(product == null) {
+            throw new NotFoundException("Product not found");
+        }
+        Review review = new Review();
+        review.setRating(reviewRequest.getRating());
+        review.setTitle(reviewRequest.getTitle());
+        review.setText(reviewRequest.getText());
+        review.setProduct(product);
+        review.setUser(userService.findByUserId(userId));
+        List<Review> reviews = product.getReviews();
+        reviews.add(review);
+        product.setReviews(reviews);
+        this.applyRating(productId, reviewRequest.getRating());
+        product = productsRepository.save(product);
+        return convertToDto(product);
+    }
+
+    public void deleteReview(int userId, int productId) {
+        Product product = productsRepository.findById(productId);
+        if(product == null) {
+            throw new NotFoundException("Product not found");
+        }
+        Review review = reviewRepository.findByProductAndUser(product, userService.findByUserId(userId));
+
+        this.removeRating(productId, review.getRating());
+
+        reviewRepository.delete(review);
+    }
+
+    public ProductDto increaseStock(int productId, int stock) {
+        if (stock <= 0) {
+            throw new BadRequestException("Quantity must be greater than 0");
+        }
+        Product product = productsRepository.findById(productId);
+        if(product == null) {
+            throw new NotFoundException("Product not found");
+        }
+
+        product.setStock(product.getStock() + stock);
+        return new ProductDto(productsRepository.save(product));
+    }
+
+    public Integer decreaseStock(int productId, int stock) {
+        Product product = productsRepository.findById(productId);
+        if(product == null) {
+            throw new NotFoundException("Product not found");
+        }
+
+        if(product.getStock() < stock) {
+            throw new BadRequestException("There is not that many products");
+        }
+        product.setStock(product.getStock() - stock);
+        return productsRepository.save(product).getStock();
     }
 }

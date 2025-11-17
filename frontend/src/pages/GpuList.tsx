@@ -11,8 +11,9 @@ import {
     Grid
 } from '@mui/material'
 import ProductList from '../components/ProductList'
-import {fetchGpuProducts, getTotalGpus} from '../api/ProductsApi'
+import {fetchProductsByCategory, getTotalProductsByCategory} from '../api/ProductsApi'
 import { Product } from '../types/Product.ts'
+import {ProductCategory} from "../types/ProductCategory.ts";
 
 const GpuList = () => {
     const [gpus, setGpus] = useState<Product[]>([])
@@ -60,27 +61,34 @@ const GpuList = () => {
             if (loading) return
             setLoading(true)
 
-            const data = await fetchGpuProducts(
+            const data = await fetchProductsByCategory(
+                ProductCategory.GPU,
                 page,
                 pageSize,
-                minPrice || undefined,
-                maxPrice || undefined,
-                minBoostClock || undefined,
-                maxBoostClock || undefined,
-                minVram || undefined,
-                maxVram || undefined,
-                minTdp || undefined,
-                maxTdp || undefined
-            )
+                {
+                    minPrice: minPrice ?? undefined,
+                    maxPrice: maxPrice ?? undefined,
+                    minBoostClock: minBoostClock ?? undefined,
+                    maxBoostClock: maxBoostClock ?? undefined,
+                    minVram: minVram ?? undefined,
+                    maxVram: maxVram ?? undefined,
+                    minTdp: minTdp ?? undefined,
+                    maxTdp: maxTdp ?? undefined
+                }
+            );
             setGpus(data)
-            const total = await getTotalGpus(minPrice || undefined,
-                maxPrice || undefined,
-                minBoostClock || undefined,
-                maxBoostClock || undefined,
-                minVram || undefined,
-                maxVram || undefined,
-                minTdp || undefined,
-                maxTdp || undefined)
+            const total = await getTotalProductsByCategory(
+                ProductCategory.GPU,
+                {
+                    minPrice: minPrice ?? undefined,
+                    maxPrice: maxPrice ?? undefined,
+                    minBoostClock: minBoostClock ?? undefined,
+                    maxBoostClock: maxBoostClock ?? undefined,
+                    minVram: minVram ?? undefined,
+                    maxVram: maxVram ?? undefined,
+                    minTdp: minTdp ?? undefined,
+                    maxTdp: maxTdp ?? undefined
+        })
             setTotalPages(Math.ceil(total / pageSize))
         } catch (error) {
             console.error('Error loading GPU products:', error)

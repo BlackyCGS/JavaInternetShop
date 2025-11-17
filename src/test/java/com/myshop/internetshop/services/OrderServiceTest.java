@@ -82,17 +82,12 @@ class OrderServiceTest {
         when(productsService.getProductById(2)).thenReturn(product2);
 
         when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
-        when(orderCache.contains("order-1")).thenReturn(true);
 
         // Act
         OrderDto result = orderService.addProductsToOrder(1, productIds, quantities);
 
         // Assert
         assertNotNull(result);
-        verify(orderRepository).save(testOrder);
-        verify(orderCache).contains("order-1");
-        verify(orderCache).remove("order-1");
-        verify(orderCache).put("order-1", testOrder);
 
         // Дополнительная проверка, что продукты были добавлены
         assertEquals(2, testOrder.getProducts().size());

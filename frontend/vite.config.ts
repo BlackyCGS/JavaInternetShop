@@ -16,6 +16,7 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:8080', // Spring порт
         changeOrigin: true,
+
       }
     }
   }

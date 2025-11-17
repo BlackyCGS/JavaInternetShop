@@ -24,6 +24,15 @@ public class Product {
 
     private float price;
 
+    @Column(columnDefinition = "INT DEFAULT 0")
+    private float rating;
+
+    @Column(columnDefinition = "INT DEFAULT 0")
+    private int ratingAmount;
+
+    @Column(columnDefinition = "INT DEFAULT 10")
+    private int stock;
+
     @Getter
     @Setter
     @SuppressWarnings("java:S7027")
@@ -89,6 +98,10 @@ public class Product {
     )
     @JsonIgnore
     private List<OrderProduct> orders;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true,
+            fetch = FetchType.LAZY)
+    private List<Review> reviews;
 
     public Product(int id, String name, int price) {
         this.id = id;

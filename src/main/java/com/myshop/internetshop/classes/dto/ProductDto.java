@@ -2,12 +2,15 @@ package com.myshop.internetshop.classes.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.myshop.internetshop.classes.entities.Product;
+import com.myshop.internetshop.classes.entities.Review;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 @Getter
@@ -38,10 +41,29 @@ public class ProductDto {
 
     private SsdDto ssd;
 
+    private Float rating;
+
+    private Integer ratingAmount;
+
+    private List<ReviewDto> reviews;
+
+    private Integer stock;
+
     public ProductDto(Product product) {
         this.id = product.getId();
         this.name = product.getName();
         this.price = product.getPrice();
+        this.rating = product.getRating();
+        this.ratingAmount = product.getRatingAmount();
+        this.stock = product.getStock();
+
+        if(product.getReviews() != null) {
+            this.reviews = new ArrayList<>();
+            for(Review review : product.getReviews()) {
+                this.reviews.add(new ReviewDto(review));
+            }
+        }
+
         if(product.getGpu() != null) {
             this.gpu = new GpuDto(product.getGpu());
         } else {
@@ -95,6 +117,9 @@ public class ProductDto {
         Product product = new Product();
         product.setName(this.name);
         product.setPrice(this.price);
+        product.setRating(this.rating);
+        product.setRatingAmount(this.ratingAmount);
+        product.setStock(this.stock);
         if(this.getGpu() != null) {
             product.setGpu(this.gpu.toEntity());
             this.gpu.setProductId(null);
