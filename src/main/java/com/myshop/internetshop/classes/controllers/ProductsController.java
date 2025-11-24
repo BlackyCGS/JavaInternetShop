@@ -401,8 +401,7 @@ public class ProductsController {
     @PreAuthorize("hasRole('ADMIN') || #name == authentication.name")
     public ResponseEntity<String> deleteReview(
             @RequestParam int id,
-            @RequestParam String name,
-            HttpServletRequest request
+            @RequestParam String name
     ) {
         productsService.deleteReview(userService.getIdByUsername(name), id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
