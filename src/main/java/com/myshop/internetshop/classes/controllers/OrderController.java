@@ -46,6 +46,7 @@ public class OrderController {
 
     @Operation(summary = "Get order information using order id")
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MERCHANT', 'DELIVERY')")
     public OrderDto getOrderById(@PathVariable int id) {
         return orderService.getOrderById(id);
     }
@@ -74,7 +75,7 @@ public class OrderController {
 
     @Operation(summary = "Change order status")
     @PutMapping("/{id}/changeStatus")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MERCHANT', 'DELIVERY')")
     OrderDto changeStatus(@PathVariable int id, @RequestParam() String status) {
         return orderService.changeStatus(id, status);
     }

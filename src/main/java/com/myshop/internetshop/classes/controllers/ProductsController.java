@@ -58,6 +58,7 @@ public class ProductsController {
 
     @Operation(summary = "Add stock to products")
     @PutMapping("/stock/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MERCHANT')")
     public ResponseEntity<ProductDto> addStockToProduct(
             @PathVariable Integer id,
             @RequestParam Integer quantity
@@ -211,31 +212,28 @@ public class ProductsController {
 
     @Operation(summary = "Add product")
     @PostMapping()
+    @PreAuthorize("hasAnyRole('ADMIN', 'MERCHANT')")
     public ProductDto addProduct(@Valid @RequestBody ProductDto product) {
         return productsService.saveProduct(product);
     }
 
     @Operation(summary = "Add multiple products")
     @PostMapping("/list")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MERCHANT')")
     public List<ProductDto> addProducts(@Valid @RequestBody List<ProductDto> products) {
         return productsService.saveProducts(products);
     }
 
     @Operation(summary = "Clear products cache")
     @PostMapping("/clearCache")
+    @PreAuthorize("hasRole('ADMIN')")
     void clearCache() {
         productsService.clearCache();
     }
 
-    @Operation(summary = "delete all")
-    @DeleteMapping
-    ResponseEntity<String> deleteAllProducts() {
-        productsService.deleteAll();
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
     @Operation(summary = "Delete product by id")
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProduct(@PathVariable("id") long id) {
         productsService.deleteProductById(id);
@@ -363,6 +361,7 @@ public class ProductsController {
 
     @Operation(summary = "Modify a product")
     @PutMapping("/")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MERCHANT')")
     ResponseEntity<ProductDto> updateProduct(@RequestBody ProductDto product) {
         return ResponseEntity.ok(productsService.updateProduct(product));
     }
@@ -405,15 +404,6 @@ public class ProductsController {
             @RequestParam String name,
             HttpServletRequest request
     ) {
-        Cookie[] cookies = request.getCookies();
-        String token = null;
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("jwt".equals(cookie.getName())) {
-                    token = cookie.getValue();
-                }
-            }
-        }
         productsService.deleteReview(userService.getIdByUsername(name), id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
